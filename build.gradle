@@ -1,0 +1,19 @@
+plugins {
+    alias(libs.plugins.fabric.loom)
+}
+
+group = "snownee.pintooltips"
+version = "${libs.versions.minecraft}-fabric-${mod_version}"
+
+archivesBaseName = project.archives_base_name
+
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
+
+dependencies {
+    // To change the versions see the gradle/libs.version.toml
+    minecraft libs.minecraft
+    mappings loom.officialMojangMappings()
+
+    modImplementation libs.fabric.loader
+}
