@@ -15,6 +15,8 @@ loom {
         defaultRefmapName = "${mod_id}.refmap.json"
     }
 
+//    accessWidenerPath = file("src/main/resources/${mod_id}.accesswidener")
+
     runs {
         configureEach {
             property "mixin.debug.export", "true"
@@ -86,12 +88,12 @@ dependencies {
 
 processResources {
     def properties = [
-            version: mod_version,
-            id: mod_id,
-            name: mod_name,
+            version    : mod_version,
+            id         : mod_id,
+            name       : mod_name,
             description: description,
-            source: "https://github.com/Snownee/PinTooltips",
-            minecraft: ">=1.20.1"
+            source     : "https://github.com/Snownee/PinTooltips",
+            minecraft  : ">=1.20.1"
     ]
     filesMatching(["fabric.mod.json", "*.mixins.json"]) {
         expand(properties)

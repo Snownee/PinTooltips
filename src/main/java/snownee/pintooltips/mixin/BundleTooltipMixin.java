@@ -15,7 +15,7 @@ import snownee.pintooltips.PinnableTooltipComponent;
  * Not working since ItemStack has no hashCode
  */
 @Mixin(BundleTooltip.class)
-public class MixinBundleTooltip implements PinnableTooltipComponent {
+public class BundleTooltipMixin implements PinnableTooltipComponent {
 	@Shadow
 	@Final
 	private NonNullList<ItemStack> items;

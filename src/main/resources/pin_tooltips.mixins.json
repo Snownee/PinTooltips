@@ -7,8 +7,9 @@
 	"mixins": [
 	],
 	"client": [
+		"AbstractContainerScreenMixin",
 		"GuiGraphicsAccess",
-		"MixinGuiGraphics",
-		"MixinMouseHandler"
+		"GuiGraphicsMixin",
+		"MouseHandlerMixin"
 	]
 }

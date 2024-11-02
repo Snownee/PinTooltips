@@ -9,10 +9,13 @@ import org.joml.Vector2i;
 import com.google.common.base.Objects;
 
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import net.minecraft.world.item.ItemStack;
+import snownee.pintooltips.duck.PTContainerScreen;
 
 public record PinnedTooltip(
 		Vector2d position,
@@ -21,7 +24,9 @@ public record PinnedTooltip(
 		@Nullable TooltipComponent tooltipImage,
 		List<ClientTooltipComponent> components,
 		ClientTooltipPositioner positioner,
-		Vector2d offset) {
+		Vector2d offset,
+		ItemStack itemStack,
+		@Nullable DummyHoveredSlot hoveredSlot) {
 
 	private static final int TOOLTIP_PADDING = 4;
 
@@ -33,9 +38,19 @@ public record PinnedTooltip(
 			ClientTooltipPositioner positioner,
 			int screenWidth,
 			int screenHeight,
-			Font font
+			Font font,
+			ItemStack itemStack
 	) {
-		this(position, new Vector2i(), content, tooltipImage, components, positioner, new Vector2d());
+		this(
+				position,
+				new Vector2i(),
+				content,
+				tooltipImage,
+				components,
+				positioner,
+				new Vector2d(),
+				itemStack,
+				itemStack.isEmpty() ? null : new DummyHoveredSlot(itemStack.copy()));
 		offset.set(getPositionerOffset(screenWidth, screenHeight, position.x(), position.y()));
 		updateSize(screenWidth, screenHeight, font);
 	}
@@ -91,5 +106,17 @@ public record PinnedTooltip(
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(content, tooltipImage);
+	}
+
+	public void renderPre(Screen screen) {
+		if (hoveredSlot != null && screen instanceof PTContainerScreen access) {
+			access.pin_tooltips$setDummyHoveredSlot(hoveredSlot);
+		}
+	}
+
+	public void renderPost(Screen screen) {
+		if (hoveredSlot != null && screen instanceof PTContainerScreen access) {
+			access.pin_tooltips$setDummyHoveredSlot(null);
+		}
 	}
 }

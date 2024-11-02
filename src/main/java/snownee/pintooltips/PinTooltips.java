@@ -25,6 +25,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import net.minecraft.world.item.ItemStack;
 import snownee.pintooltips.mixin.GuiGraphicsAccess;
 
 public class PinTooltips implements ClientModInitializer {
@@ -43,7 +44,6 @@ public class PinTooltips implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		var service = PinnedTooltipsService.INSTANCE;
-		var minecraft = Minecraft.getInstance();
 		ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
 			if (PinTooltipsConfig.INSTANCE.get().screenBlacklist().contains(screen.getClass().getName())) {
 				return;
@@ -80,19 +80,21 @@ public class PinTooltips implements ClientModInitializer {
 			});
 
 			ScreenEvents.afterRender(screen).register((ignored, context, mouseX, mouseY, tickDelta) -> {
-				var font = minecraft.font;
+				var font = Minecraft.getInstance().font;
 				for (var tooltip : service.tooltips) {
 					tooltip.updateSize(screen.width, screen.height, font);
+					tooltip.renderPre(screen);
 					((GuiGraphicsAccess) context).callRenderTooltipInternal(
 							font,
 							tooltip.components(),
 							(int) tooltip.position().x(),
 							(int) tooltip.position().y(),
 							tooltip.positioner());
+					tooltip.renderPost(screen);
 				}
 				if (GRAB_KEY.isDown()) {
 					context.drawCenteredString(
-							minecraft.font,
+							Minecraft.getInstance().font,
 							Component.translatable("gui.pin_tooltips.holding_info_" + System.currentTimeMillis() / 3000 % 3),
 							screen.width / 2,
 							4,
@@ -129,7 +131,8 @@ public class PinTooltips implements ClientModInitializer {
 			List<ClientTooltipComponent> components,
 			int mouseX,
 			int mouseY,
-			ClientTooltipPositioner tooltipPositioner) {
+			ClientTooltipPositioner tooltipPositioner,
+			ItemStack itemStack) {
 		var service = PinnedTooltipsService.INSTANCE;
 		if (!GRAB_KEY.isDown() || service.focused != null || service.operating) {
 			return;
@@ -150,7 +153,8 @@ public class PinTooltips implements ClientModInitializer {
 						tooltipPositioner,
 						Minecraft.getInstance().getWindow().getGuiScaledWidth(),
 						Minecraft.getInstance().getWindow().getGuiScaledHeight(),
-						font);
+						font,
+						itemStack);
 		service.tooltips.add(tooltip);
 	}
 }

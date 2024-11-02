@@ -10,12 +10,12 @@ import net.minecraft.client.gui.screens.Screen;
 import snownee.pintooltips.PinTooltips;
 
 @Mixin(MouseHandler.class)
-public class MixinMouseHandler {
+public class MouseHandlerMixin {
 	@ModifyReceiver(
 			method = "method_1602",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;mouseDragged(DDIDD)Z")
 	)
-	private Screen pintooltips$onDrag(
+	private Screen onDrag(
 			final Screen instance,
 			final double mouseX,
 			final double mouseY,
