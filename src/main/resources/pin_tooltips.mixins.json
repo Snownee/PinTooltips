@@ -1,0 +1,14 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "snownee.pintooltips.mixin",
+	"compatibilityLevel": "JAVA_17",
+	"refmap": "pin_tooltips.refmap.json",
+	"mixins": [
+	],
+	"client": [
+		"GuiGraphicsAccess",
+		"MixinGuiGraphics",
+		"MixinMouseHandler"
+	]
+}

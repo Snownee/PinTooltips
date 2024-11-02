@@ -3,9 +3,6 @@
 *.iml
 *.ipr
 
-# CMake
-cmake-build-*/
-
 # Mongo Explorer plugin
 .idea/**/mongoSettings.xml
 
@@ -15,15 +12,8 @@ cmake-build-*/
 # IntelliJ
 out/
 
-# mpeltonen/sbt-idea plugin
-.idea_modules/
+.gradle
+.profileconfig.json
 
-# JIRA plugin
-atlassian-ide-plugin.xml
-
-# Crashlytics plugin (for Android Studio and IntelliJ)
-com_crashlytics_export_strings.xml
-crashlytics.properties
-crashlytics-build.properties
-fabric.properties
-
+run/*
+build
