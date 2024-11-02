@@ -13,6 +13,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
@@ -89,7 +90,21 @@ public class PinTooltips implements ClientModInitializer {
 							(int) tooltip.position().y(),
 							tooltip.positioner());
 				}
+				if (GRAB_KEY.isDown()) {
+					context.drawCenteredString(
+							minecraft.font,
+							Component.translatable("gui.pin_tooltips.holding_info_" + System.currentTimeMillis() / 3000 % 3),
+							screen.width / 2,
+							4,
+							0xAAAAAA);
+				}
 			});
+		});
+
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+			service.tooltips.clear();
+			service.focused = null;
+			service.operating = false;
 		});
 	}
 
