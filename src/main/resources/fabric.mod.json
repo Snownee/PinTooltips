@@ -1,8 +1,8 @@
 {
 	"schemaVersion": 1,
-	"id": "${id}",
+	"id": "pin_tooltips",
 	"version": "${version}",
-	"name": "${name}",
+	"name": "Pin Tooltips",
 	"description": "${description}",
 	"authors": [
 		"Snownee",
@@ -22,6 +22,6 @@
 		]
 	},
 	"mixins": [
-		"${id}.mixins.json"
+		"pin_tooltips.mixins.json"
 	]
 }
