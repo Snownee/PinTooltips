@@ -7,7 +7,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
-import org.joml.Vector2i;
 
 import com.mojang.blaze3d.platform.InputConstants;
 
@@ -83,6 +82,7 @@ public class PinTooltips implements ClientModInitializer {
 			ScreenEvents.afterRender(screen).register((ignored, context, mouseX, mouseY, tickDelta) -> {
 				var font = minecraft.font;
 				for (var tooltip : service.tooltips) {
+					tooltip.updateSize(screen.width, screen.height, font);
 					((GuiGraphicsAccess) context).callRenderTooltipInternal(
 							font,
 							tooltip.components(),
@@ -140,21 +140,17 @@ public class PinTooltips implements ClientModInitializer {
 			pinnableComponents = tooltipLines.stream().map(it -> ClientTooltipComponent.create(it.getVisualOrderText())).toList();
 			tooltipImage = null;
 		}
-		var width = 0;
-		var height = 0;
-		for (var line : pinnableComponents) {
-			width = Math.max(width, line.getWidth(font));
-			height += line.getHeight();
-		}
 
-		service.tooltips.add(new PinnedTooltip(
-				new Vector2d(mouseX, mouseY),
-				new Vector2i(width, height),
-				tooltipLines,
-				tooltipImage,
-				pinnableComponents,
-				tooltipPositioner,
-				Minecraft.getInstance().getWindow().getGuiScaledWidth(),
-				Minecraft.getInstance().getWindow().getGuiScaledHeight()));
+		var tooltip =
+				new PinnedTooltip(
+						new Vector2d(mouseX, mouseY),
+						tooltipLines,
+						tooltipImage,
+						pinnableComponents,
+						tooltipPositioner,
+						Minecraft.getInstance().getWindow().getGuiScaledWidth(),
+						Minecraft.getInstance().getWindow().getGuiScaledHeight(),
+						font);
+		service.tooltips.add(tooltip);
 	}
 }
