@@ -62,13 +62,14 @@ public class PinTooltips implements ClientModInitializer {
 			});
 
 			ScreenMouseEvents.allowMouseClick(screen).register((ignored, mouseX, mouseY, button) -> {
-				if (!GRAB_KEY.isDown()) {
+				PinnedTooltip focused = service.findFocused(mouseX, mouseY);
+				if (focused == null) {
 					return true;
 				}
 				switch (button) {
-					case InputConstants.MOUSE_BUTTON_LEFT -> service.focused = service.findFocused(mouseX, mouseY);
-					case InputConstants.MOUSE_BUTTON_MIDDLE -> service.tooltips.remove(service.findFocused(mouseX, mouseY));
-					case InputConstants.MOUSE_BUTTON_RIGHT -> service.tooltips.clear();
+					case InputConstants.MOUSE_BUTTON_LEFT -> service.focused = focused;
+					case InputConstants.MOUSE_BUTTON_MIDDLE -> service.tooltips.clear();
+					case InputConstants.MOUSE_BUTTON_RIGHT -> service.tooltips.remove(focused);
 				}
 				service.operating = true;
 				return false;
@@ -111,9 +112,6 @@ public class PinTooltips implements ClientModInitializer {
 	}
 
 	public static void onDrag(Screen screen, int button, double mouseX, double mouseY, double deltaX, double deltaY) {
-		if (!GRAB_KEY.isDown()) {
-			return;
-		}
 		var service = PinnedTooltipsService.INSTANCE;
 		var focused = service.focused;
 		if (button == InputConstants.MOUSE_BUTTON_LEFT && focused != null) {
