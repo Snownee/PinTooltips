@@ -4,13 +4,14 @@
 	"package": "snownee.pintooltips.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"refmap": "pin_tooltips.refmap.json",
-	"mixins": [
-	],
 	"client": [
 		"AbstractContainerScreenMixin",
+		"EnchantmentMixin",
 		"GuiGraphicsAccess",
 		"GuiGraphicsMixin",
+		"ItemStackMixin",
 		"MouseHandlerMixin",
+		"PotionUtilsMixin",
 		"ScreenMixin"
 	]
 }
