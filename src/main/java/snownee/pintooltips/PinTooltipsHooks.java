@@ -1,10 +1,6 @@
 package snownee.pintooltips;
 
-import net.minecraft.world.item.ItemStack;
-
 public class PinTooltipsHooks {
-	public static ItemStack renderingItemStack = ItemStack.EMPTY;
-
 	private static final ThreadLocal<Boolean> isGrabbing = new ThreadLocal<>();
 
 	public static void markGrabbing() {

@@ -8,11 +8,12 @@ import org.spongepowered.asm.mixin.injection.At;
 
 import com.llamalad7.mixinextras.injector.ModifyReceiver;
 
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import snownee.pintooltips.PinTooltipsHooks;
 import snownee.pintooltips.duck.PTContainerScreen;
+import snownee.pintooltips.duck.PTGuiGraphics;
 
 @Mixin(value = AbstractContainerScreen.class, priority = 499)
 public class AbstractContainerScreenMixin implements PTContainerScreen {
@@ -40,8 +41,8 @@ public class AbstractContainerScreenMixin implements PTContainerScreen {
 			at = @At(
 					value = "INVOKE",
 					target = "Lnet/minecraft/world/item/ItemStack;getTooltipImage()Ljava/util/Optional;"))
-	private ItemStack pin_tooltips$recordContext(final ItemStack itemStack) {
-		PinTooltipsHooks.renderingItemStack = itemStack;
+	private ItemStack pin_tooltips$recordContext(final ItemStack itemStack, GuiGraphics guiGraphics) {
+		PTGuiGraphics.of(guiGraphics).pin_tooltips$setRenderingItemStack(itemStack);
 		return itemStack;
 	}
 }

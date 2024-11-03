@@ -20,15 +20,17 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import snownee.pintooltips.PinTooltips;
-import snownee.pintooltips.PinTooltipsHooks;
 import snownee.pintooltips.PinnedTooltipsService;
+import snownee.pintooltips.duck.PTGuiGraphics;
 
 @Mixin(value = GuiGraphics.class, priority = 499)
-public class GuiGraphicsMixin {
+public class GuiGraphicsMixin implements PTGuiGraphics {
 	@Unique
 	private List<Component> pin_tooltips$content = null;
 	@Unique
 	private TooltipComponent pin_tooltips$tooltipImage = null;
+	@Unique
+	private ItemStack pin_tooltips$renderingItemStack = ItemStack.EMPTY;
 
 	@Inject(
 			method = "renderTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;II)V",
@@ -76,7 +78,7 @@ public class GuiGraphicsMixin {
 
 	@Inject(method = "renderTooltip(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;II)V", at = @At("HEAD"))
 	private void pin_tooltips$renderTooltip$recordContext(Font font, ItemStack itemStack, int mouseX, int mouseY, CallbackInfo ci) {
-		PinTooltipsHooks.renderingItemStack = itemStack;
+		pin_tooltips$setRenderingItemStack(itemStack);
 	}
 
 	@Inject(
@@ -94,7 +96,14 @@ public class GuiGraphicsMixin {
 		if (pin_tooltips$content == null) {
 			return;
 		}
-		PinTooltips.onRenderTooltip(font, pin_tooltips$content, pin_tooltips$tooltipImage, components, mouseX, mouseY);
+		PinTooltips.onRenderTooltip(
+				font,
+				pin_tooltips$content,
+				pin_tooltips$tooltipImage,
+				components,
+				mouseX,
+				mouseY,
+				pin_tooltips$getRenderingItemStack());
 	}
 
 	@WrapMethod(method = "renderTooltipInternal")
@@ -110,6 +119,16 @@ public class GuiGraphicsMixin {
 		}
 		pin_tooltips$content = null;
 		pin_tooltips$tooltipImage = null;
-		PinTooltipsHooks.renderingItemStack = ItemStack.EMPTY;
+		pin_tooltips$setRenderingItemStack(ItemStack.EMPTY);
+	}
+
+	@Override
+	public void pin_tooltips$setRenderingItemStack(ItemStack itemStack) {
+		pin_tooltips$renderingItemStack = itemStack;
+	}
+
+	@Override
+	public ItemStack pin_tooltips$getRenderingItemStack() {
+		return pin_tooltips$renderingItemStack;
 	}
 }

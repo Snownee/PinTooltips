@@ -25,6 +25,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import net.minecraft.world.item.ItemStack;
 import snownee.pintooltips.mixin.pin.GuiGraphicsAccess;
 import snownee.pintooltips.util.SimpleTooltipPositioner;
 
@@ -151,7 +152,8 @@ public class PinTooltips implements ClientModInitializer {
 			@Nullable TooltipComponent tooltipImage,
 			List<ClientTooltipComponent> components,
 			int mouseX,
-			int mouseY) {
+			int mouseY,
+			ItemStack itemStack) {
 		var service = PinnedTooltipsService.INSTANCE;
 		if (grabbingTimer < 0 || service.focused != null || service.operating) {
 			return;
@@ -175,7 +177,7 @@ public class PinTooltips implements ClientModInitializer {
 				Minecraft.getInstance().getWindow().getGuiScaledWidth(),
 				Minecraft.getInstance().getWindow().getGuiScaledHeight(),
 				font,
-				PinTooltipsHooks.renderingItemStack));
+				itemStack));
 	}
 
 	public static boolean isGrabbing() {
