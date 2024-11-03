@@ -3,12 +3,12 @@ package snownee.pintooltips;
 import java.io.File;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
+import org.slf4j.Logger;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.logging.LogUtils;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -30,10 +30,11 @@ import snownee.pintooltips.mixin.GuiGraphicsAccess;
 
 public class PinTooltips implements ClientModInitializer {
 	public static final String ID = "pin_tooltips";
-	public static final Logger LOGGER = LogManager.getLogger();
+	public static final Logger LOGGER = LogUtils.getLogger();
+	public static final ThreadLocal<Boolean> IS_HOLDING_KEY = ThreadLocal.withInitial(() -> false);
 
 	public static final KeyMapping GRAB_KEY = KeyBindingHelper.registerKeyBinding(new KeyMapping(
-			"key." + ID + ".pin",
+			"key.pin_tooltips.pin",
 			InputConstants.Type.KEYSYM,
 			InputConstants.KEY_F8,
 			"key.categories.misc"
@@ -45,7 +46,7 @@ public class PinTooltips implements ClientModInitializer {
 	public void onInitializeClient() {
 		var service = PinnedTooltipsService.INSTANCE;
 		ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
-			if (PinTooltipsConfig.INSTANCE.get().screenBlacklist().contains(screen.getClass().getName())) {
+			if (PinTooltipsConfig.get().screenBlacklist().contains(screen.getClass().getName())) {
 				return;
 			}
 
@@ -160,5 +161,9 @@ public class PinTooltips implements ClientModInitializer {
 						font,
 						itemStack);
 		service.tooltips.add(tooltip);
+	}
+
+	public static boolean isHoldingKey() {
+		return IS_HOLDING_KEY.get();
 	}
 }
