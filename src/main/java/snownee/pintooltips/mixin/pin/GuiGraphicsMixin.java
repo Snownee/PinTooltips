@@ -9,6 +9,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -18,6 +21,7 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import snownee.pintooltips.PinTooltips;
 import snownee.pintooltips.PinTooltipsHooks;
+import snownee.pintooltips.PinnedTooltipsService;
 
 @Mixin(value = GuiGraphics.class, priority = 499)
 public class GuiGraphicsMixin {
@@ -79,7 +83,7 @@ public class GuiGraphicsMixin {
 			method = "renderTooltipInternal",
 			at = @At(value = "INVOKE", ordinal = 0, target = "Ljava/util/List;size()I")
 	)
-	private void pin_tooltips$renderTooltipInternal$onRender(
+	private void pin_tooltips$onRender(
 			final Font font,
 			final List<ClientTooltipComponent> components,
 			final int mouseX,
@@ -91,6 +95,19 @@ public class GuiGraphicsMixin {
 			return;
 		}
 		PinTooltips.onRenderTooltip(font, pin_tooltips$content, pin_tooltips$tooltipImage, components, mouseX, mouseY);
+	}
+
+	@WrapMethod(method = "renderTooltipInternal")
+	private void pin_tooltips$avoidRenderWhenOperating(
+			final Font font,
+			final List<ClientTooltipComponent> components,
+			final int mouseX,
+			final int mouseY,
+			final ClientTooltipPositioner tooltipPositioner,
+			final Operation<Void> original) {
+		if (!PinnedTooltipsService.INSTANCE.operating || pin_tooltips$content == null) {
+			original.call(font, components, mouseX, mouseY, tooltipPositioner);
+		}
 		pin_tooltips$content = null;
 		pin_tooltips$tooltipImage = null;
 		PinTooltipsHooks.renderingItemStack = ItemStack.EMPTY;

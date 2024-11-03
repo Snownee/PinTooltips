@@ -5,13 +5,12 @@
 	"compatibilityLevel": "JAVA_17",
 	"refmap": "pin_tooltips.refmap.json",
 	"client": [
-		"AbstractContainerScreenMixin",
-		"EnchantmentMixin",
-		"GuiGraphicsAccess",
-		"GuiGraphicsMixin",
-		"ItemStackMixin",
-		"MouseHandlerMixin",
-		"PotionUtilsMixin",
-		"ScreenMixin"
+		"interact.EnchantmentMixin",
+		"interact.ItemStackMixin",
+		"interact.PotionUtilsMixin",
+		"pin.AbstractContainerScreenMixin",
+		"pin.GuiGraphicsAccess",
+		"pin.GuiGraphicsMixin",
+		"pin.MouseHandlerMixin"
 	]
 }
