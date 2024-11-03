@@ -33,7 +33,7 @@ public class PinTooltips implements ClientModInitializer {
 	public static final Logger LOGGER = LogManager.getLogger();
 
 	public static final KeyMapping GRAB_KEY = KeyBindingHelper.registerKeyBinding(new KeyMapping(
-			"key." + ID + ".grab",
+			"key." + ID + ".pin",
 			InputConstants.Type.KEYSYM,
 			InputConstants.KEY_F8,
 			"key.categories.misc"

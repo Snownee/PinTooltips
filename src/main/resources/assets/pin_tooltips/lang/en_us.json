@@ -1,4 +1,5 @@
 {
+	"key.pin_tooltips.pin": "Pin Tooltip",
 	"gui.pin_tooltips.hold_grab_to_pin": "Hold %s to pin the incoming tooltips",
 	"gui.pin_tooltips.holding_info_0": "Left click in tooltip and drag to move",
 	"gui.pin_tooltips.holding_info_1": "Middle click/drag on tooltip to unpin",
