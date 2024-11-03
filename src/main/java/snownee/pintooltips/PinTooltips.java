@@ -42,7 +42,6 @@ public class PinTooltips implements ClientModInitializer {
 	));
 
 	public static File configDirectory = FabricLoader.getInstance().getConfigDir().toFile();
-	public static boolean jeed = FabricLoader.getInstance().isModLoaded("jeed");
 
 	@Override
 	public void onInitializeClient() {
