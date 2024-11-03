@@ -73,6 +73,7 @@ public class PinTooltips implements ClientModInitializer {
 						if (focused != null) {
 							service.focused = focused;
 							service.operating = true;
+							service.snapshot = null;
 							return false;
 						}
 					}
@@ -80,12 +81,14 @@ public class PinTooltips implements ClientModInitializer {
 						if (focused != null) {
 							service.tooltips.remove(focused);
 							service.operating = true;
+							service.snapshot = null;
 							return false;
 						}
 					}
 					case InputConstants.MOUSE_BUTTON_RIGHT -> {
 						if (GRAB_KEY.isDown()) {
 							service.tooltips.clear();
+							service.snapshot = null;
 						}
 					}
 				}
