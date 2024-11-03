@@ -14,10 +14,10 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.world.item.ItemStack;
 import snownee.pintooltips.duck.PTContainerScreen;
 import snownee.pintooltips.mixin.interact.ClientTextTooltipAccess;
@@ -110,13 +110,9 @@ public final class PinnedTooltip {
 				SimpleTooltipPositioner.INSTANCE);
 
 		if (isHovering(mouseX, mouseY)) {
-			var relativeX = (int) (mouseX - position().x() + offset.x);
-			var relativeY = (int) (mouseY - position().y() + offset.y);
-			var line = linesPosition.keySet().stream().filter(rect -> rect.contains(relativeX, relativeY)).findFirst().orElse(null);
-			var component = linesPosition.get(line);
-			if (component instanceof ClientTextTooltip textTooltip) {
-				var style = font.getSplitter().componentStyleAtWidth(((ClientTextTooltipAccess) textTooltip).getText(), relativeX);
-				context.pose().translate(0,0,1);
+			var style = getStyleAt(mouseX, mouseY, font);
+			if (style != null) {
+				context.pose().translate(0, 0, 1);
 				context.renderComponentHoverEffect(font, style, mouseX, mouseY);
 			}
 		}
@@ -146,4 +142,15 @@ public final class PinnedTooltip {
 	public List<ClientTooltipComponent> components() {return components;}
 
 	public @Nullable DummyHoveredSlot hoveredSlot() {return hoveredSlot;}
+
+	public @Nullable Style getStyleAt(double mouseX, double mouseY, Font font) {
+		var relativeX = (int) (mouseX - position().x() + offset.x);
+		var relativeY = (int) (mouseY - position().y() + offset.y);
+		var line = linesPosition.keySet().stream().filter(rect -> rect.contains(relativeX, relativeY)).findFirst().orElse(null);
+		var component = linesPosition.get(line);
+		if (component instanceof ClientTextTooltipAccess textTooltip) {
+			return font.getSplitter().componentStyleAtWidth(textTooltip.getText(), relativeX);
+		}
+		return null;
+	}
 }

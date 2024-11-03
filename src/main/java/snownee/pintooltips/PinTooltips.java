@@ -21,8 +21,10 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 
@@ -47,6 +49,9 @@ public class PinTooltips implements ClientModInitializer {
 		var service = PinnedTooltipsService.INSTANCE;
 		ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
 			if (PinTooltipsConfig.get().screenBlacklist().contains(screen.getClass().getName())) {
+				return;
+			}
+			if (PinTooltipsConfig.get().onlyInContainerScreen() && !(screen instanceof AbstractContainerScreen)) {
 				return;
 			}
 
@@ -87,9 +92,15 @@ public class PinTooltips implements ClientModInitializer {
 				return true;
 			});
 
-			ScreenMouseEvents.afterMouseRelease(screen).register((ignored, mouseX, mouseY, button) -> {
-				service.focused = null;
-				service.operating = false;
+			ScreenMouseEvents.afterMouseRelease(screen).register((screen1, mouseX, mouseY, button) -> {
+				PinnedTooltip focused = service.dragging ? null : service.focused;
+				service.clearStates();
+				if (button == InputConstants.MOUSE_BUTTON_LEFT && focused != null) {
+					Style style = focused.getStyleAt(mouseX, mouseY, Minecraft.getInstance().font);
+					if (style != null) {
+						screen1.handleComponentClicked(style);
+					}
+				}
 			});
 
 			ScreenEvents.afterRender(screen).register((screen1, context, mouseX, mouseY, tickDelta) -> {
@@ -114,19 +125,26 @@ public class PinTooltips implements ClientModInitializer {
 			});
 		});
 
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
-			service.tooltips.clear();
-			service.focused = null;
-			service.operating = false;
-		});
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> service.clearStates());
 	}
 
 	public static void onDrag(Screen screen, int button, double mouseX, double mouseY, double deltaX, double deltaY) {
 		var service = PinnedTooltipsService.INSTANCE;
 		var focused = service.focused;
 		if (button == InputConstants.MOUSE_BUTTON_LEFT && focused != null) {
-			var position = focused.position();
-			focused.setPosition(screen.width, screen.height, position.x() + deltaX, position.y() + deltaY);
+			if (!service.dragging) {
+				service.storedDragX += deltaX;
+				service.storedDragY += deltaY;
+				if (Math.abs(service.storedDragX) + Math.abs(service.storedDragY) > 5) {
+					service.dragging = true;
+					deltaX = service.storedDragX;
+					deltaY = service.storedDragY;
+				}
+			}
+			if (service.dragging) {
+				var position = focused.position();
+				focused.setPosition(screen.width, screen.height, position.x() + deltaX, position.y() + deltaY);
+			}
 		} else if (button == InputConstants.MOUSE_BUTTON_MIDDLE) {
 			service.tooltips.remove(service.findHovered(mouseX, mouseY));
 		}

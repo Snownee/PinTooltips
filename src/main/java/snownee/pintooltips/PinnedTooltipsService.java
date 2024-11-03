@@ -11,7 +11,10 @@ public class PinnedTooltipsService {
 
 	public PinnedTooltip focused = null;
 
-	public boolean operating = false;
+	public boolean operating;
+	public boolean dragging;
+	public double storedDragX;
+	public double storedDragY;
 
 	private PinnedTooltipsService() {
 	}
@@ -22,5 +25,13 @@ public class PinnedTooltipsService {
 				.filter(it -> it.isHovering(mouseX, mouseY))
 				.findFirst()
 				.orElse(null);
+	}
+
+	public void clearStates() {
+		focused = null;
+		operating = false;
+		dragging = false;
+		storedDragX = 0;
+		storedDragY = 0;
 	}
 }
