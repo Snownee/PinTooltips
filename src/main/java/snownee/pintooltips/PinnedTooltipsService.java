@@ -2,17 +2,18 @@ package snownee.pintooltips;
 
 import java.util.Set;
 
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet;
 
 public class PinnedTooltipsService {
 	public static final PinnedTooltipsService INSTANCE = new PinnedTooltipsService();
 
-	public final Set<PinnedTooltip> tooltips = new ObjectOpenHashSet<>();
-
+	public final Set<PinnedTooltip> tooltips = new ReferenceLinkedOpenHashSet<>();
 
 	public PinnedTooltip focused = null;
 
 	public boolean operating = false;
+
+	public PinnedTooltip snapshot = null;
 
 	private PinnedTooltipsService() {
 	}

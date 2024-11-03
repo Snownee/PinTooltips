@@ -59,22 +59,37 @@ public class PinTooltips implements ClientModInitializer {
 			ScreenKeyboardEvents.afterKeyRelease(screen).register((ignored, key, scancode, modifiers) -> {
 				if (GRAB_KEY.matches(key, scancode)) {
 					GRAB_KEY.setDown(false);
+					if (service.snapshot != null) {
+						service.tooltips.add(service.snapshot);
+						service.snapshot = null;
+					}
 				}
 			});
 
 			ScreenMouseEvents.allowMouseClick(screen).register((ignored, mouseX, mouseY, button) -> {
 				var focused = service.findFocused(mouseX, mouseY);
 				switch (button) {
-					case InputConstants.MOUSE_BUTTON_LEFT -> service.focused = focused;
-					case InputConstants.MOUSE_BUTTON_MIDDLE -> service.tooltips.remove(focused);
+					case InputConstants.MOUSE_BUTTON_LEFT -> {
+						if (focused != null) {
+							service.focused = focused;
+							service.operating = true;
+							return false;
+						}
+					}
+					case InputConstants.MOUSE_BUTTON_MIDDLE -> {
+						if (focused != null) {
+							service.tooltips.remove(focused);
+							service.operating = true;
+							return false;
+						}
+					}
 					case InputConstants.MOUSE_BUTTON_RIGHT -> {
 						if (GRAB_KEY.isDown()) {
 							service.tooltips.clear();
 						}
 					}
 				}
-				service.operating = true;
-				return false;
+				return true;
 			});
 
 			ScreenMouseEvents.afterMouseRelease(screen).register((ignored, mouseX, mouseY, button) -> {
@@ -84,13 +99,13 @@ public class PinTooltips implements ClientModInitializer {
 
 			ScreenEvents.afterRender(screen).register((ignored, context, mouseX, mouseY, tickDelta) -> {
 				var font = Minecraft.getInstance().font;
-				var zOffset = 0;
+				var zOffset = 1;
 				context.pose().pushPose();
 				for (var tooltip : service.tooltips) {
 					tooltip.updateSize(screen.width, screen.height, font);
 					tooltip.renderPre(screen);
 					context.pose().translate(0, 0, zOffset);
-					zOffset += 80;
+					zOffset += 200;
 					((GuiGraphicsAccess) context).callRenderTooltipInternal(
 							font,
 							tooltip.components(),
@@ -115,6 +130,7 @@ public class PinTooltips implements ClientModInitializer {
 			service.tooltips.clear();
 			service.focused = null;
 			service.operating = false;
+			service.snapshot = null;
 		});
 	}
 
@@ -142,25 +158,18 @@ public class PinTooltips implements ClientModInitializer {
 		if (!GRAB_KEY.isDown() || service.focused != null || service.operating) {
 			return;
 		}
-		var shouldRenderTooltipImage = tooltipImage instanceof PinnableTooltipComponent;
-		var pinnableComponents = components;
-		if (tooltipImage != null && !shouldRenderTooltipImage) {
-			pinnableComponents = tooltipLines.stream().map(it -> ClientTooltipComponent.create(it.getVisualOrderText())).toList();
-			tooltipImage = null;
-		}
 
-		var tooltip =
+		service.snapshot =
 				new PinnedTooltip(
 						new Vector2d(mouseX, mouseY),
 						tooltipLines,
 						tooltipImage,
-						pinnableComponents,
+						components,
 						tooltipPositioner,
 						Minecraft.getInstance().getWindow().getGuiScaledWidth(),
 						Minecraft.getInstance().getWindow().getGuiScaledHeight(),
 						font,
 						itemStack);
-		service.tooltips.add(tooltip);
 	}
 
 	public static boolean isHoldingKey() {

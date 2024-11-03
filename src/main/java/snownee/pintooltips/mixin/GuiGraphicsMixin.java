@@ -22,9 +22,9 @@ import snownee.pintooltips.duck.PTGuiGraphics;
 @Mixin(value = GuiGraphics.class, priority = 499)
 public class GuiGraphicsMixin implements PTGuiGraphics {
 	@Unique
-	private final ThreadLocal<List<Component>> pin_tooltips$content = new ThreadLocal<>();
+	private List<Component> pin_tooltips$content = null;
 	@Unique
-	private final ThreadLocal<TooltipComponent> pin_tooltips$tooltipImage = new ThreadLocal<>();
+	private TooltipComponent pin_tooltips$tooltipImage = null;
 	@Unique
 	private ItemStack pin_tooltips$itemStack = ItemStack.EMPTY;
 
@@ -32,7 +32,7 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 			method = "renderTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;II)V",
 			at = @At("HEAD")
 	)
-	private void renderTooltip$onRender(
+	private void pin_tooltips$renderTooltip$onRender(
 			final Font font,
 			final List<Component> tooltipLines,
 			final Optional<TooltipComponent> visualTooltipComponent,
@@ -40,43 +40,43 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 			final int mouseY,
 			final CallbackInfo ci
 	) {
-		pin_tooltips$content.set(tooltipLines);
-		pin_tooltips$tooltipImage.set(visualTooltipComponent.orElse(null));
+		pin_tooltips$content = tooltipLines;
+		pin_tooltips$tooltipImage = visualTooltipComponent.orElse(null);
 	}
 
 	@Inject(
 			method = "renderTooltip(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;II)V",
 			at = @At("HEAD")
 	)
-	private void renderTooltip$onRender(
+	private void pin_tooltips$renderTooltip$onRender(
 			final Font font,
 			final Component text,
 			final int mouseX,
 			final int mouseY,
 			final CallbackInfo ci
 	) {
-		pin_tooltips$content.set(List.of(text));
+		pin_tooltips$content = List.of(text);
 	}
 
 	@Inject(
 			method = "renderComponentTooltip",
 			at = @At("HEAD")
 	)
-	private void renderComponentTooltip$onRender(
+	private void pin_tooltips$renderComponentTooltip$onRender(
 			final Font font,
 			final List<Component> tooltipLines,
 			final int mouseX,
 			final int mouseY,
 			final CallbackInfo ci
 	) {
-		pin_tooltips$content.set(tooltipLines);
+		pin_tooltips$content = tooltipLines;
 	}
 
 	@Inject(
 			method = "renderTooltipInternal",
 			at = @At(value = "INVOKE", ordinal = 0, target = "Ljava/util/List;size()I")
 	)
-	private void renderTooltipInternal$onRender(
+	private void pin_tooltips$renderTooltipInternal$onRender(
 			final Font font,
 			final List<ClientTooltipComponent> components,
 			final int mouseX,
@@ -84,20 +84,20 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 			final ClientTooltipPositioner tooltipPositioner,
 			final CallbackInfo ci
 	) {
-		if (pin_tooltips$content.get() == null) {
+		if (pin_tooltips$content == null) {
 			return;
 		}
 		PinTooltips.onRenderTooltip(
 				font,
-				pin_tooltips$content.get(),
-				pin_tooltips$tooltipImage.get(),
+				pin_tooltips$content,
+				pin_tooltips$tooltipImage,
 				components,
 				mouseX,
 				mouseY,
 				tooltipPositioner,
 				pin_tooltips$itemStack);
-		pin_tooltips$content.remove();
-		pin_tooltips$tooltipImage.remove();
+		pin_tooltips$content = null;
+		pin_tooltips$tooltipImage = null;
 	}
 
 	@Inject(method = "renderTooltip(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;II)V", at = @At("HEAD"))

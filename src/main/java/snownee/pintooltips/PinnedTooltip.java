@@ -6,8 +6,6 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
 import org.joml.Vector2i;
 
-import com.google.common.base.Objects;
-
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -87,25 +85,6 @@ public record PinnedTooltip(
 		var actualY = Math.max(Math.min(y, screenHeight - size.y() + offset.y - TOOLTIP_PADDING), offset.y + TOOLTIP_PADDING);
 		offset.set(getPositionerOffset(screenWidth, screenHeight, actualX, actualY));
 		position.set(actualX, actualY);
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (!(o instanceof PinnedTooltip that)) {
-			return false;
-		}
-		return Objects.equal(content, that.content) && Objects.equal(
-				tooltipImage,
-				that.tooltipImage
-		);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hashCode(content, tooltipImage);
 	}
 
 	public void renderPre(Screen screen) {
