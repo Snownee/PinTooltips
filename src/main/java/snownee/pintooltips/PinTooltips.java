@@ -34,7 +34,7 @@ public class PinTooltips implements ClientModInitializer {
 	public static final ThreadLocal<Boolean> IS_HOLDING_KEY = ThreadLocal.withInitial(() -> false);
 
 	public static final KeyMapping GRAB_KEY = KeyBindingHelper.registerKeyBinding(new KeyMapping(
-			"key."+ID+".pin",
+			"key.pin_tooltips.pin",
 			InputConstants.Type.KEYSYM,
 			InputConstants.KEY_F8,
 			"key.categories.misc"
