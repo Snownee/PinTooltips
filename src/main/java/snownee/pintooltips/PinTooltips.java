@@ -62,14 +62,15 @@ public class PinTooltips implements ClientModInitializer {
 			});
 
 			ScreenMouseEvents.allowMouseClick(screen).register((ignored, mouseX, mouseY, button) -> {
-				PinnedTooltip focused = service.findFocused(mouseX, mouseY);
-				if (focused == null) {
-					return true;
-				}
+				var focused = service.findFocused(mouseX, mouseY);
 				switch (button) {
 					case InputConstants.MOUSE_BUTTON_LEFT -> service.focused = focused;
-					case InputConstants.MOUSE_BUTTON_MIDDLE -> service.tooltips.clear();
-					case InputConstants.MOUSE_BUTTON_RIGHT -> service.tooltips.remove(focused);
+					case InputConstants.MOUSE_BUTTON_MIDDLE -> service.tooltips.remove(focused);
+					case InputConstants.MOUSE_BUTTON_RIGHT -> {
+						if (GRAB_KEY.isDown()) {
+							service.tooltips.clear();
+						}
+					}
 				}
 				service.operating = true;
 				return false;
