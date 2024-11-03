@@ -26,6 +26,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
+import snownee.pintooltips.duck.PTContainerScreen;
 import snownee.pintooltips.mixin.pin.GuiGraphicsAccess;
 import snownee.pintooltips.util.SimpleTooltipPositioner;
 
@@ -105,7 +106,10 @@ public class PinTooltips implements ClientModInitializer {
 				context.pose().pushPose();
 				for (var tooltip : service.tooltips) {
 					tooltip.updateSize(screen.width, screen.height, font);
-					tooltip.renderPre(screen);
+					var hasItemStack = tooltip.hoveredSlot() != null && screen instanceof PTContainerScreen;
+					if (hasItemStack) {
+						((PTContainerScreen) screen).pin_tooltips$setDummyHoveredSlot(tooltip.hoveredSlot());
+					}
 					context.pose().translate(0, 0, zOffset);
 					zOffset += 200;
 					((GuiGraphicsAccess) context).callRenderTooltipInternal(
@@ -114,7 +118,9 @@ public class PinTooltips implements ClientModInitializer {
 							(int) tooltip.position().x(),
 							(int) tooltip.position().y(),
 							SimpleTooltipPositioner.INSTANCE);
-					tooltip.renderPost(screen);
+					if (hasItemStack) {
+						((PTContainerScreen) screen).pin_tooltips$dropDummyHoveredSlot();
+					}
 				}
 				context.pose().popPose();
 				if (GRAB_KEY.isDown()) {
@@ -178,6 +184,12 @@ public class PinTooltips implements ClientModInitializer {
 				Minecraft.getInstance().getWindow().getGuiScaledHeight(),
 				font,
 				itemStack));
+	}
+
+	public static void onMove(Screen screen, double mouseX, double mouseY) {
+		var service = PinnedTooltipsService.INSTANCE;
+		var focused = service.findFocused(mouseX, mouseY);
+		focused.renderPost();
 	}
 
 	public static boolean isGrabbing() {

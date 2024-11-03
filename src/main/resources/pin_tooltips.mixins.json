@@ -7,10 +7,10 @@
 	"client": [
 		"interact.EnchantmentMixin",
 		"interact.ItemStackMixin",
+		"interact.MouseHandlerMixin",
 		"interact.PotionUtilsMixin",
 		"pin.AbstractContainerScreenMixin",
 		"pin.GuiGraphicsAccess",
-		"pin.GuiGraphicsMixin",
-		"pin.MouseHandlerMixin"
+		"pin.GuiGraphicsMixin"
 	]
 }

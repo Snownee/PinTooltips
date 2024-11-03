@@ -9,12 +9,10 @@ import org.joml.Vector2d;
 import org.joml.Vector2i;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
-import snownee.pintooltips.duck.PTContainerScreen;
 import snownee.pintooltips.util.DummyHoveredSlot;
 import snownee.pintooltips.util.SimpleTooltipPositioner;
 
@@ -81,17 +79,5 @@ public record PinnedTooltip(
 	public void setPosition(int screenWidth, int screenHeight, double x, double y) {
 		offset.set(getPositionerOffset(screenWidth, screenHeight, x, y));
 		position.set(x, y);
-	}
-
-	public void renderPre(Screen screen) {
-		if (hoveredSlot != null && screen instanceof PTContainerScreen access) {
-			access.pin_tooltips$setDummyHoveredSlot(hoveredSlot);
-		}
-	}
-
-	public void renderPost(Screen screen) {
-		if (hoveredSlot != null && screen instanceof PTContainerScreen access) {
-			access.pin_tooltips$setDummyHoveredSlot(null);
-		}
 	}
 }

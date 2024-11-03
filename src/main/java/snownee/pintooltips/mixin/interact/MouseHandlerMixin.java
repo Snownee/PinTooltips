@@ -1,4 +1,4 @@
-package snownee.pintooltips.mixin.pin;
+package snownee.pintooltips.mixin.interact;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,7 +15,7 @@ public class MouseHandlerMixin {
 			method = "method_1602",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;mouseDragged(DDIDD)Z")
 	)
-	private Screen onDrag(
+	private Screen pin_tooltips$onDrag(
 			final Screen instance,
 			final double mouseX,
 			final double mouseY,
@@ -24,6 +24,18 @@ public class MouseHandlerMixin {
 			final double deltaY
 	) {
 		PinTooltips.onDrag(instance, button, mouseX, mouseY, deltaX, deltaY);
+		return instance;
+	}
+
+
+	@ModifyReceiver(
+			method = "method_16013",
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;mouseMoved(DD)V")
+	)
+	private static Screen pin_tooltips$onMove(
+			final Screen instance, final double mouseX, final double mouseY
+	) {
+		PinTooltips.onMove(instance, mouseX, mouseY);
 		return instance;
 	}
 }

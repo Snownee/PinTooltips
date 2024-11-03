@@ -26,14 +26,16 @@ public class AbstractContainerScreenMixin implements PTContainerScreen {
 
 	@Override
 	public void pin_tooltips$setDummyHoveredSlot(@Nullable Slot slot) {
-		if (slot == null) {
-			if (pin_tooltips$originalHoveredSlot != null) {
-				hoveredSlot = pin_tooltips$originalHoveredSlot;
-			}
-		} else {
+		if (pin_tooltips$originalHoveredSlot == null) {
 			pin_tooltips$originalHoveredSlot = hoveredSlot;
-			hoveredSlot = slot;
 		}
+		hoveredSlot = slot;
+	}
+
+	@Override
+	public void pin_tooltips$dropDummyHoveredSlot() {
+		hoveredSlot = pin_tooltips$originalHoveredSlot;
+		pin_tooltips$originalHoveredSlot = null;
 	}
 
 	@ModifyReceiver(
