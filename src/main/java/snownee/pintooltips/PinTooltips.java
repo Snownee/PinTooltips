@@ -83,9 +83,13 @@ public class PinTooltips implements ClientModInitializer {
 
 			ScreenEvents.afterRender(screen).register((ignored, context, mouseX, mouseY, tickDelta) -> {
 				var font = Minecraft.getInstance().font;
+				var zOffset = 0;
+				context.pose().pushPose();
 				for (var tooltip : service.tooltips) {
 					tooltip.updateSize(screen.width, screen.height, font);
 					tooltip.renderPre(screen);
+					context.pose().translate(0, 0, zOffset);
+					zOffset += 80;
 					((GuiGraphicsAccess) context).callRenderTooltipInternal(
 							font,
 							tooltip.components(),
@@ -94,6 +98,7 @@ public class PinTooltips implements ClientModInitializer {
 							tooltip.positioner());
 					tooltip.renderPost(screen);
 				}
+				context.pose().popPose();
 				if (GRAB_KEY.isDown()) {
 					context.drawCenteredString(
 							Minecraft.getInstance().font,
