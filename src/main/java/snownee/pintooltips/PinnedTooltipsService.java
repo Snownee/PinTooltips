@@ -16,7 +16,7 @@ public class PinnedTooltipsService {
 	private PinnedTooltipsService() {
 	}
 
-	public PinnedTooltip findFocused(double mouseX, double mouseY) {
+	public PinnedTooltip findHovered(double mouseX, double mouseY) {
 		// TODO the order seems wrong
 		return tooltips.stream()
 				.filter(it -> it.isHovering(mouseX, mouseY))

@@ -26,16 +26,4 @@ public class MouseHandlerMixin {
 		PinTooltips.onDrag(instance, button, mouseX, mouseY, deltaX, deltaY);
 		return instance;
 	}
-
-
-	@ModifyReceiver(
-			method = "method_16013",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;mouseMoved(DD)V")
-	)
-	private static Screen pin_tooltips$onMove(
-			final Screen instance, final double mouseX, final double mouseY
-	) {
-		PinTooltips.onMove(instance, mouseX, mouseY);
-		return instance;
-	}
 }
