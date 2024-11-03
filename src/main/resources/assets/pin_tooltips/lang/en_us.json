@@ -1,7 +1,7 @@
 {
 	"key.pin_tooltips.pin": "Pin Tooltip",
 	"gui.pin_tooltips.unpin_hint": "Middle Button to unpin",
-	"gui.pin_tooltips.clear_hint": "%s + Right Button to unpin all",
+	"gui.pin_tooltips.clear_hint": "%s + Middle Button to unpin all",
 	"enchantment.minecraft.protection.desc": "Moderate damage resistance to most sources",
 	"enchantment.minecraft.fire_protection.desc": "High resistance to fire damage and reduced burn time if you're set ablaze",
 	"enchantment.minecraft.feather_falling.desc": "Reduced fall and Ender Pearl damage",

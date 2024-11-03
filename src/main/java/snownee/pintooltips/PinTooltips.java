@@ -7,7 +7,6 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
 import org.slf4j.Logger;
 
-import com.google.common.base.Suppliers;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.logging.LogUtils;
 
@@ -30,8 +29,8 @@ import net.minecraft.world.item.ItemStack;
 public class PinTooltips implements ClientModInitializer {
 	public static final String ID = "pin_tooltips";
 	public static final Logger LOGGER = LogUtils.getLogger();
-
-	private static int grabbingTimer = -1;
+	private static int keyPressedFrames = -1;
+	private static long lastRenderTooltipTime;
 
 	public static final KeyMapping GRAB_KEY = KeyBindingHelper.registerKeyBinding(new KeyMapping(
 			"key.pin_tooltips.pin",
@@ -54,8 +53,8 @@ public class PinTooltips implements ClientModInitializer {
 			ScreenKeyboardEvents.afterKeyPress(screen).register((ignored, key, scancode, modifiers) -> {
 				if (GRAB_KEY.matches(key, scancode)) {
 					GRAB_KEY.setDown(true);
-					if (grabbingTimer < 0) {
-						grabbingTimer = 0;
+					if (keyPressedFrames < 0) {
+						keyPressedFrames = 0;
 					}
 				}
 			});
@@ -63,32 +62,27 @@ public class PinTooltips implements ClientModInitializer {
 			ScreenKeyboardEvents.afterKeyRelease(screen).register((ignored, key, scancode, modifiers) -> {
 				if (GRAB_KEY.matches(key, scancode)) {
 					GRAB_KEY.setDown(false);
-					grabbingTimer = -1;
+					keyPressedFrames = -1;
 				}
 			});
 
 			ScreenMouseEvents.allowMouseClick(screen).register((ignored, mouseX, mouseY, button) -> {
-				var focused = Suppliers.memoize(() -> service.findHovered(mouseX, mouseY));
-				switch (button) {
-					case InputConstants.MOUSE_BUTTON_LEFT -> {
-						if (focused.get() != null) {
-							service.focused = focused.get();
-							service.operating = true;
-							return false;
-						}
+				if (button != InputConstants.MOUSE_BUTTON_LEFT && button != InputConstants.MOUSE_BUTTON_MIDDLE) {
+					return true;
+				}
+				if (button == InputConstants.MOUSE_BUTTON_MIDDLE && GRAB_KEY.isDown()) {
+					service.tooltips.clear();
+					return false;
+				}
+				PinnedTooltip focused = service.findHovered(mouseX, mouseY);
+				if (focused != null) {
+					if (button == InputConstants.MOUSE_BUTTON_LEFT) {
+						service.focused = focused;
+					} else {
+						service.tooltips.remove(focused);
 					}
-					case InputConstants.MOUSE_BUTTON_MIDDLE -> {
-						if (focused.get() != null) {
-							service.tooltips.remove(focused.get());
-							service.operating = true;
-							return false;
-						}
-					}
-					case InputConstants.MOUSE_BUTTON_RIGHT -> {
-						if (GRAB_KEY.isDown()) {
-							service.tooltips.clear();
-						}
-					}
+					service.operating = true;
+					return false;
 				}
 				return true;
 			});
@@ -147,17 +141,19 @@ public class PinTooltips implements ClientModInitializer {
 			int mouseY,
 			ItemStack itemStack) {
 		var service = PinnedTooltipsService.INSTANCE;
-		if (grabbingTimer < 0 || service.focused != null || service.operating) {
+		if (keyPressedFrames < 0 || service.focused != null || service.operating) {
 			return;
 		}
 
-		// Throttle 10 ms
-		if (((System.currentTimeMillis() / 10) & 1) == 0) {
+		// there can be multiple renderTooltip calls in a single frame, so we need to skip some
+		long time = System.currentTimeMillis();
+		if (time - lastRenderTooltipTime < 10) {
 			return;
 		}
+		lastRenderTooltipTime = time;
 
 		// skip the first frame to skip the deferred tooltip
-		if (grabbingTimer++ != 1) {
+		if (keyPressedFrames++ != 1) {
 			return;
 		}
 
@@ -172,6 +168,6 @@ public class PinTooltips implements ClientModInitializer {
 	}
 
 	public static boolean isGrabbing() {
-		return grabbingTimer >= 0;
+		return keyPressedFrames >= 0;
 	}
 }
