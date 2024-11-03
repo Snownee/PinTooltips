@@ -5,6 +5,7 @@
 	"compatibilityLevel": "JAVA_17",
 	"refmap": "pin_tooltips.refmap.json",
 	"client": [
+		"interact.ClientTextTooltipAccess",
 		"interact.EnchantmentMixin",
 		"interact.ItemStackMixin",
 		"interact.MouseHandlerMixin",
