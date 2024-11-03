@@ -22,11 +22,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import snownee.pintooltips.mixin.GuiGraphicsAccess;
+import snownee.pintooltips.util.SimpleTooltipPositioner;
 
 public class PinTooltips implements ClientModInitializer {
 	public static final String ID = "pin_tooltips";
@@ -34,7 +34,7 @@ public class PinTooltips implements ClientModInitializer {
 	public static final ThreadLocal<Boolean> IS_HOLDING_KEY = ThreadLocal.withInitial(() -> false);
 
 	public static final KeyMapping GRAB_KEY = KeyBindingHelper.registerKeyBinding(new KeyMapping(
-			"key.pin_tooltips.pin",
+			"key."+ID+".pin",
 			InputConstants.Type.KEYSYM,
 			InputConstants.KEY_F8,
 			"key.categories.misc"
@@ -114,7 +114,7 @@ public class PinTooltips implements ClientModInitializer {
 							tooltip.components(),
 							(int) tooltip.position().x(),
 							(int) tooltip.position().y(),
-							tooltip.positioner());
+							SimpleTooltipPositioner.INSTANCE);
 					tooltip.renderPost(screen);
 				}
 				context.pose().popPose();
@@ -155,7 +155,6 @@ public class PinTooltips implements ClientModInitializer {
 			List<ClientTooltipComponent> components,
 			int mouseX,
 			int mouseY,
-			ClientTooltipPositioner tooltipPositioner,
 			ItemStack itemStack) {
 		var service = PinnedTooltipsService.INSTANCE;
 		if (!GRAB_KEY.isDown() || service.focused != null || service.operating) {
@@ -168,7 +167,6 @@ public class PinTooltips implements ClientModInitializer {
 						tooltipLines,
 						tooltipImage,
 						components,
-						tooltipPositioner,
 						Minecraft.getInstance().getWindow().getGuiScaledWidth(),
 						Minecraft.getInstance().getWindow().getGuiScaledHeight(),
 						font,

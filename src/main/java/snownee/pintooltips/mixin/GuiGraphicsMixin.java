@@ -94,7 +94,6 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 				components,
 				mouseX,
 				mouseY,
-				tooltipPositioner,
 				pin_tooltips$itemStack);
 		pin_tooltips$content = null;
 		pin_tooltips$tooltipImage = null;

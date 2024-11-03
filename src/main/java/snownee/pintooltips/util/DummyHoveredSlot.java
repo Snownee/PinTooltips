@@ -1,4 +1,4 @@
-package snownee.pintooltips;
+package snownee.pintooltips.util;
 
 import java.util.function.Supplier;
 

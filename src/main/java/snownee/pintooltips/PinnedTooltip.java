@@ -1,5 +1,7 @@
 package snownee.pintooltips;
 
+import static snownee.pintooltips.util.SimpleTooltipPositioner.TOOLTIP_PADDING;
+
 import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
@@ -9,11 +11,12 @@ import org.joml.Vector2i;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import snownee.pintooltips.duck.PTContainerScreen;
+import snownee.pintooltips.util.DummyHoveredSlot;
+import snownee.pintooltips.util.SimpleTooltipPositioner;
 
 public record PinnedTooltip(
 		Vector2d position,
@@ -21,19 +24,15 @@ public record PinnedTooltip(
 		List<Component> content,
 		@Nullable TooltipComponent tooltipImage,
 		List<ClientTooltipComponent> components,
-		ClientTooltipPositioner positioner,
 		Vector2d offset,
 		ItemStack itemStack,
 		@Nullable DummyHoveredSlot hoveredSlot) {
-
-	private static final int TOOLTIP_PADDING = 4;
 
 	public PinnedTooltip(
 			Vector2d position,
 			List<Component> content,
 			@Nullable TooltipComponent tooltipImage,
 			List<ClientTooltipComponent> components,
-			ClientTooltipPositioner positioner,
 			int screenWidth,
 			int screenHeight,
 			Font font,
@@ -45,7 +44,6 @@ public record PinnedTooltip(
 				content,
 				tooltipImage,
 				components,
-				positioner,
 				new Vector2d(),
 				itemStack,
 				itemStack.isEmpty() ? null : new DummyHoveredSlot(itemStack.copy()));
@@ -74,17 +72,15 @@ public record PinnedTooltip(
 	}
 
 	public Vector2d getPositionerOffset(int screenWidth, int screenHeight, double x, double y) {
-		var offset = positioner.positionTooltip(screenWidth, screenHeight, (int) x, (int) y, size.x(), size.y());
+		var offset = SimpleTooltipPositioner.INSTANCE.positionTooltip(screenWidth, screenHeight, (int) x, (int) y, size.x(), size.y());
 		var deltaX = x - offset.x();
 		var deltaY = y - offset.y();
 		return new Vector2d(deltaX, deltaY);
 	}
 
 	public void setPosition(int screenWidth, int screenHeight, double x, double y) {
-		var actualX = Math.max(Math.min(x, screenWidth - size.x() + offset.x - TOOLTIP_PADDING), offset.x + TOOLTIP_PADDING);
-		var actualY = Math.max(Math.min(y, screenHeight - size.y() + offset.y - TOOLTIP_PADDING), offset.y + TOOLTIP_PADDING);
-		offset.set(getPositionerOffset(screenWidth, screenHeight, actualX, actualY));
-		position.set(actualX, actualY);
+		offset.set(getPositionerOffset(screenWidth, screenHeight, x, y));
+		position.set(x, y);
 	}
 
 	public void renderPre(Screen screen) {
