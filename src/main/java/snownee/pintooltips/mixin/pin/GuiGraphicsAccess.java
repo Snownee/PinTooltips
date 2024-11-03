@@ -1,4 +1,4 @@
-package snownee.pintooltips.mixin;
+package snownee.pintooltips.mixin.pin;
 
 import java.util.List;
 

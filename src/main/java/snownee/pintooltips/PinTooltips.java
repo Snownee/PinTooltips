@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
 import org.slf4j.Logger;
 
+import com.google.common.base.Suppliers;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.logging.LogUtils;
 
@@ -24,16 +25,14 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
-import net.minecraft.world.item.ItemStack;
-import snownee.pintooltips.mixin.GuiGraphicsAccess;
+import snownee.pintooltips.mixin.pin.GuiGraphicsAccess;
 import snownee.pintooltips.util.SimpleTooltipPositioner;
 
 public class PinTooltips implements ClientModInitializer {
 	public static final String ID = "pin_tooltips";
 	public static final Logger LOGGER = LogUtils.getLogger();
-	private static final ThreadLocal<Boolean> IS_HOLDING_KEY = ThreadLocal.withInitial(() -> false);
-	private static int keyPressedFrames = -1;
-	private static long lastRenderTooltipTime;
+
+	private static int grabbingTimer = -1;
 
 	public static final KeyMapping GRAB_KEY = KeyBindingHelper.registerKeyBinding(new KeyMapping(
 			"key.pin_tooltips.pin",
@@ -55,8 +54,8 @@ public class PinTooltips implements ClientModInitializer {
 			ScreenKeyboardEvents.afterKeyPress(screen).register((ignored, key, scancode, modifiers) -> {
 				if (GRAB_KEY.matches(key, scancode)) {
 					GRAB_KEY.setDown(true);
-					if (keyPressedFrames < 0) {
-						keyPressedFrames = 0;
+					if (grabbingTimer < 0) {
+						grabbingTimer = 0;
 					}
 				}
 			});
@@ -64,23 +63,23 @@ public class PinTooltips implements ClientModInitializer {
 			ScreenKeyboardEvents.afterKeyRelease(screen).register((ignored, key, scancode, modifiers) -> {
 				if (GRAB_KEY.matches(key, scancode)) {
 					GRAB_KEY.setDown(false);
-					keyPressedFrames = -1;
+					grabbingTimer = -1;
 				}
 			});
 
 			ScreenMouseEvents.allowMouseClick(screen).register((ignored, mouseX, mouseY, button) -> {
-				var focused = service.findFocused(mouseX, mouseY);
+				var focused = Suppliers.memoize(() -> service.findFocused(mouseX, mouseY));
 				switch (button) {
 					case InputConstants.MOUSE_BUTTON_LEFT -> {
-						if (focused != null) {
-							service.focused = focused;
+						if (focused.get() != null) {
+							service.focused = focused.get();
 							service.operating = true;
 							return false;
 						}
 					}
 					case InputConstants.MOUSE_BUTTON_MIDDLE -> {
-						if (focused != null) {
-							service.tooltips.remove(focused);
+						if (focused.get() != null) {
+							service.tooltips.remove(focused.get());
 							service.operating = true;
 							return false;
 						}
@@ -152,21 +151,19 @@ public class PinTooltips implements ClientModInitializer {
 			@Nullable TooltipComponent tooltipImage,
 			List<ClientTooltipComponent> components,
 			int mouseX,
-			int mouseY,
-			ItemStack itemStack) {
+			int mouseY) {
 		var service = PinnedTooltipsService.INSTANCE;
-		if (keyPressedFrames < 0 || service.focused != null || service.operating) {
+		if (grabbingTimer < 0 || service.focused != null || service.operating) {
 			return;
 		}
 
-		long time = System.currentTimeMillis();
-		if (time - lastRenderTooltipTime < 10) {
+		// Throttle 10 ms
+		if (((System.currentTimeMillis() / 10) & 1) == 0) {
 			return;
 		}
-		lastRenderTooltipTime = time;
 
 		// skip the first frame to skip the deferred tooltip
-		if (keyPressedFrames++ != 1) {
+		if (grabbingTimer++ != 1) {
 			return;
 		}
 
@@ -178,20 +175,10 @@ public class PinTooltips implements ClientModInitializer {
 				Minecraft.getInstance().getWindow().getGuiScaledWidth(),
 				Minecraft.getInstance().getWindow().getGuiScaledHeight(),
 				font,
-				itemStack));
+				PinTooltipsHooks.renderingItemStack));
 	}
 
-	public static void getTooltipLinesPre() {
-		if (keyPressedFrames >= 0) {
-			IS_HOLDING_KEY.set(true);
-		}
-	}
-
-	public static void getTooltipLinesPost() {
-		IS_HOLDING_KEY.set(false);
-	}
-
-	public static boolean isHoldingKey() {
-		return IS_HOLDING_KEY.get();
+	public static boolean isGrabbing() {
+		return grabbingTimer >= 0;
 	}
 }

@@ -1,4 +1,4 @@
-package snownee.pintooltips.mixin;
+package snownee.pintooltips.mixin.pin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
