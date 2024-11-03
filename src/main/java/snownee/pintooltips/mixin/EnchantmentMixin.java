@@ -14,7 +14,7 @@ import snownee.pintooltips.util.DefaultDescriptions;
 
 @Mixin(Enchantment.class)
 public class EnchantmentMixin {
-	@Inject(method = "getFullname", at = @At("HEAD"))
+	@Inject(method = "getFullname", at = @At("RETURN"))
 	private void getFullname(int level, CallbackInfoReturnable<Component> cir) {
 		if (PinTooltips.isHoldingKey() && cir.getReturnValue() instanceof MutableComponent component) {
 			Component desc = DefaultDescriptions.forEnchantmentFormatted((Enchantment) (Object) this);

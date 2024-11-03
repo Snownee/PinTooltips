@@ -17,13 +17,11 @@ import snownee.pintooltips.PinTooltips;
 public class ItemStackMixin {
 	@Inject(method = "getTooltipLines", at = @At("HEAD"))
 	private void getTooltipLinesPre(Player player, TooltipFlag isAdvanced, CallbackInfoReturnable<List<Component>> cir) {
-		if (PinTooltips.GRAB_KEY.isDown()) {
-			PinTooltips.IS_HOLDING_KEY.set(true);
-		}
+		PinTooltips.getTooltipLinesPre();
 	}
 
 	@Inject(method = "getTooltipLines", at = @At("RETURN"))
 	private void getTooltipLinesPost(Player player, TooltipFlag isAdvanced, CallbackInfoReturnable<List<Component>> cir) {
-		PinTooltips.IS_HOLDING_KEY.set(false);
+		PinTooltips.getTooltipLinesPost();
 	}
 }

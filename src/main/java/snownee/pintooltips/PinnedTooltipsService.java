@@ -13,8 +13,6 @@ public class PinnedTooltipsService {
 
 	public boolean operating = false;
 
-	public PinnedTooltip snapshot = null;
-
 	private PinnedTooltipsService() {
 	}
 

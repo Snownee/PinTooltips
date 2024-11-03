@@ -31,7 +31,9 @@ import snownee.pintooltips.util.SimpleTooltipPositioner;
 public class PinTooltips implements ClientModInitializer {
 	public static final String ID = "pin_tooltips";
 	public static final Logger LOGGER = LogUtils.getLogger();
-	public static final ThreadLocal<Boolean> IS_HOLDING_KEY = ThreadLocal.withInitial(() -> false);
+	private static final ThreadLocal<Boolean> IS_HOLDING_KEY = ThreadLocal.withInitial(() -> false);
+	private static int keyPressedFrames = -1;
+	private static long lastRenderTooltipTime;
 
 	public static final KeyMapping GRAB_KEY = KeyBindingHelper.registerKeyBinding(new KeyMapping(
 			"key.pin_tooltips.pin",
@@ -53,16 +55,16 @@ public class PinTooltips implements ClientModInitializer {
 			ScreenKeyboardEvents.afterKeyPress(screen).register((ignored, key, scancode, modifiers) -> {
 				if (GRAB_KEY.matches(key, scancode)) {
 					GRAB_KEY.setDown(true);
+					if (keyPressedFrames < 0) {
+						keyPressedFrames = 0;
+					}
 				}
 			});
 
 			ScreenKeyboardEvents.afterKeyRelease(screen).register((ignored, key, scancode, modifiers) -> {
 				if (GRAB_KEY.matches(key, scancode)) {
 					GRAB_KEY.setDown(false);
-					if (service.snapshot != null) {
-						service.tooltips.add(service.snapshot);
-						service.snapshot = null;
-					}
+					keyPressedFrames = -1;
 				}
 			});
 
@@ -73,7 +75,6 @@ public class PinTooltips implements ClientModInitializer {
 						if (focused != null) {
 							service.focused = focused;
 							service.operating = true;
-							service.snapshot = null;
 							return false;
 						}
 					}
@@ -81,14 +82,12 @@ public class PinTooltips implements ClientModInitializer {
 						if (focused != null) {
 							service.tooltips.remove(focused);
 							service.operating = true;
-							service.snapshot = null;
 							return false;
 						}
 					}
 					case InputConstants.MOUSE_BUTTON_RIGHT -> {
 						if (GRAB_KEY.isDown()) {
 							service.tooltips.clear();
-							service.snapshot = null;
 						}
 					}
 				}
@@ -133,7 +132,6 @@ public class PinTooltips implements ClientModInitializer {
 			service.tooltips.clear();
 			service.focused = null;
 			service.operating = false;
-			service.snapshot = null;
 		});
 	}
 
@@ -157,20 +155,40 @@ public class PinTooltips implements ClientModInitializer {
 			int mouseY,
 			ItemStack itemStack) {
 		var service = PinnedTooltipsService.INSTANCE;
-		if (!GRAB_KEY.isDown() || service.focused != null || service.operating) {
+		if (keyPressedFrames < 0 || service.focused != null || service.operating) {
 			return;
 		}
 
-		service.snapshot =
-				new PinnedTooltip(
-						new Vector2d(mouseX, mouseY),
-						tooltipLines,
-						tooltipImage,
-						components,
-						Minecraft.getInstance().getWindow().getGuiScaledWidth(),
-						Minecraft.getInstance().getWindow().getGuiScaledHeight(),
-						font,
-						itemStack);
+		long time = System.currentTimeMillis();
+		if (time - lastRenderTooltipTime < 10) {
+			return;
+		}
+		lastRenderTooltipTime = time;
+
+		// skip the first frame to skip the deferred tooltip
+		if (keyPressedFrames++ != 1) {
+			return;
+		}
+
+		service.tooltips.add(new PinnedTooltip(
+				new Vector2d(mouseX, mouseY),
+				tooltipLines,
+				tooltipImage,
+				components,
+				Minecraft.getInstance().getWindow().getGuiScaledWidth(),
+				Minecraft.getInstance().getWindow().getGuiScaledHeight(),
+				font,
+				itemStack));
+	}
+
+	public static void getTooltipLinesPre() {
+		if (keyPressedFrames >= 0) {
+			IS_HOLDING_KEY.set(true);
+		}
+	}
+
+	public static void getTooltipLinesPost() {
+		IS_HOLDING_KEY.set(false);
 	}
 
 	public static boolean isHoldingKey() {
