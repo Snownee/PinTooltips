@@ -36,11 +36,12 @@ public class PinTooltips implements ClientModInitializer {
 	public static final KeyMapping GRAB_KEY = KeyBindingHelper.registerKeyBinding(new KeyMapping(
 			"key.pin_tooltips.pin",
 			InputConstants.Type.KEYSYM,
-			InputConstants.KEY_F8,
+			InputConstants.KEY_LALT,
 			"key.categories.misc"
 	));
 
 	public static File configDirectory = FabricLoader.getInstance().getConfigDir().toFile();
+	public static boolean jeed = FabricLoader.getInstance().isModLoaded("jeed");
 
 	@Override
 	public void onInitializeClient() {
@@ -97,23 +98,24 @@ public class PinTooltips implements ClientModInitializer {
 				service.operating = false;
 			});
 
-			ScreenEvents.afterRender(screen).register((ignored, context, mouseX, mouseY, tickDelta) -> {
+			ScreenEvents.afterRender(screen).register((screen1, context, mouseX, mouseY, tickDelta) -> {
 				var font = Minecraft.getInstance().font;
 				var zOffset = 1;
 				context.pose().pushPose();
 				for (var tooltip : service.tooltips) {
 					context.pose().translate(0, 0, zOffset);
 					zOffset += 200;
-					tooltip.render(screen, font, context, mouseX, mouseY, tickDelta);
+					tooltip.render(screen1, font, context, mouseX, mouseY, tickDelta);
 				}
 				context.pose().popPose();
-				if (GRAB_KEY.isDown()) {
-					context.drawCenteredString(
-							Minecraft.getInstance().font,
-							Component.translatable("gui.pin_tooltips.holding_info_" + System.currentTimeMillis() / 3000 % 3),
-							screen.width / 2,
-							4,
-							0xAAAAAA);
+				if (service.findHovered(mouseX, mouseY) != null) {
+					Component hint;
+					if (!GRAB_KEY.isUnbound() && System.currentTimeMillis() / 2000 % 2 == 0) {
+						hint = Component.translatable("gui.pin_tooltips.clear_hint", GRAB_KEY.getTranslatedKeyMessage());
+					} else {
+						hint = Component.translatable("gui.pin_tooltips.unpin_hint");
+					}
+					context.drawCenteredString(font, hint, screen1.width / 2, 4, 0xAAAAAA);
 				}
 			});
 		});

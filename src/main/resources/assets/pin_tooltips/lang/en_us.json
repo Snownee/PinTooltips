@@ -1,9 +1,7 @@
 {
 	"key.pin_tooltips.pin": "Pin Tooltip",
-	"gui.pin_tooltips.hold_grab_to_pin": "Hold %s to pin the incoming tooltips",
-	"gui.pin_tooltips.holding_info_0": "Left click in tooltip and drag to move",
-	"gui.pin_tooltips.holding_info_1": "Middle click/drag on tooltip to unpin",
-	"gui.pin_tooltips.holding_info_2": "Right click to clear all the pinned tooltips",
+	"gui.pin_tooltips.unpin_hint": "Middle Button to unpin",
+	"gui.pin_tooltips.clear_hint": "%s + Right Button to unpin all",
 	"enchantment.minecraft.protection.desc": "Moderate damage resistance to most sources",
 	"enchantment.minecraft.fire_protection.desc": "High resistance to fire damage and reduced burn time if you're set ablaze",
 	"enchantment.minecraft.feather_falling.desc": "Reduced fall and Ender Pearl damage",

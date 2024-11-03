@@ -1,7 +1,7 @@
 package snownee.pintooltips;
 
 public class PinTooltipsHooks {
-	private static final ThreadLocal<Boolean> isGrabbing = new ThreadLocal<>();
+	private static final ThreadLocal<Boolean> isGrabbing = ThreadLocal.withInitial(() -> false);
 
 	public static void markGrabbing() {
 		if (PinTooltips.isGrabbing()) {

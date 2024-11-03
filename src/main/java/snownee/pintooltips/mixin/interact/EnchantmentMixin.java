@@ -5,6 +5,7 @@ import org.spongepowered.asm.mixin.injection.At;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
@@ -22,6 +23,8 @@ public class EnchantmentMixin {
 				return null;
 			}
 			component.withStyle($ -> $.withUnderlined(true).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, desc)));
+			// debug only
+			component.withStyle($ -> $.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, desc.getString())));
 		}
 		return original;
 	}
