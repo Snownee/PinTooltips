@@ -22,19 +22,6 @@ public class SimpleTooltipPositioner implements ClientTooltipPositioner {
 			int tooltipWidth,
 			int tooltipHeight
 	) {
-		var pos = new Vector2i(mouseX, mouseY).add(12, -12);
-		if (pos.x < TOOLTIP_PADDING) {
-			pos.x = TOOLTIP_PADDING;
-		}
-		if (pos.y < TOOLTIP_PADDING) {
-			pos.y = TOOLTIP_PADDING;
-		}
-		if (pos.x + tooltipWidth + TOOLTIP_PADDING > screenWidth) {
-			pos.x = screenWidth - tooltipWidth - TOOLTIP_PADDING;
-		}
-		if (pos.y + tooltipHeight + TOOLTIP_PADDING > screenHeight) {
-			pos.y = screenHeight - tooltipHeight - TOOLTIP_PADDING;
-		}
-		return pos;
+		return new Vector2i(mouseX, mouseY).add(12, -12);
 	}
 }
