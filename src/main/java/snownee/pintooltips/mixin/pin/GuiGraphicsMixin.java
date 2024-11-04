@@ -31,7 +31,9 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 	@Unique
 	private ItemStack pin_tooltips$renderingItemStack = ItemStack.EMPTY;
 	@Unique
-	private boolean pin_tooltips$renderingPinnedTooltip = false;
+	private boolean pin_tooltips$renderingPinned = false;
+	@Unique
+	private boolean pin_tooltips$renderingPinnedEvent = false;
 
 	@Inject(method = "renderTooltip(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;II)V", at = @At("HEAD"))
 	private void pin_tooltips$renderTooltip$recordContext(Font font, ItemStack itemStack, int mouseX, int mouseY, CallbackInfo ci) {
@@ -50,7 +52,7 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 			final ClientTooltipPositioner tooltipPositioner,
 			final CallbackInfo ci
 	) {
-		if (pin_tooltips$renderingPinnedTooltip) {
+		if (pin_tooltips$renderingPinned) {
 			return;
 		}
 		PinTooltips.onRenderTooltip(
@@ -73,8 +75,9 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 			final ClientTooltipPositioner tooltipPositioner,
 			final CallbackInfo ci
 	) {
-		if (!pin_tooltips$renderingPinnedTooltip && !PinnedTooltipsService.INSTANCE.tooltips.isEmpty()) {
-			pose.translate(0, 0, PinTooltips.getBaseZOffset());
+		// Render the unpinned tooltip on top of the pinned tooltip
+		if (!pin_tooltips$renderingPinned && !PinnedTooltipsService.INSTANCE.tooltips.isEmpty() || pin_tooltips$renderingPinnedEvent) {
+			pose.translate(0, 0, PinTooltips.getMaxZOffset());
 		}
 	}
 
@@ -86,7 +89,9 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 			final int mouseY,
 			final ClientTooltipPositioner tooltipPositioner,
 			final Operation<Void> original) {
-		original.call(font, components, mouseX, mouseY, tooltipPositioner);
+		if (PinnedTooltipsService.INSTANCE.hovered == null || pin_tooltips$renderingPinned || pin_tooltips$renderingPinnedEvent) {
+			original.call(font, components, mouseX, mouseY, tooltipPositioner);
+		}
 		pin_tooltips$setRenderingItemStack(ItemStack.EMPTY);
 	}
 
@@ -101,7 +106,12 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 	}
 
 	@Override
-	public void pin_tooltips$setRenderingPinnedTooltip(boolean bl) {
-		pin_tooltips$renderingPinnedTooltip = bl;
+	public void pin_tooltips$setRenderingPinned(boolean value) {
+		pin_tooltips$renderingPinned = value;
+	}
+
+	@Override
+	public void pin_tooltips$setRenderingPinnedEvent(boolean value) {
+		pin_tooltips$renderingPinnedEvent = value;
 	}
 }

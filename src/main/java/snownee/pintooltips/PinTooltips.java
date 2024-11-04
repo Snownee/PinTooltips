@@ -44,7 +44,7 @@ public class PinTooltips implements ClientModInitializer {
 
 	public static File configDirectory = FabricLoader.getInstance().getConfigDir().toFile();
 
-	public static int getBaseZOffset() {
+	public static int getMaxZOffset() {
 		return 6000;
 	}
 
@@ -80,13 +80,11 @@ public class PinTooltips implements ClientModInitializer {
 					service.tooltips.clear();
 					return false;
 				}
-				PinnedTooltip focused = service.findHovered(mouseX, mouseY);
+				var focused = service.findHovered(mouseX, mouseY);
 				if (focused != null) {
 					if (button == InputConstants.MOUSE_BUTTON_LEFT) {
 						service.focused = focused;
-						// add to the top
-						service.tooltips.remove(focused);
-						service.tooltips.add(0, focused);
+						service.tooltips.addLast(focused);
 					} else {
 						service.tooltips.remove(focused);
 					}
@@ -107,17 +105,18 @@ public class PinTooltips implements ClientModInitializer {
 			});
 
 			ScreenEvents.afterRender(screen).register((screen1, context, mouseX, mouseY, tickDelta) -> {
-				service.hovered = service.findHovered(mouseX, mouseY);
+				service.hovered = null;
 				var font = Minecraft.getInstance().font;
 				var zOffset = 1;
-				// reversed order
-				for (int i = service.tooltips.size() - 1; i >= 0; i--) {
-					var tooltip = service.tooltips.get(i);
+				for (var tooltip : service.tooltips) {
+					if (tooltip.isHovering(mouseX, mouseY) && service.hovered == null) {
+						service.hovered = tooltip;
+					}
 					context.pose().pushPose();
 					context.pose().translate(0, 0, zOffset);
 					tooltip.render(service, screen1, font, context, mouseX, mouseY);
 					context.pose().popPose();
-					zOffset = Math.min(getBaseZOffset() - 1, zOffset + 400);
+					zOffset = Math.min(getMaxZOffset() - 1, zOffset + 400);
 				}
 				if (service.hovered != null) {
 					Component hint;
@@ -179,7 +178,7 @@ public class PinTooltips implements ClientModInitializer {
 			return;
 		}
 
-		service.tooltips.add(0, new PinnedTooltip(
+		service.tooltips.add(new PinnedTooltip(
 				new Vector2d(mouseX, mouseY),
 				components,
 				Minecraft.getInstance().getWindow().getGuiScaledWidth(),

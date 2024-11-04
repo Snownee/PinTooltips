@@ -83,7 +83,7 @@ public final class PinnedTooltip {
 			width = Math.max(width, componentWidth);
 			height += componentHeight;
 		}
-		if (width != size.x() && height != size.y()) {
+		if (width != size.x() || height != size.y()) {
 			size.set(width, height);
 			offset.set(getPositionerOffset(screenWidth, screenHeight, position.x, position.y));
 		}
@@ -97,20 +97,22 @@ public final class PinnedTooltip {
 			((PTContainerScreen) screen).pin_tooltips$setDummyHoveredSlot(hoveredSlot());
 		}
 
-		PTGuiGraphics.of(context).pin_tooltips$setRenderingPinnedTooltip(true);
+		PTGuiGraphics.of(context).pin_tooltips$setRenderingPinned(true);
 		((GuiGraphicsAccess) context).callRenderTooltipInternal(
 				font,
 				components(),
 				(int) position().x(),
 				(int) position().y(),
 				SimpleTooltipPositioner.INSTANCE);
-		PTGuiGraphics.of(context).pin_tooltips$setRenderingPinnedTooltip(false);
+		PTGuiGraphics.of(context).pin_tooltips$setRenderingPinned(false);
 
 		if (service.hovered == this) {
 			var style = getStyleAt(mouseX, mouseY, font);
 			if (style != null) {
+				PTGuiGraphics.of(context).pin_tooltips$setRenderingPinnedEvent(true);
 				context.pose().translate(0, 0, 1);
 				context.renderComponentHoverEffect(font, style, mouseX, mouseY);
+				PTGuiGraphics.of(context).pin_tooltips$setRenderingPinnedEvent(false);
 			}
 		}
 

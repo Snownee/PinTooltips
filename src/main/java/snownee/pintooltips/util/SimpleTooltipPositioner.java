@@ -11,7 +11,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositione
 @Environment(EnvType.CLIENT)
 public class SimpleTooltipPositioner implements ClientTooltipPositioner {
 	public static final SimpleTooltipPositioner INSTANCE = new SimpleTooltipPositioner();
-	public static final int TOOLTIP_PADDING = 4;
+	public static final int TOOLTIP_PADDING = 3;
 
 	@Override
 	public @NotNull Vector2ic positionTooltip(

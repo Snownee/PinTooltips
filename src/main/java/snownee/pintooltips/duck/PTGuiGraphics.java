@@ -8,7 +8,9 @@ public interface PTGuiGraphics {
 
 	ItemStack pin_tooltips$getRenderingItemStack();
 
-	void pin_tooltips$setRenderingPinnedTooltip(boolean bl);
+	void pin_tooltips$setRenderingPinned(boolean value);
+
+	void pin_tooltips$setRenderingPinnedEvent(boolean value);
 
 	static PTGuiGraphics of(GuiGraphics guiGraphics) {
 		return (PTGuiGraphics) guiGraphics;
