@@ -40,7 +40,6 @@ minecraft {
     }
 }
 
-
 repositories {
     exclusiveContent {
         forRepository {
@@ -105,16 +104,39 @@ dependencies {
 
 processResources {
     def properties = [
-            version        : realVersion,
-            id             : mod_id,
-            name           : mod_name,
-            description    : mod_description,
-            source         : "https://github.com/Snownee/PinTooltips",
-            minecraft      : ">=1.20.1"
+            version    : realVersion,
+            id         : mod_id,
+            name       : mod_name,
+            description: mod_description,
+            source     : "https://github.com/Snownee/PinTooltips",
+            minecraft  : ">=1.20.1"
     ]
     filesMatching(["META-INF/mods.toml", "*.mixins.json", "pack.mcmeta"]) {
         expand(properties)
     }
+}
+
+tasks.jarJar.configure {
+    archiveClassifier = ''
+
+    finalizedBy('reobfJarJar')
+}
+
+jar {
+    archiveClassifier = 'slim'
+
+    manifest {
+        attributes(["Specification-Title"     : mod_id,
+                    "Specification-Version"   : "1", // We are version 1 of ourselves
+                    "Implementation-Title"    : project.name,
+                    "Implementation-Version"  : realVersion,
+                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")])
+    }
+
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+
+    finalizedBy('reobfJar')
 }
 
 unifiedPublishing {
@@ -124,9 +146,9 @@ unifiedPublishing {
         changelog = file("CHANGELOG.md").exists() ? file("CHANGELOG.md").text : "" // Optional, in markdown format
         releaseType = project.release_type // Optional, use "release", "beta" or "alpha"
         gameVersions = [project.minecraft_version]
-        gameLoaders = ["forge"]
+        gameLoaders = ["forge", "neoforge"]
 
-        mainPublication tasks.jar // Declares the publicated jar
+        mainPublication tasks.jarJar // Declares the publicated jar
 
         if (System.getenv("CURSE_TOKEN") != null) {
             curseforge {

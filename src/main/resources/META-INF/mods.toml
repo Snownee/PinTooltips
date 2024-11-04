@@ -10,7 +10,7 @@ version="${version}"
 displayName="Pin Tooltips"
 displayURL="${source}"
 logoFile="logo.png"
-credits="${description}"
+credits=""
 authors="Snownee, SettingDust"
 description='''
 ${description}
