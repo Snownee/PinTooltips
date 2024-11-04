@@ -8,9 +8,9 @@ public class PinnedTooltipsService {
 
 	public final List<PinnedTooltip> tooltips = new ArrayList<>();
 
-	public PinnedTooltip focused = null;
+	public PinnedTooltip focused;
+	public PinnedTooltip hovered;
 
-	public boolean operating;
 	public boolean dragging;
 	public double storedDragX;
 	public double storedDragY;
@@ -19,7 +19,9 @@ public class PinnedTooltipsService {
 	}
 
 	public PinnedTooltip findHovered(double mouseX, double mouseY) {
-		// TODO the order seems wrong
+		if (tooltips.isEmpty()) {
+			return null;
+		}
 		return tooltips.stream()
 				.filter(it -> it.isHovering(mouseX, mouseY))
 				.findFirst()
@@ -28,7 +30,7 @@ public class PinnedTooltipsService {
 
 	public void clearStates() {
 		focused = null;
-		operating = false;
+		hovered = null;
 		dragging = false;
 		storedDragX = 0;
 		storedDragY = 0;

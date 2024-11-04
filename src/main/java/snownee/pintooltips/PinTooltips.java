@@ -90,7 +90,6 @@ public class PinTooltips implements ClientModInitializer {
 					} else {
 						service.tooltips.remove(focused);
 					}
-					service.operating = true;
 					return false;
 				}
 				return true;
@@ -108,6 +107,7 @@ public class PinTooltips implements ClientModInitializer {
 			});
 
 			ScreenEvents.afterRender(screen).register((screen1, context, mouseX, mouseY, tickDelta) -> {
+				service.hovered = service.findHovered(mouseX, mouseY);
 				var font = Minecraft.getInstance().font;
 				var zOffset = 1;
 				// reversed order
@@ -115,11 +115,11 @@ public class PinTooltips implements ClientModInitializer {
 					var tooltip = service.tooltips.get(i);
 					context.pose().pushPose();
 					context.pose().translate(0, 0, zOffset);
-					tooltip.render(screen1, font, context, mouseX, mouseY, tickDelta);
+					tooltip.render(service, screen1, font, context, mouseX, mouseY);
 					context.pose().popPose();
 					zOffset = Math.min(getBaseZOffset() - 1, zOffset + 400);
 				}
-				if (service.findHovered(mouseX, mouseY) != null) {
+				if (service.hovered != null) {
 					Component hint;
 					if (!GRAB_KEY.isUnbound() && System.currentTimeMillis() / 2000 % 2 == 0) {
 						hint = Component.translatable("gui.pin_tooltips.clear_hint", GRAB_KEY.getTranslatedKeyMessage());
@@ -163,7 +163,7 @@ public class PinTooltips implements ClientModInitializer {
 			int mouseY,
 			ItemStack itemStack) {
 		var service = PinnedTooltipsService.INSTANCE;
-		if (keyPressedFrames < 0 || service.focused != null || service.operating) {
+		if (keyPressedFrames < 0 || service.focused != null) {
 			return;
 		}
 

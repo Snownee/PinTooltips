@@ -23,5 +23,13 @@
 	},
 	"mixins": [
 		"pin_tooltips.mixins.json"
-	]
+	],
+	"custom": {
+		"modmenu": {
+			"links": {
+				"modmenu.discord": "https://discord.gg/KzGQW7a",
+				"modmenu.donate": "https://ko-fi.com/snownee"
+			}
+		}
+	}
 }

@@ -89,7 +89,7 @@ public final class PinnedTooltip {
 		}
 	}
 
-	public void render(Screen screen, Font font, GuiGraphics context, int mouseX, int mouseY, float tickDelta) {
+	public void render(PinnedTooltipsService service, Screen screen, Font font, GuiGraphics context, int mouseX, int mouseY) {
 		context.pose().pushPose();
 		updateSize(screen.width, screen.height, font);
 		var inContainer = hoveredSlot() != null && screen instanceof PTContainerScreen;
@@ -106,7 +106,7 @@ public final class PinnedTooltip {
 				SimpleTooltipPositioner.INSTANCE);
 		PTGuiGraphics.of(context).pin_tooltips$setRenderingPinnedTooltip(false);
 
-		if (isHovering(mouseX, mouseY)) {
+		if (service.hovered == this) {
 			var style = getStyleAt(mouseX, mouseY, font);
 			if (style != null) {
 				context.pose().translate(0, 0, 1);
