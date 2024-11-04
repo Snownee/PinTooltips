@@ -9,7 +9,7 @@
 		"SettingDust"
 	],
 	"contact": {
-		"homepage": "${source}",
+		"homepage": "https://www.curseforge.com/minecraft/mc-mods/pin-tooltips",
 		"sources": "${source}",
 		"issues": "${source}/issues"
 	},

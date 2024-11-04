@@ -1,10 +1,11 @@
 plugins {
     alias(libs.plugins.fabric.loom)
+    id "me.shedaniel.unified-publishing" version "0.1.+"
 }
 
 group = "snownee.pintooltips"
-version = "${libs.versions.minecraft.get()}-fabric-${mod_version}"
-
+version = "${libs.versions.minecraft.get()}-Fabric-${mod_version}"
+var realVersion = project.mod_version + '+fabric'
 archivesBaseName = project.archives_base_name
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -90,7 +91,7 @@ dependencies {
 
 processResources {
     def properties = [
-            version    : mod_version,
+            version    : realVersion,
             id         : mod_id,
             name       : mod_name,
             description: description,
@@ -99,5 +100,40 @@ processResources {
     ]
     filesMatching(["fabric.mod.json", "*.mixins.json"]) {
         expand(properties)
+    }
+}
+
+unifiedPublishing {
+    project {
+        displayName = "[Fabric $project.supported_version] $project.mod_version"
+        version = realVersion // Optional, Inferred from project by default
+        changelog = file("CHANGELOG.md").exists() ? file("CHANGELOG.md").text : "" // Optional, in markdown format
+        releaseType = project.release_type // Optional, use "release", "beta" or "alpha"
+        gameVersions = [project.minecraft_version]
+        gameLoaders = ["fabric", "quilt"]
+
+        mainPublication tasks.remapJar // Declares the publicated jar
+
+        if (System.getenv("CURSE_TOKEN") != null) {
+            curseforge {
+                token = System.getenv("CURSE_TOKEN")
+                id = "1131483"
+
+                relations { // Optional, Inferred from the relations above by default
+                    optional "just-enough-effect-descriptions-jeed"
+                }
+            }
+        }
+
+        if (System.getenv("MODRINTH_TOKEN") != null) {
+            modrinth {
+                token = System.getenv("MODRINTH_TOKEN")
+                id = "fFmpgMfg"
+
+                relations { // Optional, Inferred from the relations above by default
+                    optional "just-enough-effect-descriptions-jeed"
+                }
+            }
+        }
     }
 }
