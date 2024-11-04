@@ -1,7 +1,5 @@
 package snownee.pintooltips.mixin.interact;
 
-import java.util.Objects;
-
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -32,8 +30,8 @@ public class ScreenMixin {
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;hasShiftDown()Z"),
 			cancellable = true)
 	private void handleComponentClicked(Style style, CallbackInfoReturnable<Boolean> cir) {
-		ClickEvent clickEvent = Objects.requireNonNull(style.getClickEvent());
-		if (clickEvent.getAction() != ClickEvent.Action.RUN_COMMAND) {
+		ClickEvent clickEvent = style.getClickEvent();
+		if (clickEvent == null || clickEvent.getAction() != ClickEvent.Action.RUN_COMMAND) {
 			return;
 		}
 		String value = clickEvent.getValue();
@@ -45,15 +43,14 @@ public class ScreenMixin {
 			value = value.substring(13);
 			try {
 				MobEffectInstance effectInstance = MobEffectInstance.load(TagParser.parseTag(value));
-				if (effectInstance == null) {
+				if (effectInstance == null || minecraft == null) {
 					return;
 				}
-				Objects.requireNonNull(minecraft);
 				Window window = minecraft.getWindow();
 				double mouseX = minecraft.mouseHandler.xpos() * (double) window.getGuiScaledWidth() / (double) window.getScreenWidth();
 				double mouseY = minecraft.mouseHandler.ypos() * (double) window.getGuiScaledHeight() / (double) window.getScreenHeight();
 				PinTooltipsCompats.clickEffect(effectInstance, mouseX, mouseY, InputConstants.MOUSE_BUTTON_LEFT);
-			} catch (Exception e) {
+			} catch (Throwable e) {
 				PinTooltips.LOGGER.error("Failed to parse action", e);
 			}
 		}

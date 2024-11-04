@@ -17,14 +17,11 @@ import snownee.pintooltips.util.JsonConfig;
 
 public record PinTooltipsConfig(
 		boolean hideMissingDescriptions,
-		boolean onlyInContainerScreen,
 		Set<String> screenBlacklist
 ) {
 	public static final Codec<PinTooltipsConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Codec.BOOL.fieldOf("hideMissingDescriptions")
 					.forGetter(it -> it.hideMissingDescriptions),
-			Codec.BOOL.fieldOf("onlyInContainerScreen")
-					.forGetter(it -> it.onlyInContainerScreen),
 			Codec.STRING.listOf()
 					.<Set<String>>xmap(it -> new ObjectOpenHashSet<>(it), List::copyOf)
 					.fieldOf("screenBlacklist")
@@ -38,7 +35,7 @@ public record PinTooltipsConfig(
 				PinTooltips.configDirectory.toPath().resolve("pin_tooltips.json"),
 				CODEC,
 				DefaultDescriptions::clearCache,
-				() -> new PinTooltipsConfig(true, true, Set.of(
+				() -> new PinTooltipsConfig(true, Set.of(
 						PauseScreen.class.getName(),
 						ChatScreen.class.getName(),
 						GenericDirtMessageScreen.class.getName(),

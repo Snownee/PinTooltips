@@ -21,7 +21,6 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
@@ -50,9 +49,6 @@ public class PinTooltips implements ClientModInitializer {
 		var service = PinnedTooltipsService.INSTANCE;
 		ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
 			if (PinTooltipsConfig.get().screenBlacklist().contains(screen.getClass().getName())) {
-				return;
-			}
-			if (PinTooltipsConfig.get().onlyInContainerScreen() && !(screen instanceof AbstractContainerScreen)) {
 				return;
 			}
 
