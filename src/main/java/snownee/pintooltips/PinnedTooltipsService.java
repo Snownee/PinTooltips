@@ -36,7 +36,6 @@ public class PinnedTooltipsService {
 
 	public void clearStates() {
 		focused = null;
-		hovered = null;
 		dragging = false;
 		storedDragX = 0;
 		storedDragY = 0;
