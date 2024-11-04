@@ -8,7 +8,6 @@
 		"interact.ClientTextTooltipAccess",
 		"interact.EnchantmentMixin",
 		"interact.ItemStackMixin",
-		"interact.MouseHandlerMixin",
 		"interact.PotionUtilsMixin",
 		"interact.ScreenMixin",
 		"pin.AbstractContainerScreenMixin",

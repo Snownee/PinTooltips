@@ -1,22 +1,30 @@
 plugins {
-    alias(libs.plugins.fabric.loom)
+    alias(libs.plugins.forge.gradle)
+    id 'org.spongepowered.mixin' version '0.7-SNAPSHOT'
     id "me.shedaniel.unified-publishing" version "0.1.+"
 }
 
 group = "snownee.pintooltips"
-version = "${libs.versions.minecraft.get()}-Fabric-${mod_version}"
-var realVersion = project.mod_version + '+fabric'
+version = "${libs.versions.minecraft.get()}-Forge-${mod_version}"
+var realVersion = project.mod_version + '+forge'
 archivesBaseName = project.archives_base_name
 
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
-loom {
-    mixin {
-        defaultRefmapName = "${mod_id}.refmap.json"
-    }
+mixin {
+    config("${mod_id}.mixins.json")
+    add("main", "${mod_id}.refmap.json")
+}
 
-//    accessWidenerPath = file("src/main/resources/${mod_id}.accesswidener")
+minecraft {
+    mappings channel: 'official', version: minecraft_version
+
+    copyIdeResources = true //Calls processResources when in dev
+
+    if (file('src/main/resources/META-INF/accesstransformer.cfg').exists()) {
+        accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+    }
 
     runs {
         configureEach {
@@ -25,8 +33,13 @@ loom {
             property "mixin.debug.verbose", "true"
             property "mixin.dumpTargetOnFailure", "true"
         }
+
+        client {
+
+        }
     }
 }
+
 
 repositories {
     exclusiveContent {
@@ -36,6 +49,7 @@ repositories {
                 url = "https://api.modrinth.com/maven"
             }
         }
+        forRepositories(fg.repository)
         filter {
             includeGroup "maven.modrinth"
         }
@@ -53,9 +67,12 @@ repositories {
         url = "https://maven.terraformersmc.com/"
 
         content {
-            includeGroup("com.terraformersmc")
             includeGroup("me.shedaniel.cloth")
         }
+    }
+
+    maven {
+        url "https://maven.su5ed.dev/releases"
     }
 
     maven {
@@ -66,27 +83,24 @@ repositories {
 
 dependencies {
     // To change the versions see the gradle/libs.version.toml
-    minecraft libs.minecraft
-    mappings loom.layered() {
-        officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-1.20.1:${libs.versions.parchmentmc.get()}@zip")
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${libs.versions.forge.get()}"
+
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
+    implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.4.1")) {
+        jarJar.ranged(it, "[${it.version},)")
     }
 
-    modImplementation libs.fabric.loader
-    modApi libs.fabric.api
+    compileOnly libs.forgified.fabric.api
+    runtimeOnly fg.deobf(libs.forgified.fabric.api.get().toString())
 
-    modRuntimeOnly(libs.modmenu)
-    modRuntimeOnly(libs.cloth.config) {
-        exclude(group: "net.fabricmc.fabric-api")
-    }
+    runtimeOnly fg.deobf(libs.cloth.config.get().toString())
 
-    modRuntimeOnly("maven.modrinth:prism-lib:1.0.5-fabric")
-    modRuntimeOnly("maven.modrinth:iceberg:1.1.25-fabric")
-    modRuntimeOnly("maven.modrinth:forge-config-api-port:v8.0.0-1.20.1-Fabric")
-    modRuntimeOnly("maven.modrinth:equipment-compare:1.3.8-fabric,1.20.1")
-    modRuntimeOnly("maven.modrinth:legendary-tooltips:1.4.5-fabric,1.20.1")
-    modImplementation("maven.modrinth:jei:15.20.0.105")
-    modImplementation("maven.modrinth:just-enough-effect-descriptions-jeed:1.20-2.2.2")
+//    runtimeOnly fg.deobf("maven.modrinth:prism-lib:1.0.5-forge")
+//    runtimeOnly fg.deobf("maven.modrinth:iceberg:1.1.25-forge")
+//    runtimeOnly fg.deobf("maven.modrinth:equipment-compare:1.3.7-forge,1.20.1")
+//    runtimeOnly fg.deobf("maven.modrinth:legendary-tooltips:1.4.5-forge,1.20.1")
+    implementation fg.deobf("maven.modrinth:jei:15.20.0.105-forge")
+    implementation fg.deobf("maven.modrinth:just-enough-effect-descriptions-jeed:1.20-2.2.2-forge")
 }
 
 processResources {
@@ -94,25 +108,25 @@ processResources {
             version        : realVersion,
             id             : mod_id,
             name           : mod_name,
-            mod_description: mod_description,
+            description    : mod_description,
             source         : "https://github.com/Snownee/PinTooltips",
             minecraft      : ">=1.20.1"
     ]
-    filesMatching(["fabric.mod.json", "*.mixins.json"]) {
+    filesMatching(["META-INF/mods.toml", "*.mixins.json", "pack.mcmeta"]) {
         expand(properties)
     }
 }
 
 unifiedPublishing {
     project {
-        displayName = "[Fabric $project.supported_version] $project.mod_version"
+        displayName = "[Forge $project.supported_version] $project.mod_version"
         version = realVersion // Optional, Inferred from project by default
         changelog = file("CHANGELOG.md").exists() ? file("CHANGELOG.md").text : "" // Optional, in markdown format
         releaseType = project.release_type // Optional, use "release", "beta" or "alpha"
         gameVersions = [project.minecraft_version]
-        gameLoaders = ["fabric", "quilt"]
+        gameLoaders = ["forge"]
 
-        mainPublication tasks.remapJar // Declares the publicated jar
+        mainPublication tasks.jar // Declares the publicated jar
 
         if (System.getenv("CURSE_TOKEN") != null) {
             curseforge {

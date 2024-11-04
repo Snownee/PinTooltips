@@ -1,0 +1,31 @@
+modLoader="javafml"
+loaderVersion="[46,)"
+
+license="All Rights Reserved"
+issueTrackerURL="${source}/issues"
+
+[[mods]]
+modId="pin_tooltips"
+version="${version}"
+displayName="Pin Tooltips"
+displayURL="${source}"
+logoFile="logo.png"
+credits="${description}"
+authors="Snownee, SettingDust"
+description='''
+${description}
+'''
+
+[[dependencies.pin_tooltips]]
+modId="forge"
+mandatory=true
+versionRange="[46,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.pin_tooltips]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.20,)"
+ordering="NONE"
+side="BOTH"
