@@ -3,7 +3,7 @@
 	"id": "pin_tooltips",
 	"version": "${version}",
 	"name": "Pin Tooltips",
-	"description": "${description}",
+	"description": "${mod_description}",
 	"authors": [
 		"Snownee",
 		"SettingDust"
