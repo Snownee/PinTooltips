@@ -3,7 +3,6 @@ package snownee.pintooltips;
 import java.io.File;
 import java.util.List;
 
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
 import org.slf4j.Logger;
 
@@ -27,7 +26,6 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 
 public class PinTooltips implements ClientModInitializer {
@@ -155,8 +153,6 @@ public class PinTooltips implements ClientModInitializer {
 
 	public static void onRenderTooltip(
 			Font font,
-			List<Component> tooltipLines,
-			@Nullable TooltipComponent tooltipImage,
 			List<ClientTooltipComponent> components,
 			int mouseX,
 			int mouseY,
@@ -180,7 +176,6 @@ public class PinTooltips implements ClientModInitializer {
 
 		service.tooltips.add(new PinnedTooltip(
 				new Vector2d(mouseX, mouseY),
-				tooltipLines,
 				components,
 				Minecraft.getInstance().getWindow().getGuiScaledWidth(),
 				Minecraft.getInstance().getWindow().getGuiScaledHeight(),

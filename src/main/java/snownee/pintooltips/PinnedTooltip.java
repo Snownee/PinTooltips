@@ -16,10 +16,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.renderer.Rect2i;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.item.ItemStack;
 import snownee.pintooltips.duck.PTContainerScreen;
+import snownee.pintooltips.duck.PTGuiGraphics;
 import snownee.pintooltips.mixin.interact.ClientTextTooltipAccess;
 import snownee.pintooltips.mixin.pin.GuiGraphicsAccess;
 import snownee.pintooltips.util.DummyHoveredSlot;
@@ -28,7 +28,6 @@ import snownee.pintooltips.util.SimpleTooltipPositioner;
 public final class PinnedTooltip {
 	private final Vector2d position;
 	private final Vector2i size;
-	private final List<Component> content;
 	private final List<ClientTooltipComponent> components;
 	private final Vector2d offset;
 	private final @Nullable DummyHoveredSlot hoveredSlot;
@@ -37,13 +36,11 @@ public final class PinnedTooltip {
 	public PinnedTooltip(
 			Vector2d position,
 			Vector2i size,
-			List<Component> content,
 			List<ClientTooltipComponent> components,
 			Vector2d offset,
 			@Nullable DummyHoveredSlot hoveredSlot) {
 		this.position = position;
 		this.size = size;
-		this.content = content;
 		this.components = components;
 		this.offset = offset;
 		this.hoveredSlot = hoveredSlot;
@@ -52,7 +49,6 @@ public final class PinnedTooltip {
 
 	public PinnedTooltip(
 			Vector2d position,
-			List<Component> content,
 			List<ClientTooltipComponent> components,
 			int screenWidth,
 			int screenHeight,
@@ -62,7 +58,6 @@ public final class PinnedTooltip {
 		this(
 				position,
 				new Vector2i(),
-				content,
 				components,
 				new Vector2d(),
 				itemStack.isEmpty() ? null : new DummyHoveredSlot(itemStack.copy()));
@@ -102,12 +97,14 @@ public final class PinnedTooltip {
 			((PTContainerScreen) screen).pin_tooltips$setDummyHoveredSlot(hoveredSlot());
 		}
 
+		PTGuiGraphics.of(context).pin_tooltips$setRenderingPinnedTooltip(true);
 		((GuiGraphicsAccess) context).callRenderTooltipInternal(
 				font,
 				components(),
 				(int) position().x(),
 				(int) position().y(),
 				SimpleTooltipPositioner.INSTANCE);
+		PTGuiGraphics.of(context).pin_tooltips$setRenderingPinnedTooltip(false);
 
 		if (isHovering(mouseX, mouseY)) {
 			var style = getStyleAt(mouseX, mouseY, font);
