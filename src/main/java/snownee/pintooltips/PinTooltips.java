@@ -85,7 +85,8 @@ public class PinTooltips implements ClientModInitializer {
 				if (focused != null) {
 					if (button == InputConstants.MOUSE_BUTTON_LEFT) {
 						service.focused = focused;
-						service.tooltips.addLast(focused);
+						service.tooltips.remove(focused);
+						service.tooltips.add(focused);
 					} else {
 						service.tooltips.remove(focused);
 					}

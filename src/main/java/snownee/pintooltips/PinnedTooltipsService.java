@@ -1,11 +1,15 @@
 package snownee.pintooltips;
 
-import java.util.LinkedHashSet;
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
+import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 
 public class PinnedTooltipsService {
 	public static final PinnedTooltipsService INSTANCE = new PinnedTooltipsService();
 
-	public final LinkedHashSet<PinnedTooltip> tooltips = new LinkedHashSet<>();
+	public final List<PinnedTooltip> tooltips = new ReferenceArrayList<>();
 
 	public PinnedTooltip focused;
 	public PinnedTooltip hovered;
@@ -21,7 +25,8 @@ public class PinnedTooltipsService {
 		if (tooltips.isEmpty()) {
 			return null;
 		}
-		for (var tooltip : tooltips.reversed()) {
+
+		for (var tooltip : Lists.reverse(tooltips)) {
 			if (tooltip.isHovering(mouseX, mouseY)) {
 				return tooltip;
 			}
