@@ -95,15 +95,20 @@ public class PinTooltips implements ClientModInitializer {
 				return true;
 			});
 
-			ScreenMouseEvents.afterMouseRelease(screen).register((screen1, mouseX, mouseY, button) -> {
-				PinnedTooltip focused = service.dragging ? null : service.focused;
+			ScreenMouseEvents.allowMouseRelease(screen).register((screen1, mouseX, mouseY, button) -> {
+				var focused = service.focused;
+				var dragging = service.dragging;
 				service.clearStates();
-				if (button == InputConstants.MOUSE_BUTTON_LEFT && focused != null) {
-					Style style = focused.getStyleAt(mouseX, mouseY, Minecraft.getInstance().font);
-					if (style != null) {
-						screen1.handleComponentClicked(style);
+				if (focused != null) {
+					if (button == InputConstants.MOUSE_BUTTON_LEFT && !dragging) {
+						Style style = focused.getStyleAt(mouseX, mouseY, Minecraft.getInstance().font);
+						if (style != null) {
+							screen1.handleComponentClicked(style);
+						}
 					}
+					return false;
 				}
+				return true;
 			});
 
 			ScreenEvents.afterRender(screen).register((screen1, context, mouseX, mouseY, tickDelta) -> {
