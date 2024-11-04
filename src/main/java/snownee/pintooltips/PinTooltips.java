@@ -44,6 +44,10 @@ public class PinTooltips implements ClientModInitializer {
 
 	public static File configDirectory = FabricLoader.getInstance().getConfigDir().toFile();
 
+	public static int getBaseZOffset() {
+		return 6000;
+	}
+
 	@Override
 	public void onInitializeClient() {
 		var service = PinnedTooltipsService.INSTANCE;
@@ -80,6 +84,9 @@ public class PinTooltips implements ClientModInitializer {
 				if (focused != null) {
 					if (button == InputConstants.MOUSE_BUTTON_LEFT) {
 						service.focused = focused;
+						// add to the top
+						service.tooltips.remove(focused);
+						service.tooltips.add(0, focused);
 					} else {
 						service.tooltips.remove(focused);
 					}
@@ -103,13 +110,15 @@ public class PinTooltips implements ClientModInitializer {
 			ScreenEvents.afterRender(screen).register((screen1, context, mouseX, mouseY, tickDelta) -> {
 				var font = Minecraft.getInstance().font;
 				var zOffset = 1;
-				context.pose().pushPose();
-				for (var tooltip : service.tooltips) {
+				// reversed order
+				for (int i = service.tooltips.size() - 1; i >= 0; i--) {
+					var tooltip = service.tooltips.get(i);
+					context.pose().pushPose();
 					context.pose().translate(0, 0, zOffset);
-					zOffset += 200;
 					tooltip.render(screen1, font, context, mouseX, mouseY, tickDelta);
+					context.pose().popPose();
+					zOffset = Math.min(getBaseZOffset() - 1, zOffset + 400);
 				}
-				context.pose().popPose();
 				if (service.findHovered(mouseX, mouseY) != null) {
 					Component hint;
 					if (!GRAB_KEY.isUnbound() && System.currentTimeMillis() / 2000 % 2 == 0) {
@@ -170,7 +179,7 @@ public class PinTooltips implements ClientModInitializer {
 			return;
 		}
 
-		service.tooltips.add(new PinnedTooltip(
+		service.tooltips.add(0, new PinnedTooltip(
 				new Vector2d(mouseX, mouseY),
 				components,
 				Minecraft.getInstance().getWindow().getGuiScaledWidth(),
@@ -180,6 +189,6 @@ public class PinTooltips implements ClientModInitializer {
 	}
 
 	public static boolean isGrabbing() {
-		return keyPressedFrames >= 0;
+		return GRAB_KEY.isDown();
 	}
 }

@@ -2,7 +2,9 @@ package snownee.pintooltips.mixin.pin;
 
 import java.util.List;
 
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -10,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -17,10 +20,14 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.world.item.ItemStack;
 import snownee.pintooltips.PinTooltips;
+import snownee.pintooltips.PinnedTooltipsService;
 import snownee.pintooltips.duck.PTGuiGraphics;
 
 @Mixin(value = GuiGraphics.class, priority = 499)
 public class GuiGraphicsMixin implements PTGuiGraphics {
+	@Shadow
+	@Final
+	private PoseStack pose;
 	@Unique
 	private ItemStack pin_tooltips$renderingItemStack = ItemStack.EMPTY;
 	@Unique
@@ -52,6 +59,23 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 				mouseX,
 				mouseY,
 				pin_tooltips$getRenderingItemStack());
+	}
+
+	@Inject(
+			method = "renderTooltipInternal", at = @At(
+			value = "INVOKE",
+			target = "Lnet/minecraft/client/gui/GuiGraphics;drawManaged(Ljava/lang/Runnable;)V"))
+	private void pin_tooltips$changeZOffset(
+			final Font font,
+			final List<ClientTooltipComponent> components,
+			final int mouseX,
+			final int mouseY,
+			final ClientTooltipPositioner tooltipPositioner,
+			final CallbackInfo ci
+	) {
+		if (!pin_tooltips$renderingPinnedTooltip && !PinnedTooltipsService.INSTANCE.tooltips.isEmpty()) {
+			pose.translate(0, 0, PinTooltips.getBaseZOffset());
+		}
 	}
 
 	@WrapMethod(method = "renderTooltipInternal")
