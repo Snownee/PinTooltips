@@ -62,6 +62,24 @@ repositories {
         name = 'ParchmentMC'
         url = 'https://maven.parchmentmc.org'
     }
+
+    maven {
+        name = "Greenhouse Maven"
+        url = 'https://repo.greenhouse.house/releases/'
+    }
+    maven { url "https://mvn.devos.one/releases/" } // Porting Lib
+    maven {
+        url "https://maven.jamieswhiteshirt.com/libs-release" // Reach Entity Attributes (Required by Porting Lib)
+        content {
+            includeGroup "com.jamieswhiteshirt"
+        }
+    }
+    maven {
+        url "https://jitpack.io/" // Fabric ASM
+        content {
+            excludeGroup "io.github.fabricators_of_create"
+        }
+    }
 }
 
 dependencies {
@@ -87,6 +105,11 @@ dependencies {
     modRuntimeOnly("maven.modrinth:legendary-tooltips:1.4.5-fabric,1.20.1")
     modImplementation("maven.modrinth:jei:15.20.0.105")
     modImplementation("maven.modrinth:just-enough-effect-descriptions-jeed:1.20-2.2.2")
+    // https://github.com/MehVahdJukaar/FarmersDelightRefabricated/blob/1.20/src/main/java/vectorwing/farmersdelight/FarmersDelightASM.java
+    // https://github.com/StellarWind22/Fabric-Shield-Lib/issues/159
+    modImplementation("vectorwing:FarmersDelight:${fdrf_version}") {
+        exclude(group: "net.fabricmc")
+    }
 }
 
 processResources {

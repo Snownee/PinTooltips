@@ -5,6 +5,8 @@
 	"compatibilityLevel": "JAVA_17",
 	"refmap": "pin_tooltips.refmap.json",
 	"client": [
+		"farmersdelight.TextUtilsMixin",
+		"farmersdelight.TooltipEventsMixin",
 		"interact.ClientTextTooltipAccess",
 		"interact.EnchantmentMixin",
 		"interact.ItemStackMixin",
