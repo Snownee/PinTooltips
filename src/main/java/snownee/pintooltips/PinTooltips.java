@@ -2,7 +2,6 @@ package snownee.pintooltips;
 
 import java.io.File;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import org.joml.Vector2d;
 import org.joml.Vector2ic;
@@ -183,15 +182,15 @@ public class PinTooltips implements ClientModInitializer {
 		}
 
 		// Avoid modifying the tooltips when rendering the tooltip hover event that will cause crash.
-		CompletableFuture.runAsync(() -> Minecraft.getInstance().submit(() -> {
-			service.tooltips.add(new PinnedTooltip(
-					new Vector2d(position),
-					components,
-					Minecraft.getInstance().getWindow().getGuiScaledWidth(),
-					Minecraft.getInstance().getWindow().getGuiScaledHeight(),
-					font,
-					itemStack));
-		}));
+		Minecraft.getInstance().tell(() ->
+				service.tooltips.add(new PinnedTooltip(
+						new Vector2d(position),
+						components,
+						Minecraft.getInstance().getWindow().getGuiScaledWidth(),
+						Minecraft.getInstance().getWindow().getGuiScaledHeight(),
+						font,
+						itemStack))
+		);
 	}
 
 	public static boolean isGrabbing() {
