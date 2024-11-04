@@ -2,6 +2,7 @@ package snownee.pintooltips;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.joml.Vector2d;
 import org.slf4j.Logger;
@@ -80,7 +81,7 @@ public class PinTooltips implements ClientModInitializer {
 					service.tooltips.clear();
 					return false;
 				}
-				var focused = service.findHovered(mouseX, mouseY);
+				var focused = service.hovered;
 				if (focused != null) {
 					if (button == InputConstants.MOUSE_BUTTON_LEFT) {
 						service.focused = focused;
@@ -105,13 +106,10 @@ public class PinTooltips implements ClientModInitializer {
 			});
 
 			ScreenEvents.afterRender(screen).register((screen1, context, mouseX, mouseY, tickDelta) -> {
-				service.hovered = null;
+				service.hovered = service.findHovered(mouseX, mouseY);
 				var font = Minecraft.getInstance().font;
 				var zOffset = 1;
 				for (var tooltip : service.tooltips) {
-					if (tooltip.isHovering(mouseX, mouseY) && service.hovered == null) {
-						service.hovered = tooltip;
-					}
 					context.pose().pushPose();
 					context.pose().translate(0, 0, zOffset);
 					tooltip.render(service, screen1, font, context, mouseX, mouseY);
@@ -151,7 +149,7 @@ public class PinTooltips implements ClientModInitializer {
 				focused.setPosition(screen.width, screen.height, position.x() + deltaX, position.y() + deltaY);
 			}
 		} else if (button == InputConstants.MOUSE_BUTTON_MIDDLE) {
-			service.tooltips.remove(service.findHovered(mouseX, mouseY));
+			service.tooltips.remove(service.hovered);
 		}
 	}
 
@@ -178,13 +176,16 @@ public class PinTooltips implements ClientModInitializer {
 			return;
 		}
 
-		service.tooltips.add(new PinnedTooltip(
-				new Vector2d(mouseX, mouseY),
-				components,
-				Minecraft.getInstance().getWindow().getGuiScaledWidth(),
-				Minecraft.getInstance().getWindow().getGuiScaledHeight(),
-				font,
-				itemStack));
+		// Avoid modifying the tooltips when rendering the tooltip hover event that will cause crash.
+		CompletableFuture.runAsync(() -> Minecraft.getInstance().submit(() -> {
+			service.tooltips.add(new PinnedTooltip(
+					new Vector2d(mouseX, mouseY),
+					components,
+					Minecraft.getInstance().getWindow().getGuiScaledWidth(),
+					Minecraft.getInstance().getWindow().getGuiScaledHeight(),
+					font,
+					itemStack));
+		}));
 	}
 
 	public static boolean isGrabbing() {
