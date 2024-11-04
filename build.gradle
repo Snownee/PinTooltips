@@ -91,12 +91,12 @@ dependencies {
 
 processResources {
     def properties = [
-            version    : realVersion,
-            id         : mod_id,
-            name       : mod_name,
-            description: description,
-            source     : "https://github.com/Snownee/PinTooltips",
-            minecraft  : ">=1.20.1"
+            version        : realVersion,
+            id             : mod_id,
+            name           : mod_name,
+            mod_description: mod_description,
+            source         : "https://github.com/Snownee/PinTooltips",
+            minecraft      : ">=1.20.1"
     ]
     filesMatching(["fabric.mod.json", "*.mixins.json"]) {
         expand(properties)
