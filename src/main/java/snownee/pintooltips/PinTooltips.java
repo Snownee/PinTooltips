@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.joml.Vector2d;
+import org.joml.Vector2ic;
 import org.slf4j.Logger;
 
 import com.mojang.blaze3d.platform.InputConstants;
@@ -137,7 +138,7 @@ public class PinTooltips implements ClientModInitializer {
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> service.clearStates());
 	}
 
-	public static void onDrag(Screen screen, int button, double mouseX, double mouseY, double deltaX, double deltaY) {
+	public static void onDrag(Screen screen, int button, double deltaX, double deltaY) {
 		var service = PinnedTooltipsService.INSTANCE;
 		var focused = service.focused;
 		if (button == InputConstants.MOUSE_BUTTON_LEFT && focused != null) {
@@ -162,8 +163,7 @@ public class PinTooltips implements ClientModInitializer {
 	public static void onRenderTooltip(
 			Font font,
 			List<ClientTooltipComponent> components,
-			int mouseX,
-			int mouseY,
+			Vector2ic position,
 			ItemStack itemStack) {
 		var service = PinnedTooltipsService.INSTANCE;
 		if (keyPressedFrames < 0 || service.focused != null) {
@@ -185,7 +185,7 @@ public class PinTooltips implements ClientModInitializer {
 		// Avoid modifying the tooltips when rendering the tooltip hover event that will cause crash.
 		CompletableFuture.runAsync(() -> Minecraft.getInstance().submit(() -> {
 			service.tooltips.add(new PinnedTooltip(
-					new Vector2d(mouseX, mouseY),
+					new Vector2d(position),
 					components,
 					Minecraft.getInstance().getWindow().getGuiScaledWidth(),
 					Minecraft.getInstance().getWindow().getGuiScaledHeight(),

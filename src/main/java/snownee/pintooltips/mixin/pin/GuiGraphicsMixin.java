@@ -2,6 +2,7 @@ package snownee.pintooltips.mixin.pin;
 
 import java.util.List;
 
+import org.joml.Vector2ic;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -12,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.gui.Font;
@@ -42,7 +44,7 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 
 	@Inject(
 			method = "renderTooltipInternal",
-			at = @At(value = "INVOKE", ordinal = 0, target = "Ljava/util/List;size()I")
+			at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;pushPose()V")
 	)
 	private void pin_tooltips$onRender(
 			final Font font,
@@ -50,7 +52,8 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 			final int mouseX,
 			final int mouseY,
 			final ClientTooltipPositioner tooltipPositioner,
-			final CallbackInfo ci
+			final CallbackInfo ci,
+			@Local Vector2ic position
 	) {
 		if (pin_tooltips$renderingPinned) {
 			return;
@@ -58,8 +61,7 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 		PinTooltips.onRenderTooltip(
 				font,
 				components,
-				mouseX,
-				mouseY,
+				position,
 				pin_tooltips$getRenderingItemStack());
 	}
 

@@ -1,10 +1,9 @@
 package snownee.pintooltips;
 
-import static snownee.pintooltips.util.SimpleTooltipPositioner.TOOLTIP_PADDING;
-
 import java.util.List;
 import java.util.Map;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
 import org.joml.Vector2i;
@@ -15,6 +14,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.item.ItemStack;
@@ -23,13 +23,12 @@ import snownee.pintooltips.duck.PTGuiGraphics;
 import snownee.pintooltips.mixin.interact.ClientTextTooltipAccess;
 import snownee.pintooltips.mixin.pin.GuiGraphicsAccess;
 import snownee.pintooltips.util.DummyHoveredSlot;
-import snownee.pintooltips.util.SimpleTooltipPositioner;
 
-public final class PinnedTooltip {
+public final class PinnedTooltip implements ClientTooltipPositioner {
+	public static final int TOOLTIP_PADDING = 3;
 	private final Vector2d position;
 	private final Vector2i size;
 	private final List<ClientTooltipComponent> components;
-	private final Vector2d offset;
 	private final @Nullable DummyHoveredSlot hoveredSlot;
 	private final Map<Rect2i, ClientTooltipComponent> linesPosition;
 
@@ -37,12 +36,10 @@ public final class PinnedTooltip {
 			Vector2d position,
 			Vector2i size,
 			List<ClientTooltipComponent> components,
-			Vector2d offset,
 			@Nullable DummyHoveredSlot hoveredSlot) {
 		this.position = position;
 		this.size = size;
 		this.components = components;
-		this.offset = offset;
 		this.hoveredSlot = hoveredSlot;
 		this.linesPosition = new Reference2ObjectOpenHashMap<>();
 	}
@@ -59,17 +56,13 @@ public final class PinnedTooltip {
 				position,
 				new Vector2i(),
 				components,
-				new Vector2d(),
 				itemStack.isEmpty() ? null : new DummyHoveredSlot(itemStack.copy()));
-		offset.set(getPositionerOffset(screenWidth, screenHeight, position.x(), position.y()));
 		updateSize(screenWidth, screenHeight, font);
 	}
 
 	public boolean isHovering(double mouseX, double mouseY) {
-		var x = mouseX + offset.x();
-		var y = mouseY + offset.y();
-		return x >= position.x() - TOOLTIP_PADDING && x <= position.x() + size.x() + TOOLTIP_PADDING
-				&& y >= position.y() - TOOLTIP_PADDING && y <= position.y() + size.y() + TOOLTIP_PADDING;
+		return mouseX >= position.x() - TOOLTIP_PADDING && mouseX <= position.x() + size.x() + TOOLTIP_PADDING
+				&& mouseY >= position.y() - TOOLTIP_PADDING && mouseY <= position.y() + size.y() + TOOLTIP_PADDING;
 	}
 
 	public void updateSize(int screenWidth, int screenHeight, Font font) {
@@ -85,7 +78,6 @@ public final class PinnedTooltip {
 		}
 		if (width != size.x() || height != size.y()) {
 			size.set(width, height);
-			offset.set(getPositionerOffset(screenWidth, screenHeight, position.x, position.y));
 		}
 	}
 
@@ -103,7 +95,7 @@ public final class PinnedTooltip {
 				components(),
 				(int) position().x(),
 				(int) position().y(),
-				SimpleTooltipPositioner.INSTANCE);
+				this);
 		PTGuiGraphics.of(context).pin_tooltips$setRenderingPinned(false);
 
 		if (service.hovered == this) {
@@ -122,15 +114,7 @@ public final class PinnedTooltip {
 		context.pose().popPose();
 	}
 
-	public Vector2d getPositionerOffset(int screenWidth, int screenHeight, double x, double y) {
-		var offset = SimpleTooltipPositioner.INSTANCE.positionTooltip(screenWidth, screenHeight, (int) x, (int) y, size.x(), size.y());
-		var deltaX = x - offset.x();
-		var deltaY = y - offset.y();
-		return new Vector2d(deltaX, deltaY);
-	}
-
 	public void setPosition(int screenWidth, int screenHeight, double x, double y) {
-		offset.set(getPositionerOffset(screenWidth, screenHeight, x, y));
 		position.set(x, y);
 	}
 
@@ -143,13 +127,24 @@ public final class PinnedTooltip {
 	public @Nullable DummyHoveredSlot hoveredSlot() {return hoveredSlot;}
 
 	public @Nullable Style getStyleAt(double mouseX, double mouseY, Font font) {
-		var relativeX = (int) (mouseX - position().x() + offset.x);
-		var relativeY = (int) (mouseY - position().y() + offset.y);
+		var relativeX = (int) (mouseX - position().x());
+		var relativeY = (int) (mouseY - position().y());
 		var line = linesPosition.keySet().stream().filter(rect -> rect.contains(relativeX, relativeY)).findFirst().orElse(null);
 		var component = linesPosition.get(line);
 		if (component instanceof ClientTextTooltipAccess textTooltip) {
 			return font.getSplitter().componentStyleAtWidth(textTooltip.getText(), relativeX);
 		}
 		return null;
+	}
+
+	@Override
+	public @NotNull Vector2ic positionTooltip(
+			int screenWidth,
+			int screenHeight,
+			int mouseX,
+			int mouseY,
+			int tooltipWidth,
+			int tooltipHeight) {
+		return new Vector2i((int) position.x, (int) position.y);
 	}
 }

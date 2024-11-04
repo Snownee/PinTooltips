@@ -23,7 +23,7 @@ public class MouseHandlerMixin {
 			final double deltaX,
 			final double deltaY
 	) {
-		PinTooltips.onDrag(instance, button, mouseX, mouseY, deltaX, deltaY);
+		PinTooltips.onDrag(instance, button, deltaX, deltaY);
 		return instance;
 	}
 }
