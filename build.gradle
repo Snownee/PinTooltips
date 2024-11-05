@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.forge.gradle)
     id 'org.spongepowered.mixin' version '0.7-SNAPSHOT'
     id "me.shedaniel.unified-publishing" version "0.1.+"
+    id 'eclipse'
+    id "com.diffplug.eclipse.apt" version "4.1.0"
 }
 
 group = "snownee.pintooltips"
@@ -14,7 +16,7 @@ targetCompatibility = JavaVersion.VERSION_17
 
 mixin {
     config("${mod_id}.mixins.json")
-    add("main", "${mod_id}.refmap.json")
+    add sourceSets.main, "${mod_id}.refmap.json"
 }
 
 minecraft {
@@ -84,6 +86,7 @@ dependencies {
     // To change the versions see the gradle/libs.version.toml
     minecraft "net.minecraftforge:forge:${minecraft_version}-${libs.versions.forge.get()}"
 
+    annotationProcessor "org.spongepowered:mixin:0.8.5:processor"
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
     implementation("io.github.llamalad7:mixinextras-forge:0.4.1")
 
