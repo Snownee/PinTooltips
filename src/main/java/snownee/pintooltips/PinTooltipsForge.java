@@ -9,8 +9,9 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 @Mod(PinTooltips.ID)
 public class PinTooltipsForge {
 
-	public PinTooltipsForge(FMLJavaModLoadingContext context) {
-		context.getModEventBus().addListener((FMLClientSetupEvent event) -> new PinTooltips().onInitializeClient());
+	public PinTooltipsForge() {
+		//noinspection removal
+		FMLJavaModLoadingContext.get().getModEventBus().addListener((FMLClientSetupEvent event) -> new PinTooltips().onInitializeClient());
 		MinecraftForge.EVENT_BUS.addListener((ScreenEvent.MouseDragged.Pre event) ->
 				PinTooltips.onDrag(event.getScreen(), event.getMouseButton(), event.getDragX(), event.getDragY()));
 	}
