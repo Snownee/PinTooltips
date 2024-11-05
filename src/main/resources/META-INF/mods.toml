@@ -20,12 +20,16 @@ ${description}
 modId="forge"
 mandatory=true
 versionRange="[46,)"
-ordering="NONE"
-side="BOTH"
+side="CLIENT"
 
 [[dependencies.pin_tooltips]]
 modId="minecraft"
 mandatory=true
 versionRange="[1.20,)"
-ordering="NONE"
-side="BOTH"
+side="CLIENT"
+
+[[dependencies.pin_tooltips]]
+modId="fabric_api"
+mandatory=true
+versionRange="[0.92,)"
+side="CLIENT"

@@ -114,15 +114,7 @@ processResources {
     }
 }
 
-tasks.jarJar.configure {
-    archiveClassifier = ''
-
-    finalizedBy('reobfJarJar')
-}
-
 jar {
-    archiveClassifier = 'slim'
-
     manifest {
         attributes(["Specification-Title"     : mod_id,
                     "Specification-Version"   : "1", // We are version 1 of ourselves
@@ -133,8 +125,6 @@ jar {
 
     preserveFileTimestamps = false
     reproducibleFileOrder = true
-
-    finalizedBy('reobfJar')
 }
 
 unifiedPublishing {
@@ -146,7 +136,7 @@ unifiedPublishing {
         gameVersions = [project.minecraft_version]
         gameLoaders = ["forge", "neoforge"]
 
-        mainPublication tasks.jarJar // Declares the publicated jar
+        mainPublication tasks.jar // Declares the publicated jar
 
         if (System.getenv("CURSE_TOKEN") != null) {
             curseforge {
@@ -154,6 +144,7 @@ unifiedPublishing {
                 id = "1131483"
 
                 relations { // Optional, Inferred from the relations above by default
+                    depends "forgified-fabric-api"
                     optional "just-enough-effect-descriptions-jeed"
                 }
             }
@@ -165,6 +156,7 @@ unifiedPublishing {
                 id = "fFmpgMfg"
 
                 relations { // Optional, Inferred from the relations above by default
+                    depends "forgified-fabric-api"
                     optional "just-enough-effect-descriptions-jeed"
                 }
             }
