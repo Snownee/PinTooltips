@@ -87,6 +87,7 @@ dependencies {
     modRuntimeOnly("maven.modrinth:legendary-tooltips:1.4.5-fabric,1.20.1")
     modImplementation("maven.modrinth:jei:15.20.0.105")
     modImplementation("maven.modrinth:just-enough-effect-descriptions-jeed:1.20-2.2.2")
+    modImplementation("maven.modrinth:jade:11.12.0+fabric")
 }
 
 processResources {

@@ -23,3 +23,4 @@ build
 /.settings
 /bin
 /CHANGELOG.md
+/.factorypath
