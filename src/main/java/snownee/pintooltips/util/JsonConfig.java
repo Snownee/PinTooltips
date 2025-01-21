@@ -120,10 +120,11 @@ public class JsonConfig<T> {
 		public T get() {
 			if (value == null) {
 				synchronized (this) {
-					value = supplier.get();
-					Objects.requireNonNull(value);
-					if (onUpdate != null) {
-						onUpdate.run();
+					if (value == null) {
+						value = Objects.requireNonNull(supplier.get());
+						if (onUpdate != null) {
+							onUpdate.run();
+						}
 					}
 				}
 			}

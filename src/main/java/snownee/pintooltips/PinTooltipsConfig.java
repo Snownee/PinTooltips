@@ -19,6 +19,7 @@ public record PinTooltipsConfig(
 		boolean hideMissingDescriptions,
 		boolean jadeModEnchantmentModName,
 		boolean jadeModMobEffectModName,
+		int hoveringAutoPinDelay,
 		Set<String> screenBlacklist
 ) {
 	public static final Codec<PinTooltipsConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -31,6 +32,9 @@ public record PinTooltipsConfig(
 			Codec.BOOL.fieldOf("jadeModMobEffectModName")
 					.orElse(true)
 					.forGetter(PinTooltipsConfig::jadeModMobEffectModName),
+			Codec.INT.fieldOf("hoveringAutoPinDelay")
+					.orElse(1500)
+					.forGetter(PinTooltipsConfig::hoveringAutoPinDelay),
 			Codec.STRING.listOf()
 					.<Set<String>>xmap(it -> new ObjectOpenHashSet<>(it), List::copyOf)
 					.fieldOf("screenBlacklist")
@@ -45,12 +49,16 @@ public record PinTooltipsConfig(
 				PinTooltips.configDirectory.toPath().resolve("pin_tooltips.json"),
 				CODEC,
 				DefaultDescriptions::clearCache,
-				() -> new PinTooltipsConfig(true, true, true, defaultBlacklist())
+				() -> new PinTooltipsConfig(true, true, true, 1500, defaultBlacklist())
 		);
 	}
 
 	public static PinTooltipsConfig get() {
 		return INSTANCE.get();
+	}
+
+	public static void save() {
+		INSTANCE.save();
 	}
 
 	private static Set<String> defaultBlacklist() {

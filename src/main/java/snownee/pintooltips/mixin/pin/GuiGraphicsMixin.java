@@ -78,7 +78,7 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 			final CallbackInfo ci
 	) {
 		// Render the unpinned tooltip on top of the pinned tooltip
-		if (!pin_tooltips$renderingPinned && !PinnedTooltipsService.INSTANCE.tooltips.isEmpty() || pin_tooltips$renderingPinnedEvent) {
+		if (!pin_tooltips$renderingPinned && !PinnedTooltipsService.INSTANCE.tooltips().isEmpty() || pin_tooltips$renderingPinnedEvent) {
 			pose.translate(0, 0, PinTooltips.getMaxZOffset());
 		}
 	}
