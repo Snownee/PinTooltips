@@ -3,7 +3,6 @@ package snownee.pintooltips;
 import java.io.File;
 import java.util.List;
 
-import org.joml.Vector2d;
 import org.joml.Vector2ic;
 import org.slf4j.Logger;
 
@@ -35,6 +34,10 @@ public class PinTooltips implements ClientModInitializer {
 	public static final HoverEvent CLICK_TO_COPY_EVENT = new HoverEvent(HoverEvent.Action.SHOW_TEXT, CLICK_TO_COPY);
 	private static int keyPressedFrames = -1;
 	private static long lastRenderTooltipTime;
+	private static int lastMouseX;
+	private static int lastMouseY;
+	private static long lastMouseMovedTime;
+	private static boolean hasTooltipInThisFrame;
 
 	public static final KeyMapping GRAB_KEY = KeyBindingHelper.registerKeyBinding(new KeyMapping(
 			"key.pin_tooltips.pin",
@@ -51,6 +54,7 @@ public class PinTooltips implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
+		PinTooltipsConfig.save();
 		var service = PinnedTooltipsService.INSTANCE;
 		ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
 			if (PinTooltipsConfig.get().screenBlacklist().contains(screen.getClass().getName())) {
@@ -78,17 +82,16 @@ public class PinTooltips implements ClientModInitializer {
 					return true;
 				}
 				if (button == InputConstants.MOUSE_BUTTON_MIDDLE && GRAB_KEY.isDown()) {
-					service.tooltips.clear();
+					service.clearTooltips();
 					return false;
 				}
 				var focused = service.hovered;
 				if (focused != null) {
 					if (button == InputConstants.MOUSE_BUTTON_LEFT) {
 						service.focused = focused;
-						service.tooltips.remove(focused);
-						service.tooltips.add(focused);
+						service.placeOnTop(focused);
 					} else {
-						service.tooltips.remove(focused);
+						service.unpin(focused);
 					}
 					return false;
 				}
@@ -112,17 +115,35 @@ public class PinTooltips implements ClientModInitializer {
 			});
 
 			ScreenEvents.afterRender(screen).register((screen1, context, mouseX, mouseY, tickDelta) -> {
+				if (hasTooltipInThisFrame) {
+					hasTooltipInThisFrame = false;
+					if (lastMouseX != mouseX || lastMouseY != mouseY) {
+						lastMouseX = mouseX;
+						lastMouseY = mouseY;
+						lastMouseMovedTime = System.currentTimeMillis();
+					}
+				} else {
+					lastMouseX = 0;
+					lastMouseY = 0;
+					lastMouseMovedTime = 0;
+				}
+
 				service.hovered = service.findHovered(mouseX, mouseY);
 				var font = Minecraft.getInstance().font;
 				var zOffset = 1;
-				for (var tooltip : service.tooltips) {
+				for (var tooltip : service.tooltips()) {
 					context.pose().pushPose();
 					context.pose().translate(0, 0, zOffset);
 					tooltip.render(service, screen1, font, context, mouseX, mouseY);
 					context.pose().popPose();
 					zOffset = Math.min(getMaxZOffset() - 1, zOffset + 400);
 				}
+				PinnedTooltip autoPinnedTooltip = service.autoPinnedTooltip();
+				if (autoPinnedTooltip != null && autoPinnedTooltip.isHovered() && autoPinnedTooltip != service.hovered) {
+					service.unpin(autoPinnedTooltip);
+				}
 				if (service.hovered != null) {
+					service.hovered.hovered();
 					Component hint;
 					if (!GRAB_KEY.isUnbound() && System.currentTimeMillis() / 2000 % 2 == 0) {
 						hint = Component.translatable("gui.pin_tooltips.clear_hint", GRAB_KEY.getTranslatedKeyMessage());
@@ -130,6 +151,13 @@ public class PinTooltips implements ClientModInitializer {
 						hint = Component.translatable("gui.pin_tooltips.unpin_hint");
 					}
 					context.drawCenteredString(font, hint, screen1.width / 2, 4, 0xAAAAAA);
+				}
+			});
+
+			ScreenEvents.remove(screen).register(screen1 -> {
+				PinnedTooltip tooltip = service.autoPinnedTooltip();
+				if (tooltip != null) {
+					service.unpin(tooltip);
 				}
 			});
 		});
@@ -155,7 +183,7 @@ public class PinTooltips implements ClientModInitializer {
 				focused.setPosition(screen.width, screen.height, position.x() + deltaX, position.y() + deltaY);
 			}
 		} else if (button == InputConstants.MOUSE_BUTTON_MIDDLE) {
-			service.tooltips.remove(service.hovered);
+			service.unpin(service.hovered);
 		}
 	}
 
@@ -165,12 +193,24 @@ public class PinTooltips implements ClientModInitializer {
 			Vector2ic position,
 			ItemStack itemStack) {
 		var service = PinnedTooltipsService.INSTANCE;
-		if (keyPressedFrames < 0 || service.focused != null) {
+		if (service.focused != null) {
+			return;
+		}
+
+		long time = System.currentTimeMillis();
+
+		if (keyPressedFrames < 0) {
+			int autoPinDelay = PinTooltipsConfig.get().hoveringAutoPinDelay();
+			if (autoPinDelay >= 0) {
+				hasTooltipInThisFrame = true;
+				if (lastMouseMovedTime > 0 && time - lastMouseMovedTime >= autoPinDelay) {
+					service.pin(position, components, font, itemStack, time);
+				}
+			}
 			return;
 		}
 
 		// there can be multiple renderTooltip calls in a single frame, so we need to skip some
-		long time = System.currentTimeMillis();
 		if (time - lastRenderTooltipTime < 10) {
 			return;
 		}
@@ -181,19 +221,11 @@ public class PinTooltips implements ClientModInitializer {
 			return;
 		}
 
-		// Avoid modifying the tooltips when rendering the tooltip hover event that will cause crash.
-		Minecraft.getInstance().tell(() ->
-				service.tooltips.add(new PinnedTooltip(
-						new Vector2d(position),
-						components,
-						Minecraft.getInstance().getWindow().getGuiScaledWidth(),
-						Minecraft.getInstance().getWindow().getGuiScaledHeight(),
-						font,
-						itemStack))
-		);
+		service.pin(position, components, font, itemStack, -1);
 	}
 
 	public static boolean isGrabbing() {
-		return GRAB_KEY.isDown();
+		int delay = PinTooltipsConfig.get().hoveringAutoPinDelay();
+		return GRAB_KEY.isDown() || delay >= 0 && System.currentTimeMillis() - lastMouseMovedTime >= delay;
 	}
 }
