@@ -9,10 +9,12 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import snownee.jade.api.config.IWailaConfig;
 import snownee.jade.util.ModIdentification;
 import snownee.pintooltips.compat.JeedCompat;
+import snownee.pintooltips.compat.MEICompat;
 
 public class PinTooltipsCompats {
 	public static boolean jeed = FabricLoader.getInstance().isModLoaded("jeed");
 	public static boolean jade = FabricLoader.getInstance().isModLoaded("jade");
+	public static boolean moreEnchantmentInfo = FabricLoader.getInstance().isModLoaded("more_enchantment_info");
 
 	public static boolean canClickEffect(MobEffectInstance effectInstance) {
 		if (jeed) {
@@ -24,6 +26,19 @@ public class PinTooltipsCompats {
 	public static void clickEffect(MobEffectInstance effectInstance, double mouseX, double mouseY, int button) {
 		if (jeed) {
 			JeedCompat.clickEffect(effectInstance, mouseX, mouseY, button);
+		}
+	}
+
+	public static boolean canClickEnchantment(Enchantment enchantment) {
+		if (moreEnchantmentInfo) {
+			return MEICompat.canClickEnchantment(enchantment);
+		}
+		return false;
+	}
+
+	public static void clickEnchantment(Enchantment enchantment, int level, int button) {
+		if (moreEnchantmentInfo) {
+			MEICompat.clickEnchantment(enchantment, button);
 		}
 	}
 

@@ -121,6 +121,8 @@ unifiedPublishing {
                 id = "1131483"
 
                 relations { // Optional, Inferred from the relations above by default
+                    optional "jade"
+                    optional "more-enchantment-info"
                     optional "just-enough-effect-descriptions-jeed"
                 }
             }
@@ -132,6 +134,8 @@ unifiedPublishing {
                 id = "fFmpgMfg"
 
                 relations { // Optional, Inferred from the relations above by default
+                    optional "jade"
+                    optional "more-enchantment-info"
                     optional "just-enough-effect-descriptions-jeed"
                 }
             }

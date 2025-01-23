@@ -1,5 +1,6 @@
 package snownee.pintooltips.util;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
@@ -20,8 +21,9 @@ public class ComponentDecorator {
 		component.withStyle($ -> $.withUnderlined(true).withHoverEvent(hoverEvent));
 		if (PinTooltipsCompats.canClickEffect(effectInstance)) {
 			CompoundTag tag = effectInstance.save(new CompoundTag());
-			component.withStyle($ -> $.withUnderlined(true)
-					.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "@pin_tooltips click_effect %s".formatted(tag))));
+			component.withStyle($ -> $.withClickEvent(new ClickEvent(
+					ClickEvent.Action.RUN_COMMAND,
+					"@pin_tooltips click_effect %s".formatted(tag))));
 		}
 	}
 
@@ -33,5 +35,10 @@ public class ComponentDecorator {
 		desc = PinTooltipsCompats.appendModName(desc, enchantment);
 		HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, desc);
 		component.withStyle($ -> $.withUnderlined(true).withHoverEvent(hoverEvent));
+		if (PinTooltipsCompats.canClickEnchantment(enchantment)) {
+			component.withStyle($ -> $.withClickEvent(new ClickEvent(
+					ClickEvent.Action.RUN_COMMAND,
+					"@pin_tooltips click_enchantment %s %d".formatted(BuiltInRegistries.ENCHANTMENT.getKey(enchantment), level))));
+		}
 	}
 }

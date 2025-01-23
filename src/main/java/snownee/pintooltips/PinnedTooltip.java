@@ -104,7 +104,7 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 				this);
 		PTGuiGraphics.of(context).pin_tooltips$setRenderingPinned(false);
 
-		if (service.hovered == this) {
+		if (service.hovered == this && !service.dragging) {
 			var style = getStyleAt(mouseX, mouseY, font);
 			if (style != null) {
 				PTGuiGraphics.of(context).pin_tooltips$setRenderingPinnedEvent(true);
