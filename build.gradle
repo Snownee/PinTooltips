@@ -149,6 +149,8 @@ unifiedPublishing {
 
                 relations { // Optional, Inferred from the relations above by default
                     depends "forgified-fabric-api"
+                    optional "jade"
+                    optional "more-enchantment-info"
                     optional "just-enough-effect-descriptions-jeed"
                 }
             }
@@ -161,6 +163,8 @@ unifiedPublishing {
 
                 relations { // Optional, Inferred from the relations above by default
                     depends "forgified-fabric-api"
+                    optional "jade"
+                    optional "more-enchantment-info"
                     optional "just-enough-effect-descriptions-jeed"
                 }
             }
