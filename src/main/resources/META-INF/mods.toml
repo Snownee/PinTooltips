@@ -33,3 +33,9 @@ modId="fabric_api"
 mandatory=true
 versionRange="[0.92,)"
 side="CLIENT"
+
+[[dependencies.pin_tooltips]]
+modId="more_enchantment_info"
+mandatory=false
+versionRange="[0.2,)"
+side="CLIENT"
