@@ -31,15 +31,19 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 	private final List<ClientTooltipComponent> components;
 	private final @Nullable DummyHoveredSlot hoveredSlot;
 	private final Map<Rect2i, ClientTooltipComponent> linesPosition;
+	long autoPinnedTimestamp;
+	private boolean hovered;
 
 	public PinnedTooltip(
 			Vector2d position,
 			Vector2i size,
 			List<ClientTooltipComponent> components,
+			long autoPinnedTimestamp,
 			@Nullable DummyHoveredSlot hoveredSlot) {
 		this.position = position;
 		this.size = size;
 		this.components = components;
+		this.autoPinnedTimestamp = autoPinnedTimestamp;
 		this.hoveredSlot = hoveredSlot;
 		this.linesPosition = new Reference2ObjectOpenHashMap<>();
 	}
@@ -50,12 +54,14 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 			int screenWidth,
 			int screenHeight,
 			Font font,
-			ItemStack itemStack
+			ItemStack itemStack,
+			long autoPinnedTimestamp
 	) {
 		this(
 				position,
 				new Vector2i(),
 				components,
+				autoPinnedTimestamp,
 				itemStack.isEmpty() ? null : new DummyHoveredSlot(itemStack.copy()));
 		updateSize(screenWidth, screenHeight, font);
 	}
@@ -98,7 +104,7 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 				this);
 		PTGuiGraphics.of(context).pin_tooltips$setRenderingPinned(false);
 
-		if (service.hovered == this) {
+		if (service.hovered == this && !service.dragging) {
 			var style = getStyleAt(mouseX, mouseY, font);
 			if (style != null) {
 				PTGuiGraphics.of(context).pin_tooltips$setRenderingPinnedEvent(true);
@@ -146,5 +152,13 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 			int tooltipWidth,
 			int tooltipHeight) {
 		return new Vector2i((int) position.x, (int) position.y);
+	}
+
+	public void hovered() {
+		hovered = true;
+	}
+
+	public boolean isHovered() {
+		return hovered;
 	}
 }
