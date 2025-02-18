@@ -8,7 +8,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.client.gui.screens.ChatScreen;
-import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
+import net.minecraft.client.gui.screens.GenericMessageScreen;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.ProgressScreen;
 import net.minecraft.client.gui.screens.ReceivingLevelScreen;
@@ -65,7 +65,7 @@ public record PinTooltipsConfig(
 		return Set.of(
 				PauseScreen.class.getName(),
 				ChatScreen.class.getName(),
-				GenericDirtMessageScreen.class.getName(),
+				GenericMessageScreen.class.getName(),
 				ReceivingLevelScreen.class.getName(),
 				ProgressScreen.class.getName()
 		);

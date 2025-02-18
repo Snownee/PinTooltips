@@ -2,7 +2,6 @@ package snownee.pintooltips.mixin.interact;
 
 import java.util.List;
 
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -11,8 +10,9 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
@@ -28,23 +28,19 @@ import snownee.pintooltips.PinTooltipsHooks;
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin {
 	@Shadow
-	@Nullable
-	public abstract CompoundTag getTag();
-
-	@Shadow
-	@Nullable
-	private CompoundTag tag;
-
-	@Shadow
 	public abstract Item getItem();
+
+	@Shadow
+	public abstract DataComponentMap getComponents();
 
 	@WrapMethod(method = "getTooltipLines")
 	private List<Component> pin_tooltips$handleGrabbing(
-			final @Nullable Player player,
-			final TooltipFlag isAdvanced,
+			final Item.TooltipContext tooltipContext,
+			final Player player,
+			final TooltipFlag tooltipFlag,
 			final Operation<List<Component>> original) {
 		PinTooltipsHooks.markGrabbing();
-		var result = original.call(player, isAdvanced);
+		var result = original.call(tooltipContext, player, tooltipFlag);
 		PinTooltipsHooks.unmarkGrabbing();
 		return result;
 	}
@@ -72,8 +68,8 @@ public abstract class ItemStackMixin {
 					target = "Lnet/minecraft/network/chat/Component;translatable(Ljava/lang/String;[Ljava/lang/Object;)Lnet/minecraft/network/chat/MutableComponent;"))
 	private MutableComponent pin_tooltips$handleTranslatable(String key, Object[] args, Operation<MutableComponent> original) {
 		MutableComponent component = original.call(key, args);
-		if (PinTooltipsHooks.isGrabbing() && "item.nbt_tags".equals(key) && PinTooltipsHooks.isGrabbing()) {
-			Component prettyComponent = NbtUtils.toPrettyComponent(getTag());
+		if (PinTooltipsHooks.isGrabbing() && "item.components".equals(key) && PinTooltipsHooks.isGrabbing()) {
+			Component prettyComponent = NbtUtils.toPrettyComponent(DataComponentMap.CODEC.encodeStart(NbtOps.INSTANCE, getComponents()).getOrThrow());
 			component.withStyle($ -> $.withHoverEvent(new HoverEvent(
 							HoverEvent.Action.SHOW_TEXT,
 							prettyComponent.copy().append("\n").append(PinTooltips.CLICK_TO_COPY)))
