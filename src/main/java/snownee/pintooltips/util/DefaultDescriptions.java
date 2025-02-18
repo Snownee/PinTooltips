@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.Util;
+import net.minecraft.core.Holder;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffect;
@@ -12,7 +14,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import snownee.pintooltips.PinTooltipsConfig;
 
 public class DefaultDescriptions {
-	private static final Map<Enchantment, Component> ENCHANTMENT_CACHE = new HashMap<>();
+	private static final Map<Holder<Enchantment>, Component> ENCHANTMENT_CACHE = new HashMap<>();
 	private static final Map<MobEffect, Component> EFFECT_CACHE = new HashMap<>();
 
 	private DefaultDescriptions() {}
@@ -22,8 +24,8 @@ public class DefaultDescriptions {
 	 * {@code <enchantment translation key>.desc}) for {@code enchantment}, or {@code null} if no description
 	 * is provided by any language file and {@link IdwtialsimmoedmConfig#hideMissingDescriptions} is {@code true}
 	 */
-	public static @Nullable Component forEnchantmentRaw(Enchantment enchantment) {
-		var translationKey = enchantment.getDescriptionId() + ".desc";
+	public static @Nullable Component forEnchantmentRaw(Holder<Enchantment> enchantment) {
+		var translationKey = Util.makeDescriptionId("enchantment", enchantment.getKey().location()) + ".desc";
 		if (PinTooltipsConfig.get().hideMissingDescriptions() && !Language.getInstance().has(translationKey)) {
 			return null;
 		}
@@ -36,7 +38,7 @@ public class DefaultDescriptions {
 	 * {@code enchantment}, or {@code null} if no description is provided by any language file and
 	 * {@link IdwtialsimmoedmConfig#hideMissingDescriptions} is {@code true}
 	 */
-	public static @Nullable Component forEnchantmentFormatted(Enchantment enchantment) {
+	public static @Nullable Component forEnchantmentFormatted(Holder<Enchantment> enchantment) {
 		return ENCHANTMENT_CACHE.computeIfAbsent(enchantment, DefaultDescriptions::forEnchantmentRaw);
 	}
 

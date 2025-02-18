@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[46,)"
+loaderVersion="[4,)"
 
 license="All Rights Reserved"
 issueTrackerURL="${source}/issues"
@@ -16,16 +16,19 @@ description='''
 ${description}
 '''
 
+[[mixins]]
+config="pin_tooltips.mixins.json"
+
 [[dependencies.pin_tooltips]]
-modId="forge"
+modId="neoforge"
 mandatory=true
-versionRange="[46,)"
+versionRange="[21,)"
 side="CLIENT"
 
 [[dependencies.pin_tooltips]]
 modId="minecraft"
 mandatory=true
-versionRange="[1.20,)"
+versionRange="[1.21,)"
 side="CLIENT"
 
 [[dependencies.pin_tooltips]]
@@ -36,6 +39,6 @@ side="CLIENT"
 
 [[dependencies.pin_tooltips]]
 modId="more_enchantment_info"
-mandatory=false
+type="optional"
 versionRange="[0.2,)"
 side="CLIENT"
