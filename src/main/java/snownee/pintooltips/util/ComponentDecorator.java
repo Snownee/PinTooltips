@@ -1,7 +1,6 @@
 package snownee.pintooltips.util;
 
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
@@ -12,7 +11,7 @@ import snownee.pintooltips.PinTooltipsCompats;
 
 public class ComponentDecorator {
 	public static void mobEffect(MutableComponent component, MobEffectInstance effectInstance) {
-		Component desc = DefaultDescriptions.forStatusEffectFormatted(effectInstance.getEffect());
+		Component desc = DefaultDescriptions.forStatusEffectFormatted(effectInstance.getEffect().value());
 		if (desc == null) {
 			return;
 		}
@@ -20,14 +19,14 @@ public class ComponentDecorator {
 		HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, desc);
 		component.withStyle($ -> $.withUnderlined(true).withHoverEvent(hoverEvent));
 		if (PinTooltipsCompats.canClickEffect(effectInstance)) {
-			CompoundTag tag = effectInstance.save(new CompoundTag());
+			var tag = effectInstance.save();
 			component.withStyle($ -> $.withClickEvent(new ClickEvent(
 					ClickEvent.Action.RUN_COMMAND,
 					"@pin_tooltips click_effect %s".formatted(tag))));
 		}
 	}
 
-	public static void enchantment(MutableComponent component, Enchantment enchantment, int level) {
+	public static void enchantment(MutableComponent component, Holder<Enchantment> enchantment, int level) {
 		var desc = DefaultDescriptions.forEnchantmentFormatted(enchantment);
 		if (desc == null) {
 			return;
@@ -38,7 +37,7 @@ public class ComponentDecorator {
 		if (PinTooltipsCompats.canClickEnchantment(enchantment)) {
 			component.withStyle($ -> $.withClickEvent(new ClickEvent(
 					ClickEvent.Action.RUN_COMMAND,
-					"@pin_tooltips click_enchantment %s %d".formatted(BuiltInRegistries.ENCHANTMENT.getKey(enchantment), level))));
+					"@pin_tooltips click_enchantment %s %d".formatted(enchantment.getKey().location(), level))));
 		}
 	}
 }

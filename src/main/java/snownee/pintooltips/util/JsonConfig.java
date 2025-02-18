@@ -44,10 +44,7 @@ public class JsonConfig<T> {
 				return def;
 			}
 			try (BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
-				return codec.parse(JsonOps.INSTANCE, GSON.fromJson(reader, JsonElement.class))
-						.get()
-						.left()
-						.orElseThrow();
+				return codec.parse(JsonOps.INSTANCE, GSON.fromJson(reader, JsonElement.class)).getOrThrow();
 			} catch (Throwable e) {
 				PinTooltips.LOGGER.error("Failed to read config file {}", this.path, e);
 				if (this.path.getNameCount() > 0) {
@@ -90,7 +87,7 @@ public class JsonConfig<T> {
 		}
 
 		try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
-			writer.write(GSON.toJson(codec.encodeStart(JsonOps.INSTANCE, t).get().left().orElseThrow()));
+			writer.write(GSON.toJson(codec.encodeStart(JsonOps.INSTANCE, t).getOrThrow()));
 			if (invalidate) {
 				invalidate();
 			}
