@@ -18,6 +18,7 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -66,10 +67,17 @@ public abstract class ItemStackMixin {
 			at = @At(
 					value = "INVOKE",
 					target = "Lnet/minecraft/network/chat/Component;translatable(Ljava/lang/String;[Ljava/lang/Object;)Lnet/minecraft/network/chat/MutableComponent;"))
-	private MutableComponent pin_tooltips$handleTranslatable(String key, Object[] args, Operation<MutableComponent> original) {
+	private MutableComponent pin_tooltips$handleTranslatable(
+			String key,
+			Object[] args,
+			Operation<MutableComponent> original,
+			Item.TooltipContext tooltipContext) {
 		MutableComponent component = original.call(key, args);
 		if (PinTooltipsHooks.isGrabbing() && "item.components".equals(key) && PinTooltipsHooks.isGrabbing()) {
-			Component prettyComponent = NbtUtils.toPrettyComponent(DataComponentMap.CODEC.encodeStart(NbtOps.INSTANCE, getComponents()).getOrThrow());
+			Component prettyComponent = NbtUtils.toPrettyComponent(DataComponentMap.CODEC.encodeStart(
+					RegistryOps.create(
+							NbtOps.INSTANCE,
+							tooltipContext.registries()), getComponents()).getOrThrow());
 			component.withStyle($ -> $.withHoverEvent(new HoverEvent(
 							HoverEvent.Action.SHOW_TEXT,
 							prettyComponent.copy().append("\n").append(PinTooltips.CLICK_TO_COPY)))
