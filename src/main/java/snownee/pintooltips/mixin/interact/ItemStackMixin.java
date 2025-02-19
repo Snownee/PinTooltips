@@ -10,6 +10,7 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.NbtOps;
@@ -73,11 +74,12 @@ public abstract class ItemStackMixin {
 			Operation<MutableComponent> original,
 			Item.TooltipContext tooltipContext) {
 		MutableComponent component = original.call(key, args);
-		if (PinTooltipsHooks.isGrabbing() && "item.components".equals(key) && PinTooltipsHooks.isGrabbing()) {
+		HolderLookup.Provider registries = tooltipContext.registries();
+		if (PinTooltipsHooks.isGrabbing() && "item.components".equals(key) && registries != null) {
 			Component prettyComponent = NbtUtils.toPrettyComponent(DataComponentMap.CODEC.encodeStart(
 					RegistryOps.create(
 							NbtOps.INSTANCE,
-							tooltipContext.registries()), getComponents()).getOrThrow());
+							registries), getComponents()).getOrThrow());
 			component.withStyle($ -> $.withHoverEvent(new HoverEvent(
 							HoverEvent.Action.SHOW_TEXT,
 							prettyComponent.copy().append("\n").append(PinTooltips.CLICK_TO_COPY)))

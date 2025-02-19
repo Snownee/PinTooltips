@@ -21,21 +21,20 @@ config="pin_tooltips.mixins.json"
 
 [[dependencies.pin_tooltips]]
 modId="neoforge"
-mandatory=true
 versionRange="[21,)"
 side="CLIENT"
 
 [[dependencies.pin_tooltips]]
 modId="minecraft"
-mandatory=true
 versionRange="[1.21,)"
 side="CLIENT"
 
 [[dependencies.pin_tooltips]]
 modId="fabric_api"
-mandatory=true
 versionRange="[0.92,)"
 side="CLIENT"
+reason="Forgified Fabric API is required for this mod to work."
+referralUrl="https://www.curseforge.com/minecraft/mc-mods/forgified-fabric-api"
 
 [[dependencies.pin_tooltips]]
 modId="more_enchantment_info"
