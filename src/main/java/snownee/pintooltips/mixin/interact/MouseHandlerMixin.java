@@ -12,7 +12,7 @@ import snownee.pintooltips.PinTooltips;
 @Mixin(MouseHandler.class)
 public class MouseHandlerMixin {
 	@ModifyReceiver(
-			method = "method_1602",
+			method = "method_55795",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;mouseDragged(DDIDD)Z")
 	)
 	private Screen pin_tooltips$onDrag(

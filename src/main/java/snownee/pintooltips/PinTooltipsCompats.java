@@ -45,7 +45,7 @@ public class PinTooltipsCompats {
 		if (!PinTooltipsConfig.get().jadeModEnchantmentModName() || !shouldAppendModName()) {
 			return desc;
 		}
-		var key = effectInstance.getEffect().getKey();
+		var key = effectInstance.getEffect().unwrapKey().orElse(null);
 		if (key == null) {
 			return desc;
 		}
@@ -56,7 +56,7 @@ public class PinTooltipsCompats {
 		if (!PinTooltipsConfig.get().jadeModEnchantmentModName() || !shouldAppendModName()) {
 			return desc;
 		}
-		var key = enchantment.getKey();
+		var key = enchantment.unwrapKey().orElse(null);
 		if (key == null) {
 			return desc;
 		}

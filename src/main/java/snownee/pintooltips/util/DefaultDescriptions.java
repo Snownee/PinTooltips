@@ -25,7 +25,7 @@ public class DefaultDescriptions {
 	 * is provided by any language file and {@link IdwtialsimmoedmConfig#hideMissingDescriptions} is {@code true}
 	 */
 	public static @Nullable Component forEnchantmentRaw(Holder<Enchantment> enchantment) {
-		var translationKey = Util.makeDescriptionId("enchantment", enchantment.getKey().location()) + ".desc";
+		var translationKey = Util.makeDescriptionId("enchantment", enchantment.unwrapKey().orElseThrow().location()) + ".desc";
 		if (PinTooltipsConfig.get().hideMissingDescriptions() && !Language.getInstance().has(translationKey)) {
 			return null;
 		}

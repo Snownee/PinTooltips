@@ -37,7 +37,7 @@ public class ComponentDecorator {
 		if (PinTooltipsCompats.canClickEnchantment(enchantment)) {
 			component.withStyle($ -> $.withClickEvent(new ClickEvent(
 					ClickEvent.Action.RUN_COMMAND,
-					"@pin_tooltips click_enchantment %s %d".formatted(enchantment.getKey().location(), level))));
+					"@pin_tooltips click_enchantment %s %d".formatted(enchantment.unwrapKey().orElseThrow().location(), level))));
 		}
 	}
 }

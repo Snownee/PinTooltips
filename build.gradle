@@ -59,6 +59,15 @@ repositories {
     }
 
     maven {
+        name = "Fuzs Mod Resources"
+        url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
+
+        content {
+            includeGroup("fuzs.forgeconfigapiport")
+        }
+    }
+
+    maven {
         name = 'ParchmentMC'
         url = 'https://maven.parchmentmc.org'
     }
@@ -81,7 +90,7 @@ dependencies {
 
     modRuntimeOnly("maven.modrinth:prism-lib:1.0.9-fabric")
     modRuntimeOnly("maven.modrinth:iceberg:1.2.9.2-fabric")
-    modRuntimeOnly("maven.modrinth:forge-config-api-port:v21.1.3-1.21.1-Fabric")
+    modApi "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:21.1.3"
     modRuntimeOnly("maven.modrinth:equipment-compare:1.3.12-fabric,1.21")
     modRuntimeOnly("maven.modrinth:legendary-tooltips:1.4.11-fabric,1.21.1")
 
