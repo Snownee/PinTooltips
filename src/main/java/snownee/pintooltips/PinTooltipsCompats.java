@@ -1,9 +1,8 @@
 package snownee.pintooltips;
 
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.enchantment.Enchantment;
 import snownee.jade.api.config.IWailaConfig;
@@ -29,9 +28,9 @@ public class PinTooltipsCompats {
 		}
 	}
 
-	public static boolean canClickEnchantment(Enchantment enchantment) {
+	public static boolean canClickEnchantment(Holder<Enchantment> enchantment) {
 		if (moreEnchantmentInfo) {
-			return MEICompat.canClickEnchantment(enchantment);
+			return MEICompat.canClickEnchantment(enchantment.value());
 		}
 		return false;
 	}
@@ -46,26 +45,27 @@ public class PinTooltipsCompats {
 		if (!PinTooltipsConfig.get().jadeModEnchantmentModName() || !shouldAppendModName()) {
 			return desc;
 		}
-		ResourceLocation key = BuiltInRegistries.MOB_EFFECT.getKey(effectInstance.getEffect());
+		var key = effectInstance.getEffect().unwrapKey().orElse(null);
 		if (key == null) {
 			return desc;
 		}
-		return appendModName(desc, ModIdentification.getModName(key));
+		return appendModName(desc, ModIdentification.getModName(key.location()));
 	}
 
-	public static Component appendModName(Component desc, Enchantment enchantment) {
+	public static Component appendModName(Component desc, Holder<Enchantment> enchantment) {
 		if (!PinTooltipsConfig.get().jadeModEnchantmentModName() || !shouldAppendModName()) {
 			return desc;
 		}
-		ResourceLocation key = BuiltInRegistries.ENCHANTMENT.getKey(enchantment);
+		var key = enchantment.unwrapKey().orElse(null);
 		if (key == null) {
 			return desc;
 		}
-		return appendModName(desc, ModIdentification.getModName(key));
+		return appendModName(desc, ModIdentification.getModName(key.location()));
 	}
 
 	private static Component appendModName(Component desc, String modName) {
-		return desc.copy().append("\n").append(IWailaConfig.get().getFormatting().getModName().formatted(modName));
+		return desc.copy().append("\n").append(Component.literal(modName)
+				.withStyle(IWailaConfig.get().getFormatting().getItemModNameStyle()));
 	}
 
 	public static boolean shouldAppendModName() {

@@ -15,7 +15,7 @@ import com.mojang.blaze3d.platform.Window;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Style;
@@ -59,7 +59,10 @@ public class ScreenMixin {
 				PinTooltipsCompats.clickEffect(effectInstance, mouseX, mouseY, InputConstants.MOUSE_BUTTON_LEFT);
 			} else if (value.startsWith("click_enchantment ")) {
 				String[] parts = StringUtils.split(value.substring(18), " ");
-				Optional<Enchantment> enchantment = BuiltInRegistries.ENCHANTMENT.getOptional(new ResourceLocation(parts[0]));
+				Optional<Enchantment> enchantment = Minecraft.getInstance().level
+						.registryAccess()
+						.registry(Registries.ENCHANTMENT)
+						.flatMap(it -> it.getOptional(ResourceLocation.parse(parts[0])));
 				if (enchantment.isEmpty()) {
 					return;
 				}

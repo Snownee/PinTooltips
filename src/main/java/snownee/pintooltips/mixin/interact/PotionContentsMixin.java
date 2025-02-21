@@ -9,14 +9,14 @@ import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionContents;
 import snownee.pintooltips.PinTooltipsHooks;
 import snownee.pintooltips.util.ComponentDecorator;
 
-@Mixin(PotionUtils.class)
-public class PotionUtilsMixin {
+@Mixin(PotionContents.class)
+public class PotionContentsMixin {
 	@ModifyReceiver(
-			method = "addPotionTooltip(Ljava/util/List;Ljava/util/List;F)V",
+			method = "addPotionTooltip(Ljava/lang/Iterable;Ljava/util/function/Consumer;FF)V",
 			at = @At(
 					value = "INVOKE",
 					ordinal = 0,
