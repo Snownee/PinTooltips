@@ -31,7 +31,8 @@
 		"more_enchantment_info": ">=0.2"
 	},
 	"breaks": {
-		"more_enchantment_info": "<0.2"
+		"more_enchantment_info": "<0.2",
+		"jeed": "<1.21-2.2.15"
 	},
 	"custom": {
 		"modmenu": {
