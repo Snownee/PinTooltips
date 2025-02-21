@@ -41,3 +41,9 @@ modId="more_enchantment_info"
 type="optional"
 versionRange="[0.2,)"
 side="CLIENT"
+
+[[dependencies.pin_tooltips]]
+modId="jeed"
+type="optional"
+versionRange="[1.21-2.2.16,)"
+side="CLIENT"
