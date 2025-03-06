@@ -39,6 +39,8 @@ minecraft {
         client {
 
         }
+
+        server {}
     }
 }
 
