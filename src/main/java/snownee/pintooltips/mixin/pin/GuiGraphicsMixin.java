@@ -113,7 +113,17 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 	}
 
 	@Override
+	public boolean pin_tooltips$getRenderingPinned() {
+		return pin_tooltips$renderingPinned;
+	}
+
+	@Override
 	public void pin_tooltips$setRenderingPinnedEvent(boolean value) {
 		pin_tooltips$renderingPinnedEvent = value;
+	}
+
+	@Override
+	public boolean pin_tooltips$getRenderingPinnedEvent() {
+		return pin_tooltips$renderingPinnedEvent;
 	}
 }

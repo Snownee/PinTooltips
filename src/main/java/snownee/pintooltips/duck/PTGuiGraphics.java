@@ -10,7 +10,11 @@ public interface PTGuiGraphics {
 
 	void pin_tooltips$setRenderingPinned(boolean value);
 
+	boolean pin_tooltips$getRenderingPinned();
+
 	void pin_tooltips$setRenderingPinnedEvent(boolean value);
+
+	boolean pin_tooltips$getRenderingPinnedEvent();
 
 	static PTGuiGraphics of(GuiGraphics guiGraphics) {
 		return (PTGuiGraphics) guiGraphics;
