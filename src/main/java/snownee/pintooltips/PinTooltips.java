@@ -61,6 +61,8 @@ public class PinTooltips implements ClientModInitializer {
 				return;
 			}
 
+			lastMouseMovedTime = 0;
+
 			ScreenKeyboardEvents.afterKeyPress(screen).register((ignored, key, scancode, modifiers) -> {
 				if (GRAB_KEY.matches(key, scancode)) {
 					GRAB_KEY.setDown(true);
@@ -200,10 +202,10 @@ public class PinTooltips implements ClientModInitializer {
 		long time = System.currentTimeMillis();
 
 		if (keyPressedFrames < 0) {
-			int autoPinDelay = PinTooltipsConfig.get().hoveringAutoPinDelay();
-			if (autoPinDelay >= 0) {
+			int delay = PinTooltipsConfig.get().hoveringAutoPinDelay();
+			if (delay >= 0) {
 				hasTooltipInThisFrame = true;
-				if (lastMouseMovedTime > 0 && time - lastMouseMovedTime >= autoPinDelay) {
+				if (lastMouseMovedTime > 0 && time - lastMouseMovedTime >= delay) {
 					service.pin(position, components, font, itemStack, time);
 				}
 			}
@@ -226,6 +228,6 @@ public class PinTooltips implements ClientModInitializer {
 
 	public static boolean isGrabbing() {
 		int delay = PinTooltipsConfig.get().hoveringAutoPinDelay();
-		return GRAB_KEY.isDown() || delay >= 0 && System.currentTimeMillis() - lastMouseMovedTime >= delay;
+		return GRAB_KEY.isDown() || delay >= 0 && lastMouseMovedTime > 0 && System.currentTimeMillis() - lastMouseMovedTime >= delay;
 	}
 }
