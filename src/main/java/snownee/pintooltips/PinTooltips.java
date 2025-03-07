@@ -36,7 +36,7 @@ public class PinTooltips implements ClientModInitializer {
 	private static long lastRenderTooltipTime;
 	private static int lastMouseX;
 	private static int lastMouseY;
-	private static long lastMouseMovedTime;
+	public static long lastMouseMovedTime;
 	private static boolean hasTooltipInThisFrame;
 
 	public static final KeyMapping GRAB_KEY = KeyBindingHelper.registerKeyBinding(new KeyMapping(
