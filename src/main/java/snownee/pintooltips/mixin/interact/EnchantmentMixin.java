@@ -15,7 +15,7 @@ import snownee.pintooltips.util.ComponentDecorator;
 @Mixin(Enchantment.class)
 public class EnchantmentMixin {
 	@ModifyReturnValue(method = "getFullname", at = @At("RETURN"))
-	private static Component getFullname(final Component original, Holder<Enchantment> enchantment, int level) {
+	private static Component pin_tooltips$getFullname(final Component original, Holder<Enchantment> enchantment, int level) {
 		if (PinTooltipsHooks.isGrabbing() && original instanceof MutableComponent component) {
 			ComponentDecorator.enchantment(component, enchantment, level);
 		}
