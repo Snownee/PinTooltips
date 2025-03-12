@@ -2,7 +2,6 @@ package snownee.pintooltips.util;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -28,7 +27,7 @@ public class DefaultDescriptions {
 	 * is provided by any language file and {@link IdwtialsimmoedmConfig#hideMissingDescriptions} is {@code true}
 	 */
 	public static @Nullable Component forEnchantmentRaw(Holder<Enchantment> enchantment) {
-		var translationKey = Util.makeDescriptionId("enchantment", Objects.requireNonNull(enchantment.getKey()).location()) + ".desc";
+		var translationKey = Util.makeDescriptionId("enchantment", enchantment.unwrapKey().orElseThrow().location()) + ".desc";
 		if (PinTooltipsConfig.hideMissingDescriptions && !Language.getInstance().has(translationKey)) {
 			return null;
 		}

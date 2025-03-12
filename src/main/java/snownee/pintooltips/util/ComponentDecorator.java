@@ -1,7 +1,5 @@
 package snownee.pintooltips.util;
 
-import java.util.Objects;
-
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
@@ -39,7 +37,7 @@ public class ComponentDecorator {
 		if (PinTooltipsCompats.canClickEnchantment(enchantment)) {
 			component.withStyle($ -> $.withClickEvent(new ClickEvent(
 					ClickEvent.Action.RUN_COMMAND,
-					"@pin_tooltips click_enchantment %s %d".formatted(Objects.requireNonNull(enchantment.getKey()).location(), level))));
+					"@pin_tooltips click_enchantment %s %d".formatted(enchantment.unwrapKey().orElseThrow().location(), level))));
 		}
 	}
 }
