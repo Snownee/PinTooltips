@@ -9,9 +9,10 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
+import snownee.pintooltips.PinTooltips;
 import snownee.pintooltips.PinnedTooltipsService;
 
-@Mixin(GameRenderer.class)
+@Mixin(value = GameRenderer.class, priority = 5000)
 public class GameRendererMixin {
 	@WrapOperation(
 			method = "render",
@@ -26,6 +27,7 @@ public class GameRendererMixin {
 			float partialTick,
 			Operation<Void> original) {
 		if (PinnedTooltipsService.INSTANCE.hovered != null) {
+			PinTooltips.LOGGER.info("111111111");
 			mouseX = Integer.MAX_VALUE;
 			mouseY = Integer.MAX_VALUE;
 		}
