@@ -1,6 +1,5 @@
 package snownee.pintooltips;
 
-import java.io.File;
 import java.util.List;
 import java.util.Objects;
 
@@ -55,7 +54,6 @@ public class PinTooltips implements ClientModInitializer {
 			"key.categories.misc"
 	));
 
-	public static File configDirectory = FabricLoader.getInstance().getConfigDir().toFile();
 	private static boolean validateTranslations = FabricLoader.getInstance().isDevelopmentEnvironment();
 
 	public static int getMaxZOffset() {
