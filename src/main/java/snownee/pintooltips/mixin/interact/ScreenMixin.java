@@ -1,5 +1,6 @@
 package snownee.pintooltips.mixin.interact;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
@@ -10,10 +11,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Window;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.TagParser;
@@ -24,6 +28,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.enchantment.Enchantment;
 import snownee.pintooltips.PinTooltips;
 import snownee.pintooltips.PinTooltipsCompats;
+import snownee.pintooltips.PinTooltipsHooks;
 
 @Mixin(Screen.class)
 public class ScreenMixin {
@@ -35,7 +40,7 @@ public class ScreenMixin {
 			method = "handleComponentClicked",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;hasShiftDown()Z"),
 			cancellable = true)
-	private void handleComponentClicked(Style style, CallbackInfoReturnable<Boolean> cir) {
+	private void pin_tooltips$handleComponentClicked(Style style, CallbackInfoReturnable<Boolean> cir) {
 		ClickEvent clickEvent = style.getClickEvent();
 		if (clickEvent == null || minecraft == null || clickEvent.getAction() != ClickEvent.Action.RUN_COMMAND) {
 			return;
@@ -59,7 +64,7 @@ public class ScreenMixin {
 				PinTooltipsCompats.clickEffect(effectInstance, mouseX, mouseY, InputConstants.MOUSE_BUTTON_LEFT);
 			} else if (value.startsWith("click_enchantment ")) {
 				String[] parts = StringUtils.split(value.substring(18), " ");
-				Optional<Enchantment> enchantment = Minecraft.getInstance().level
+				Optional<Enchantment> enchantment = Objects.requireNonNull(Minecraft.getInstance().level)
 						.registryAccess()
 						.registry(Registries.ENCHANTMENT)
 						.flatMap(it -> it.getOptional(ResourceLocation.parse(parts[0])));
@@ -74,5 +79,17 @@ public class ScreenMixin {
 			PinTooltips.LOGGER.error("Failed to parse component action", e);
 		}
 		cir.setReturnValue(true);
+	}
+
+	@WrapMethod(method = "renderWithTooltip")
+	private void pin_tooltips$renderWithTooltip(
+			GuiGraphics guiGraphics,
+			int mouseX,
+			int mouseY,
+			float partialTick,
+			Operation<Void> original) {
+		boolean grabbing = PinTooltipsHooks.markGrabbing();
+		original.call(guiGraphics, mouseX, mouseY, partialTick);
+		PinTooltipsHooks.unmarkGrabbing(grabbing);
 	}
 }

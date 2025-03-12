@@ -21,7 +21,7 @@ public class PotionContentsMixin {
 					value = "INVOKE",
 					ordinal = 0,
 					target = "Lnet/minecraft/network/chat/MutableComponent;withStyle(Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;"))
-	private static MutableComponent addPotionTooltip(
+	private static MutableComponent pin_tooltips$addPotionTooltip(
 			final MutableComponent component,
 			final ChatFormatting format,
 			@Local MobEffectInstance effectInstance) {
