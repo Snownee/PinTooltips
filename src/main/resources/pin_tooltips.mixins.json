@@ -5,6 +5,7 @@
 	"compatibilityLevel": "JAVA_21",
 	"refmap": "pin_tooltips.refmap.json",
 	"client": [
+		"fabric.GameRendererMixin",
 		"interact.ClientTextTooltipAccess",
 		"interact.EnchantmentMixin",
 		"interact.ItemStackMixin",
