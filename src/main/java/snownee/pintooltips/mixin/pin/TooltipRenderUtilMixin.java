@@ -49,7 +49,7 @@ public class TooltipRenderUtilMixin {
 		if (pin_tooltips$lock.get()) {
 			return;
 		}
-		int delay = PinTooltipsConfig.get().hoveringAutoPinDelay();
+		int delay = PinTooltipsConfig.hoveringAutoPinDelay;
 		if (PinTooltips.lastMouseMovedTime == 0 || delay <= 0) {
 			return;
 		}

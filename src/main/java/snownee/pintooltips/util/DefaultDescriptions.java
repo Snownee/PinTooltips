@@ -2,13 +2,16 @@ package snownee.pintooltips.util;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.locale.Language;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.enchantment.Enchantment;
 import snownee.pintooltips.PinTooltipsConfig;
@@ -25,12 +28,12 @@ public class DefaultDescriptions {
 	 * is provided by any language file and {@link IdwtialsimmoedmConfig#hideMissingDescriptions} is {@code true}
 	 */
 	public static @Nullable Component forEnchantmentRaw(Holder<Enchantment> enchantment) {
-		var translationKey = Util.makeDescriptionId("enchantment", enchantment.getKey().location()) + ".desc";
-		if (PinTooltipsConfig.get().hideMissingDescriptions() && !Language.getInstance().has(translationKey)) {
+		var translationKey = Util.makeDescriptionId("enchantment", Objects.requireNonNull(enchantment.getKey()).location()) + ".desc";
+		if (PinTooltipsConfig.hideMissingDescriptions && !Language.getInstance().has(translationKey)) {
 			return null;
 		}
 
-		return Component.translatable(translationKey);
+		return clickCopyTranslationKey(translationKey);
 	}
 
 	/**
@@ -58,11 +61,11 @@ public class DefaultDescriptions {
 			return Component.translatable(secondaryTranslationKey);
 		}
 
-		if (PinTooltipsConfig.get().hideMissingDescriptions()) {
+		if (PinTooltipsConfig.hideMissingDescriptions) {
 			return null;
 		}
 
-		return Component.translatable(primaryTranslationKey);
+		return clickCopyTranslationKey(primaryTranslationKey);
 	}
 
 	/**
@@ -72,6 +75,10 @@ public class DefaultDescriptions {
 	 */
 	public static @Nullable Component forStatusEffectFormatted(MobEffect effect) {
 		return EFFECT_CACHE.computeIfAbsent(effect, DefaultDescriptions::forStatusEffectRaw);
+	}
+
+	public static Component clickCopyTranslationKey(String key) {
+		return Component.translatable(key).withStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, key)));
 	}
 
 	public static void clearCache() {

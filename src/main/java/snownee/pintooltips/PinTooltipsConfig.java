@@ -3,66 +3,31 @@ package snownee.pintooltips;
 import java.util.List;
 import java.util.Set;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.gui.screens.GenericMessageScreen;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.ProgressScreen;
 import net.minecraft.client.gui.screens.ReceivingLevelScreen;
-import snownee.pintooltips.util.DefaultDescriptions;
-import snownee.pintooltips.util.JsonConfig;
+import snownee.kiwi.KiwiModule;
+import snownee.kiwi.config.KiwiConfig;
 
-public record PinTooltipsConfig(
-		boolean hideMissingDescriptions,
-		boolean jadeModEnchantmentModName,
-		boolean jadeModMobEffectModName,
-		int hoveringAutoPinDelay,
-		Set<String> screenBlacklist
-) {
-	public static final Codec<PinTooltipsConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			Codec.BOOL.fieldOf("hideMissingDescriptions")
-					.orElse(true)
-					.forGetter(PinTooltipsConfig::hideMissingDescriptions),
-			Codec.BOOL.fieldOf("jadeModEnchantmentModName")
-					.orElse(true)
-					.forGetter(PinTooltipsConfig::jadeModEnchantmentModName),
-			Codec.BOOL.fieldOf("jadeModMobEffectModName")
-					.orElse(true)
-					.forGetter(PinTooltipsConfig::jadeModMobEffectModName),
-			Codec.INT.fieldOf("hoveringAutoPinDelay")
-					.orElse(1500)
-					.forGetter(PinTooltipsConfig::hoveringAutoPinDelay),
-			Codec.STRING.listOf()
-					.<Set<String>>xmap(it -> new ObjectOpenHashSet<>(it), List::copyOf)
-					.fieldOf("screenBlacklist")
-					.orElseGet(PinTooltipsConfig::defaultBlacklist)
-					.forGetter(PinTooltipsConfig::screenBlacklist)
-	).apply(instance, PinTooltipsConfig::new));
+@KiwiConfig(type = KiwiConfig.ConfigType.CLIENT)
+public class PinTooltipsConfig {
+	public static boolean hideMissingDescriptions = true;
+	public static boolean jadeModEnchantmentModName = true;
+	public static boolean jadeModMobEffectModName = true;
+	public static int hoveringAutoPinDelay = 1500;
+	public static List<String> screenBlacklist = defaultBlacklist();
+	@KiwiModule.Skip
+	public static Set<String> screenBlacklistSet = Set.copyOf(defaultBlacklist());
 
-	private static final JsonConfig<PinTooltipsConfig> INSTANCE;
-
-	static {
-		INSTANCE = new JsonConfig<>(
-				PinTooltips.configDirectory.toPath().resolve("pin_tooltips.json"),
-				CODEC,
-				DefaultDescriptions::clearCache,
-				() -> new PinTooltipsConfig(true, true, true, 1500, defaultBlacklist())
-		);
+	@KiwiConfig.Listen("screenBlacklist")
+	public static void blocklistChanged(String path) {
+		screenBlacklistSet = Set.copyOf(screenBlacklist);
 	}
 
-	public static PinTooltipsConfig get() {
-		return INSTANCE.get();
-	}
-
-	public static void save() {
-		INSTANCE.save();
-	}
-
-	private static Set<String> defaultBlacklist() {
-		return Set.of(
+	private static List<String> defaultBlacklist() {
+		return List.of(
 				PauseScreen.class.getName(),
 				ChatScreen.class.getName(),
 				GenericMessageScreen.class.getName(),
