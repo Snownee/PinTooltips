@@ -10,6 +10,7 @@
 		"interact.ItemStackMixin",
 		"interact.PotionContentsMixin",
 		"interact.ScreenMixin",
+		"neo.GameRendererMixin",
 		"pin.AbstractContainerScreenMixin",
 		"pin.GuiGraphicsAccess",
 		"pin.GuiGraphicsMixin",

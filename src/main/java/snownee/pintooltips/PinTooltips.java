@@ -127,7 +127,19 @@ public class PinTooltips implements ClientModInitializer {
 				service.clearStates();
 				if (focused != null) {
 					if (button == InputConstants.MOUSE_BUTTON_LEFT && !dragging) {
-						Style style = focused.getStyleAt(mouseX, mouseY, Minecraft.getInstance().font);
+						// Mouse position is offset to avoid rendering highlights. Re-calculate it.
+						Minecraft mc = Minecraft.getInstance();
+						mouseX = (int) (
+								mc.mouseHandler.xpos()
+										* (double) mc.getWindow().getGuiScaledWidth()
+										/ (double) mc.getWindow().getScreenWidth()
+						);
+						mouseY = (int) (
+								mc.mouseHandler.ypos()
+										* (double) mc.getWindow().getGuiScaledHeight()
+										/ (double) mc.getWindow().getScreenHeight()
+						);
+						Style style = focused.getStyleAt(mouseX, mouseY, mc.font);
 						if (style != null) {
 							screen1.handleComponentClicked(style);
 						}
@@ -141,6 +153,18 @@ public class PinTooltips implements ClientModInitializer {
 				if (!shouldShowTooltips(screen1)) {
 					return;
 				}
+				// Mouse position is offset to avoid rendering highlights. Re-calculate it.
+				Minecraft mc = Minecraft.getInstance();
+				mouseX = (int) (
+						mc.mouseHandler.xpos()
+								* (double) mc.getWindow().getGuiScaledWidth()
+								/ (double) mc.getWindow().getScreenWidth()
+				);
+				mouseY = (int) (
+						mc.mouseHandler.ypos()
+								* (double) mc.getWindow().getGuiScaledHeight()
+								/ (double) mc.getWindow().getScreenHeight()
+				);
 				if (hasTooltipInThisFrame) {
 					hasTooltipInThisFrame = false;
 					if (lastMouseX != mouseX || lastMouseY != mouseY) {
@@ -155,7 +179,7 @@ public class PinTooltips implements ClientModInitializer {
 				}
 
 				service.hovered = service.findHovered(mouseX, mouseY);
-				var font = Minecraft.getInstance().font;
+				var font = mc.font;
 				var zOffset = 1;
 				for (var tooltip : service.tooltips()) {
 					context.pose().pushPose();
@@ -285,6 +309,7 @@ public class PinTooltips implements ClientModInitializer {
 	}
 
 	public static boolean shouldShowTooltips(Screen screen) {
+		// Avoid rendering tooltips when there are multiple screens open
 		return Minecraft.getInstance().screen == screen;
 	}
 }
