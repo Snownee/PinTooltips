@@ -97,6 +97,8 @@ dependencies {
     modImplementation("maven.modrinth:jei:19.21.0.247-fabric")
     modImplementation("maven.modrinth:just-enough-effect-descriptions-jeed:1.21-2.2.15-fabric")
     modImplementation("maven.modrinth:jade:15.9.3+fabric")
+    modImplementation("maven.modrinth:kiwi:15.1.4+fabric")
+    annotationProcessor("maven.modrinth:kiwi:15.1.4+fabric")
 }
 
 processResources {
@@ -130,6 +132,8 @@ unifiedPublishing {
                 id = "1131483"
 
                 relations { // Optional, Inferred from the relations above by default
+                    depends "fabric-api"
+                    depends "kiwi-fabric"
                     optional "jade"
                     optional "more-enchantment-info"
                     optional "just-enough-effect-descriptions-jeed"
@@ -143,6 +147,8 @@ unifiedPublishing {
                 id = "fFmpgMfg"
 
                 relations { // Optional, Inferred from the relations above by default
+                    depends "fabric-api"
+                    depends "kiwi"
                     optional "jade"
                     optional "more-enchantment-info"
                     optional "just-enough-effect-descriptions-jeed"

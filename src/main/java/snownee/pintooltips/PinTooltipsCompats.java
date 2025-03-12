@@ -42,7 +42,7 @@ public class PinTooltipsCompats {
 	}
 
 	public static Component appendModName(Component desc, MobEffectInstance effectInstance) {
-		if (!PinTooltipsConfig.get().jadeModEnchantmentModName() || !shouldAppendModName()) {
+		if (!PinTooltipsConfig.jadeModMobEffectModName || !shouldAppendModName()) {
 			return desc;
 		}
 		var key = effectInstance.getEffect().unwrapKey().orElse(null);
@@ -53,7 +53,7 @@ public class PinTooltipsCompats {
 	}
 
 	public static Component appendModName(Component desc, Holder<Enchantment> enchantment) {
-		if (!PinTooltipsConfig.get().jadeModEnchantmentModName() || !shouldAppendModName()) {
+		if (!PinTooltipsConfig.jadeModEnchantmentModName || !shouldAppendModName()) {
 			return desc;
 		}
 		var key = enchantment.unwrapKey().orElse(null);
