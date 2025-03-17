@@ -43,9 +43,9 @@ public abstract class ItemStackMixin {
 			final @Nullable Player player,
 			final TooltipFlag isAdvanced,
 			final Operation<List<Component>> original) {
-		PinTooltipsHooks.markGrabbing();
+		boolean grabbing = PinTooltipsHooks.markGrabbing();
 		var result = original.call(player, isAdvanced);
-		PinTooltipsHooks.unmarkGrabbing();
+		PinTooltipsHooks.unmarkGrabbing(grabbing);
 		return result;
 	}
 
