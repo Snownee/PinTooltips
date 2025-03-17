@@ -5,14 +5,17 @@ import java.util.Map;
 
 import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.core.Holder;
 import net.minecraft.locale.Language;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.enchantment.Enchantment;
 import snownee.pintooltips.PinTooltipsConfig;
 
 public class DefaultDescriptions {
-	private static final Map<Enchantment, Component> ENCHANTMENT_CACHE = new HashMap<>();
+	private static final Map<Holder<Enchantment>, Component> ENCHANTMENT_CACHE = new HashMap<>();
 	private static final Map<MobEffect, Component> EFFECT_CACHE = new HashMap<>();
 
 	private DefaultDescriptions() {}
@@ -22,13 +25,13 @@ public class DefaultDescriptions {
 	 * {@code <enchantment translation key>.desc}) for {@code enchantment}, or {@code null} if no description
 	 * is provided by any language file and {@link IdwtialsimmoedmConfig#hideMissingDescriptions} is {@code true}
 	 */
-	public static @Nullable Component forEnchantmentRaw(Enchantment enchantment) {
-		var translationKey = enchantment.getDescriptionId() + ".desc";
+	public static @Nullable Component forEnchantmentRaw(Holder<Enchantment> enchantment) {
+		var translationKey = enchantment.value().getDescriptionId() + ".desc";
 		if (PinTooltipsConfig.get().hideMissingDescriptions() && !Language.getInstance().has(translationKey)) {
 			return null;
 		}
 
-		return Component.translatable(translationKey);
+		return clickCopyTranslationKey(translationKey);
 	}
 
 	/**
@@ -36,7 +39,7 @@ public class DefaultDescriptions {
 	 * {@code enchantment}, or {@code null} if no description is provided by any language file and
 	 * {@link IdwtialsimmoedmConfig#hideMissingDescriptions} is {@code true}
 	 */
-	public static @Nullable Component forEnchantmentFormatted(Enchantment enchantment) {
+	public static @Nullable Component forEnchantmentFormatted(Holder<Enchantment> enchantment) {
 		return ENCHANTMENT_CACHE.computeIfAbsent(enchantment, DefaultDescriptions::forEnchantmentRaw);
 	}
 
@@ -60,7 +63,7 @@ public class DefaultDescriptions {
 			return null;
 		}
 
-		return Component.translatable(primaryTranslationKey);
+		return clickCopyTranslationKey(primaryTranslationKey);
 	}
 
 	/**
@@ -70,6 +73,10 @@ public class DefaultDescriptions {
 	 */
 	public static @Nullable Component forStatusEffectFormatted(MobEffect effect) {
 		return EFFECT_CACHE.computeIfAbsent(effect, DefaultDescriptions::forStatusEffectRaw);
+	}
+
+	public static Component clickCopyTranslationKey(String key) {
+		return Component.translatable(key).withStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, key)));
 	}
 
 	public static void clearCache() {

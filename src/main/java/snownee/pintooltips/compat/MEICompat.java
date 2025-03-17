@@ -3,6 +3,7 @@ package snownee.pintooltips.compat;
 import java.lang.reflect.Method;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.enchantment.Enchantment;
 import snownee.pintooltips.PinTooltips;
 
@@ -23,7 +24,7 @@ public class MEICompat {
 		return INSTANCE;
 	}
 
-	public static boolean canClickEnchantment(Enchantment enchantment) {
+	public static boolean canClickEnchantment(Holder<Enchantment> enchantment) {
 		return isAvailable();
 	}
 

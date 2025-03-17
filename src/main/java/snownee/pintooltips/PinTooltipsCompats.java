@@ -1,6 +1,7 @@
 package snownee.pintooltips;
 
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -29,7 +30,7 @@ public class PinTooltipsCompats {
 		}
 	}
 
-	public static boolean canClickEnchantment(Enchantment enchantment) {
+	public static boolean canClickEnchantment(Holder<Enchantment> enchantment) {
 		if (moreEnchantmentInfo) {
 			return MEICompat.canClickEnchantment(enchantment);
 		}
@@ -53,14 +54,11 @@ public class PinTooltipsCompats {
 		return appendModName(desc, ModIdentification.getModName(key));
 	}
 
-	public static Component appendModName(Component desc, Enchantment enchantment) {
+	public static Component appendModName(Component desc, Holder<Enchantment> enchantment) {
 		if (!PinTooltipsConfig.get().jadeModEnchantmentModName() || !shouldAppendModName()) {
 			return desc;
 		}
-		ResourceLocation key = BuiltInRegistries.ENCHANTMENT.getKey(enchantment);
-		if (key == null) {
-			return desc;
-		}
+		ResourceLocation key = enchantment.unwrapKey().orElseThrow().location();
 		return appendModName(desc, ModIdentification.getModName(key));
 	}
 

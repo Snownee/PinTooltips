@@ -2,10 +2,13 @@ package snownee.pintooltips;
 
 import java.io.File;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import org.joml.Vector2ic;
 import org.slf4j.Logger;
 
+import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.logging.LogUtils;
 
@@ -22,10 +25,17 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import snownee.pintooltips.util.DefaultDescriptions;
 
 public class PinTooltips implements ClientModInitializer {
 	public static final String ID = "pin_tooltips";
@@ -47,6 +57,7 @@ public class PinTooltips implements ClientModInitializer {
 	));
 
 	public static File configDirectory = FabricLoader.getInstance().getConfigDir().toFile();
+	private static boolean validateTranslations = FabricLoader.getInstance().isDevelopmentEnvironment();
 
 	public static int getMaxZOffset() {
 		return 6000;
@@ -59,6 +70,12 @@ public class PinTooltips implements ClientModInitializer {
 		ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
 			if (PinTooltipsConfig.get().screenBlacklist().contains(screen.getClass().getName())) {
 				return;
+			}
+
+			if (validateTranslations && client.level != null &&
+					client.level.registryAccess().registry(Registries.ENCHANTMENT).isPresent()) {
+				validateTranslations = false;
+				validateTranslations();
 			}
 
 			lastMouseMovedTime = 0;
@@ -165,6 +182,34 @@ public class PinTooltips implements ClientModInitializer {
 		});
 
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> service.clearStates());
+	}
+
+	private static void validateTranslations() {
+		LOGGER.info("Validating translations...");
+		PinTooltipsConfig.setOverride(new PinTooltipsConfig(true, false, false, 1500, Set.of()));
+		RegistryAccess registryAccess = Objects.requireNonNull(Minecraft.getInstance().level).registryAccess();
+		List<ResourceLocation> missingEnchantments = Lists.newArrayList();
+		for (Holder.Reference<Enchantment> holder : registryAccess.registryOrThrow(Registries.ENCHANTMENT).holders().toList()) {
+			if (DefaultDescriptions.forEnchantmentRaw(holder) == null) {
+				missingEnchantments.add(holder.key().location());
+			}
+		}
+		if (!missingEnchantments.isEmpty()) {
+			String msg = "Missing enchantment descriptions: %s".formatted(missingEnchantments);
+			Minecraft.getInstance().getChatListener().handleSystemMessage(Component.literal(msg).withStyle(ChatFormatting.DARK_RED), false);
+		}
+		List<ResourceLocation> missingEffects = Lists.newArrayList();
+		for (Holder.Reference<MobEffect> holder : registryAccess.registryOrThrow(Registries.MOB_EFFECT).holders().toList()) {
+			if (DefaultDescriptions.forStatusEffectRaw(holder.value()) == null) {
+				missingEffects.add(holder.key().location());
+			}
+		}
+		if (!missingEffects.isEmpty()) {
+			String msg = "Missing status effect descriptions: %s".formatted(missingEffects);
+			Minecraft.getInstance().getChatListener().handleSystemMessage(Component.literal(msg).withStyle(ChatFormatting.DARK_RED), false);
+		}
+		PinTooltipsConfig.setOverride(null);
+		LOGGER.info("Translations validated.");
 	}
 
 	public static void onDrag(Screen screen, int button, double deltaX, double deltaY) {
