@@ -80,8 +80,8 @@ public class PinTooltips implements ClientModInitializer {
 
 			lastMouseMovedTime = 0;
 
-			ScreenKeyboardEvents.afterKeyPress(screen).register((ignored, key, scancode, modifiers) -> {
-				if (GRAB_KEY.matches(key, scancode)) {
+			ScreenKeyboardEvents.afterKeyPress(screen).register((screen1, key, scancode, modifiers) -> {
+				if (shouldShowTooltips(screen1) && GRAB_KEY.matches(key, scancode)) {
 					GRAB_KEY.setDown(true);
 					if (keyPressedFrames < 0) {
 						keyPressedFrames = 0;
@@ -89,14 +89,17 @@ public class PinTooltips implements ClientModInitializer {
 				}
 			});
 
-			ScreenKeyboardEvents.afterKeyRelease(screen).register((ignored, key, scancode, modifiers) -> {
-				if (GRAB_KEY.matches(key, scancode)) {
+			ScreenKeyboardEvents.afterKeyRelease(screen).register((screen1, key, scancode, modifiers) -> {
+				if (shouldShowTooltips(screen1) && GRAB_KEY.matches(key, scancode)) {
 					GRAB_KEY.setDown(false);
 					keyPressedFrames = -1;
 				}
 			});
 
-			ScreenMouseEvents.allowMouseClick(screen).register((ignored, mouseX, mouseY, button) -> {
+			ScreenMouseEvents.allowMouseClick(screen).register((screen1, mouseX, mouseY, button) -> {
+				if (!shouldShowTooltips(screen1)) {
+					return true;
+				}
 				if (button != InputConstants.MOUSE_BUTTON_LEFT && button != InputConstants.MOUSE_BUTTON_MIDDLE) {
 					return true;
 				}
@@ -118,6 +121,9 @@ public class PinTooltips implements ClientModInitializer {
 			});
 
 			ScreenMouseEvents.allowMouseRelease(screen).register((screen1, mouseX, mouseY, button) -> {
+				if (!shouldShowTooltips(screen1)) {
+					return true;
+				}
 				var focused = service.focused;
 				var dragging = service.dragging;
 				service.clearStates();
@@ -134,6 +140,9 @@ public class PinTooltips implements ClientModInitializer {
 			});
 
 			ScreenEvents.afterRender(screen).register((screen1, context, mouseX, mouseY, tickDelta) -> {
+				if (!shouldShowTooltips(screen1)) {
+					return;
+				}
 				if (hasTooltipInThisFrame) {
 					hasTooltipInThisFrame = false;
 					if (lastMouseX != mouseX || lastMouseY != mouseY) {
@@ -274,5 +283,9 @@ public class PinTooltips implements ClientModInitializer {
 	public static boolean isGrabbing() {
 		int delay = PinTooltipsConfig.get().hoveringAutoPinDelay();
 		return GRAB_KEY.isDown() || delay >= 0 && lastMouseMovedTime > 0 && System.currentTimeMillis() - lastMouseMovedTime >= delay;
+	}
+
+	public static boolean shouldShowTooltips(Screen screen) {
+		return Minecraft.getInstance().screen == screen;
 	}
 }
