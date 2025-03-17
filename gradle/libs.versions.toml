@@ -21,4 +21,4 @@ modmenu = { group = "com.terraformersmc", name = "modmenu", version.ref = "modme
 cloth-config = { group = "me.shedaniel.cloth", name = "cloth-config-fabric", version.ref = "cloth-config" }
 
 [plugins]
-fabric-loom = { id = "fabric-loom", version = "1.7.+" }
+fabric-loom = { id = "fabric-loom", version = "1.10-SNAPSHOT" }

@@ -3,6 +3,8 @@ package snownee.pintooltips;
 import java.util.List;
 import java.util.Set;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
@@ -43,6 +45,7 @@ public record PinTooltipsConfig(
 	).apply(instance, PinTooltipsConfig::new));
 
 	private static final JsonConfig<PinTooltipsConfig> INSTANCE;
+	private static @Nullable PinTooltipsConfig override;
 
 	static {
 		INSTANCE = new JsonConfig<>(
@@ -54,6 +57,9 @@ public record PinTooltipsConfig(
 	}
 
 	public static PinTooltipsConfig get() {
+		if (override != null) {
+			return override;
+		}
 		return INSTANCE.get();
 	}
 
@@ -69,5 +75,9 @@ public record PinTooltipsConfig(
 				ReceivingLevelScreen.class.getName(),
 				ProgressScreen.class.getName()
 		);
+	}
+
+	public static void setOverride(@Nullable PinTooltipsConfig config) {
+		override = config;
 	}
 }

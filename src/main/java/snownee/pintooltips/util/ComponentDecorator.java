@@ -1,6 +1,6 @@
 package snownee.pintooltips.util;
 
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
@@ -27,7 +27,7 @@ public class ComponentDecorator {
 		}
 	}
 
-	public static void enchantment(MutableComponent component, Enchantment enchantment, int level) {
+	public static void enchantment(MutableComponent component, Holder<Enchantment> enchantment, int level) {
 		var desc = DefaultDescriptions.forEnchantmentFormatted(enchantment);
 		if (desc == null) {
 			return;
@@ -38,7 +38,7 @@ public class ComponentDecorator {
 		if (PinTooltipsCompats.canClickEnchantment(enchantment)) {
 			component.withStyle($ -> $.withClickEvent(new ClickEvent(
 					ClickEvent.Action.RUN_COMMAND,
-					"@pin_tooltips click_enchantment %s %d".formatted(BuiltInRegistries.ENCHANTMENT.getKey(enchantment), level))));
+					"@pin_tooltips click_enchantment %s %d".formatted(enchantment.unwrapKey().orElseThrow().location(), level))));
 		}
 	}
 }

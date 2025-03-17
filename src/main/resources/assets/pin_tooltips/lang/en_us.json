@@ -41,6 +41,9 @@
 	"enchantment.minecraft.piercing.desc": "Arrows fired from the Crossbow will pierce through multiple enemies at once",
 	"enchantment.minecraft.soul_speed.desc": "Greater walking speed on Soul Sand and Soul Soil",
 	"enchantment.minecraft.swift_sneak.desc": "Enhanced movement speed while sneaking",
+	"enchantment.minecraft.density.desc": "Increases attack damage based on the fall distance",
+	"enchantment.minecraft.breach.desc": "Reduces the effectiveness of the armor on the target",
+	"enchantment.minecraft.wind_burst.desc": "Emits a burst of wind (like that of a wind charge) upon executing a mace smash attack on an entity, launching the attacker upward.",
 	"effect.minecraft.night_vision.desc": "Improved vision in darkness",
 	"effect.minecraft.absorption.desc": "Temporary, non-regenerating extra health",
 	"effect.minecraft.bad_omen.desc": "Entering a village area causes mayhem",
@@ -73,5 +76,11 @@
 	"effect.minecraft.weakness.desc": "Significantly reduced attack strength",
 	"effect.minecraft.luck.desc": "Improved luck in some circumstances, primarily fishing",
 	"effect.minecraft.unluck.desc": "Bad luck in some circumstances, primarily fishing",
-	"effect.minecraft.wither.desc": "Applies damage to the affected over time"
+	"effect.minecraft.wither.desc": "Applies damage to the affected over time",
+	"effect.minecraft.trial_omen.desc": "Transforms nearby trial spawners into ominous trial spawners",
+	"effect.minecraft.raid_omen.desc": "Starts a raid at the location the player gained the Raid Omen, once the effect expires",
+	"effect.minecraft.wind_charged.desc": "Emits a burst of wind upon death",
+	"effect.minecraft.weaving.desc": "Spreads cobweb blocks upon death",
+	"effect.minecraft.oozing.desc": "Spawns 2 slimes upon death",
+	"effect.minecraft.infested.desc": "10% chance to spawn between 1 and 3 silverfish when hurt"
 }
