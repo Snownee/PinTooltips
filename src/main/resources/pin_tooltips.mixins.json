@@ -13,6 +13,7 @@
 		"pin.AbstractContainerScreenMixin",
 		"pin.GuiGraphicsAccess",
 		"pin.GuiGraphicsMixin",
-		"pin.TooltipRenderUtilMixin"
+		"pin.TooltipRenderUtilMixin",
+		"tconstruct.TooltipUtilMixin"
 	]
 }

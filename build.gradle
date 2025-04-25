@@ -105,6 +105,8 @@ dependencies {
     implementation fg.deobf("maven.modrinth:jei:15.20.0.105-forge")
     implementation fg.deobf("maven.modrinth:just-enough-effect-descriptions-jeed:1.20-2.2.2-forge")
     implementation fg.deobf("maven.modrinth:jade:11.12.2+forge")
+    implementation fg.deobf("maven.modrinth:tinkers-construct:3.9.2.37")
+    implementation fg.deobf("maven.modrinth:mantle:1.11.44")
 }
 
 processResources {
