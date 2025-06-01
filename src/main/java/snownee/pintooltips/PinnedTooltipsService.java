@@ -53,8 +53,7 @@ public class PinnedTooltipsService {
 	}
 
 	public void pin(Vector2ic position, List<ClientTooltipComponent> components, Font font, ItemStack itemStack, long autoPinnedTimestamp) {
-		PinnedTooltip pinnedTooltip = autoPinnedTooltip;
-		if (autoPinnedTimestamp > 0 && pinnedTooltip != null && pinnedTooltip.autoPinnedTimestamp == autoPinnedTimestamp) {
+		if (autoPinnedTimestamp > 0 && autoPinnedTooltip != null && autoPinnedTooltip.autoPinnedTimestamp == autoPinnedTimestamp) {
 			return;
 		}
 
