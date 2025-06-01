@@ -113,6 +113,9 @@ public class PinTooltips implements ClientModInitializer {
 					}
 					return false;
 				}
+				if (button == InputConstants.MOUSE_BUTTON_LEFT && service.autoPinnedTooltip() != null) {
+					service.unpin(service.autoPinnedTooltip());
+				}
 				return true;
 			});
 
