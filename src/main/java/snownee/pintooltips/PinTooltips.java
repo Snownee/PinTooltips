@@ -91,7 +91,7 @@ public class PinTooltips implements ClientModInitializer {
 
 			ScreenKeyboardEvents.afterKeyRelease(screen).register((screen1, key, scancode, modifiers) -> {
 				if (shouldShowTooltips(screen1)) {
-					if (service.autoPinnedTooltip() != null) {
+					if (service.autoPinnedTooltip() != null && service.focused != service.autoPinnedTooltip()) {
 						service.unpin(service.autoPinnedTooltip());
 					}
 					if (GRAB_KEY.matches(key, scancode)) {
@@ -132,7 +132,7 @@ public class PinTooltips implements ClientModInitializer {
 				var focused = service.focused;
 				var dragging = service.dragging;
 				service.clearStates();
-				if (service.autoPinnedTooltip() != null) {
+				if (service.autoPinnedTooltip() != null && focused != service.autoPinnedTooltip()) {
 					service.unpin(service.autoPinnedTooltip());
 				}
 				if (focused != null) {
