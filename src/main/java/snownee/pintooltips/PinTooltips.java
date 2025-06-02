@@ -90,9 +90,14 @@ public class PinTooltips implements ClientModInitializer {
 			});
 
 			ScreenKeyboardEvents.afterKeyRelease(screen).register((screen1, key, scancode, modifiers) -> {
-				if (shouldShowTooltips(screen1) && GRAB_KEY.matches(key, scancode)) {
-					GRAB_KEY.setDown(false);
-					keyPressedFrames = -1;
+				if (shouldShowTooltips(screen1)) {
+					if (service.autoPinnedTooltip() != null) {
+						service.unpin(service.autoPinnedTooltip());
+					}
+					if (GRAB_KEY.matches(key, scancode)) {
+						GRAB_KEY.setDown(false);
+						keyPressedFrames = -1;
+					}
 				}
 			});
 
@@ -117,9 +122,6 @@ public class PinTooltips implements ClientModInitializer {
 					}
 					return false;
 				}
-				if (button == InputConstants.MOUSE_BUTTON_LEFT && service.autoPinnedTooltip() != null) {
-					service.unpin(service.autoPinnedTooltip());
-				}
 				return true;
 			});
 
@@ -130,6 +132,9 @@ public class PinTooltips implements ClientModInitializer {
 				var focused = service.focused;
 				var dragging = service.dragging;
 				service.clearStates();
+				if (service.autoPinnedTooltip() != null) {
+					service.unpin(service.autoPinnedTooltip());
+				}
 				if (focused != null) {
 					if (button == InputConstants.MOUSE_BUTTON_LEFT && !dragging) {
 						Style style = focused.getStyleAt(mouseX, mouseY, Minecraft.getInstance().font);
