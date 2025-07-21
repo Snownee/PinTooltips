@@ -2,13 +2,13 @@ modLoader="javafml"
 loaderVersion="[46,)"
 
 license="All Rights Reserved"
-issueTrackerURL="${source}/issues"
+issueTrackerURL="https://github.com/Snownee/PinTooltips/issues"
 
 [[mods]]
 modId="pin_tooltips"
 version="${version}"
 displayName="Pin Tooltips"
-displayURL="${source}"
+displayURL="https://github.com/Snownee/PinTooltips"
 logoFile="logo.png"
 credits=""
 authors="Snownee, SettingDust"

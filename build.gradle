@@ -59,6 +59,13 @@ repositories {
     }
 
     maven {
+        url "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
+
+    maven {
         url = "https://maven.shedaniel.me/"
         content {
             includeGroup("me.shedaniel.cloth")
@@ -107,6 +114,9 @@ dependencies {
     implementation fg.deobf("maven.modrinth:jade:11.12.2+forge")
     implementation fg.deobf("maven.modrinth:tinkers-construct:3.9.2.37")
     implementation fg.deobf("maven.modrinth:mantle:1.11.44")
+
+//    implementation fg.deobf("curse.maven:obscure-tooltips-715660:4686579")
+    compileOnly fg.deobf("curse.maven:obscure-tooltips-715660:4686579")
 }
 
 processResources {
