@@ -1,13 +1,12 @@
 plugins {
-    alias(libs.plugins.forge.gradle)
-    id 'org.spongepowered.mixin' version '0.7-SNAPSHOT'
+    id 'net.neoforged.moddev.legacyforge' version '2.0.103'
     id "me.shedaniel.unified-publishing" version "0.1.+"
     id 'eclipse'
     id "com.diffplug.eclipse.apt" version "4.1.0"
 }
 
 group = "snownee.pintooltips"
-version = "${libs.versions.minecraft.get()}-Forge-${mod_version}"
+version = "$minecraft_version-Forge-${mod_version}"
 var realVersion = project.mod_version + '+forge'
 archivesBaseName = project.archives_base_name
 
@@ -19,28 +18,32 @@ mixin {
     add sourceSets.main, "${mod_id}.refmap.json"
 }
 
-minecraft {
-    mappings channel: 'official', version: minecraft_version
+legacyForge {
+    // Develop against MinecraftForge version 47.3.0 for 1.20.1 (the versions can be found at https://files.minecraftforge.net/)
+    version = "$minecraft_version-47.4.4"
 
-    copyIdeResources = true //Calls processResources when in dev
-
-    if (file('src/main/resources/META-INF/accesstransformer.cfg').exists()) {
-        accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-    }
+    // Validate AT files and raise errors when they have invalid targets
+    // This option is false by default, but turning it on is recommended
+    validateAccessTransformers = true
 
     runs {
         configureEach {
-            property "mixin.debug.export", "true"
-            property "mixin.debug.countInjection", "true"
-            property "mixin.debug.verbose", "true"
-            property "mixin.dumpTargetOnFailure", "true"
+
+            systemProperty "mixin.debug.export", "true"
+            systemProperty "mixin.debug.countInjection", "true"
+            systemProperty "mixin.debug.verbose", "true"
+            systemProperty "mixin.dumpTargetOnFailure", "true"
         }
 
         client {
-
+            client()
         }
+    }
 
-        server {}
+    mods {
+        "$mod_id" {
+            sourceSet sourceSets.main
+        }
     }
 }
 
@@ -52,7 +55,6 @@ repositories {
                 url = "https://api.modrinth.com/maven"
             }
         }
-        forRepositories(fg.repository)
         filter {
             includeGroup "maven.modrinth"
         }
@@ -92,31 +94,28 @@ repositories {
 }
 
 dependencies {
-    // To change the versions see the gradle/libs.version.toml
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${libs.versions.forge.get()}"
-
     annotationProcessor "org.spongepowered:mixin:0.8.5:processor"
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
     implementation("io.github.llamalad7:mixinextras-forge:0.4.1")
 
     compileOnly libs.forgified.fabric.api
-    runtimeOnly fg.deobf(libs.forgified.fabric.api.get().toString())
+    modRuntimeOnly(libs.forgified.fabric.api.get().toString())
 
-    runtimeOnly fg.deobf(libs.cloth.config.get().toString())
+    modRuntimeOnly(libs.cloth.config.get().toString())
 
 //    runtimeOnly fg.deobf("maven.modrinth:prism-lib:1.0.5-forge")
 //    runtimeOnly fg.deobf("maven.modrinth:iceberg:1.1.25-forge")
 //    runtimeOnly fg.deobf("maven.modrinth:equipment-compare:1.3.7-forge,1.20.1")
 //    runtimeOnly fg.deobf("maven.modrinth:legendary-tooltips:1.4.5-forge,1.20.1")
-    implementation fg.deobf("maven.modrinth:kiwi:11.8.30+forge")
-    implementation fg.deobf("maven.modrinth:jei:15.20.0.105-forge")
-    implementation fg.deobf("maven.modrinth:just-enough-effect-descriptions-jeed:1.20-2.2.2-forge")
-    implementation fg.deobf("maven.modrinth:jade:11.12.2+forge")
-    implementation fg.deobf("maven.modrinth:tinkers-construct:3.9.2.37")
-    implementation fg.deobf("maven.modrinth:mantle:1.11.44")
+    modImplementation("maven.modrinth:kiwi:11.8.30+forge")
+    modImplementation("maven.modrinth:jei:15.20.0.105-forge")
+    modImplementation("maven.modrinth:just-enough-effect-descriptions-jeed:1.20-2.2.2-forge")
+    modImplementation("maven.modrinth:jade:11.12.2+forge")
+    modImplementation("maven.modrinth:tinkers-construct:3.9.2.37")
+    modImplementation("maven.modrinth:mantle:1.11.44")
 
 //    implementation fg.deobf("curse.maven:obscure-tooltips-715660:4686579")
-    compileOnly fg.deobf("curse.maven:obscure-tooltips-715660:4686579")
+    modCompileOnly("curse.maven:obscure-tooltips-715660:4686579")
 }
 
 processResources {
