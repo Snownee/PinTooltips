@@ -76,7 +76,7 @@ public class PinTooltips implements ClientModInitializer {
 
 			lastMouseMovedTime = 0;
 
-			ScreenKeyboardEvents.afterKeyPress(screen).register((screen1, key, scancode, modifiers) -> {
+			ScreenKeyboardEvents.beforeKeyPress(screen).register((screen1, key, scancode, modifiers) -> {
 				if (shouldShowTooltips(screen1) && GRAB_KEY.matches(key, scancode)) {
 					GRAB_KEY.setDown(true);
 					if (keyPressedFrames < 0) {
