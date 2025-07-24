@@ -20,12 +20,11 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.world.item.ItemStack;
 import snownee.pintooltips.duck.PTContainerScreen;
 import snownee.pintooltips.duck.PTGuiGraphics;
-import snownee.pintooltips.mixin.interact.ClientTextTooltipAccess;
 import snownee.pintooltips.mixin.pin.GuiGraphicsAccess;
 import snownee.pintooltips.util.DummyHoveredSlot;
 
 public final class PinnedTooltip implements ClientTooltipPositioner {
-	public static final int TOOLTIP_PADDING = 3;
+	private final TooltipStyle style;
 	private final Vector2d position;
 	private final Vector2i size;
 	private final List<ClientTooltipComponent> components;
@@ -35,11 +34,13 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 	private boolean hovered;
 
 	public PinnedTooltip(
+			TooltipStyle style,
 			Vector2d position,
 			Vector2i size,
 			List<ClientTooltipComponent> components,
 			long autoPinnedTimestamp,
 			@Nullable DummyHoveredSlot hoveredSlot) {
+		this.style = style;
 		this.position = position;
 		this.size = size;
 		this.components = components;
@@ -49,6 +50,7 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 	}
 
 	public PinnedTooltip(
+			TooltipStyle style,
 			Vector2d position,
 			List<ClientTooltipComponent> components,
 			int screenWidth,
@@ -58,6 +60,7 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 			long autoPinnedTimestamp
 	) {
 		this(
+				style,
 				position,
 				new Vector2i(),
 				components,
@@ -67,24 +70,11 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 	}
 
 	public boolean isHovering(double mouseX, double mouseY) {
-		return mouseX >= position.x() - TOOLTIP_PADDING && mouseX <= position.x() + size.x() + TOOLTIP_PADDING
-				&& mouseY >= position.y() - TOOLTIP_PADDING && mouseY <= position.y() + size.y() + TOOLTIP_PADDING;
+		return style.isHovering(this, mouseX, mouseY);
 	}
 
 	public void updateSize(int screenWidth, int screenHeight, Font font) {
-		var width = 0;
-		var height = 0;
-		linesPosition.clear();
-		for (var component : components) {
-			var componentWidth = component.getWidth(font);
-			var componentHeight = component.getHeight();
-			linesPosition.put(new Rect2i(0, height, componentWidth, componentHeight), component);
-			width = Math.max(width, componentWidth);
-			height += componentHeight;
-		}
-		if (width != size.x() || height != size.y()) {
-			size.set(width, height);
-		}
+		style.updateSize(this, screenWidth, screenHeight, font);
 	}
 
 	public void render(PinnedTooltipsService service, Screen screen, Font font, GuiGraphics context, int mouseX, int mouseY) {
@@ -95,22 +85,26 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 			((PTContainerScreen) screen).pin_tooltips$setDummyHoveredSlot(hoveredSlot());
 		}
 
-		PTGuiGraphics.of(context).pin_tooltips$setRenderingPinned(true);
+		PTGuiGraphics graphics = PTGuiGraphics.of(context);
+		graphics.pin_tooltips$setRenderingPinned(true);
+		if (hoveredSlot != null) {
+			graphics.pin_tooltips$setRenderingItemStack(hoveredSlot.getItem());
+		}
 		((GuiGraphicsAccess) context).callRenderTooltipInternal(
 				font,
 				components(),
 				(int) position().x(),
 				(int) position().y(),
 				this);
-		PTGuiGraphics.of(context).pin_tooltips$setRenderingPinned(false);
+		graphics.pin_tooltips$setRenderingPinned(false);
 
 		if (service.hovered == this && !service.dragging) {
 			var style = getStyleAt(mouseX, mouseY, font);
 			if (style != null) {
-				PTGuiGraphics.of(context).pin_tooltips$setRenderingPinnedEvent(true);
+				graphics.pin_tooltips$setRenderingPinnedEvent(true);
 				context.pose().translate(0, 0, 1);
 				context.renderComponentHoverEffect(font, style, mouseX, mouseY);
-				PTGuiGraphics.of(context).pin_tooltips$setRenderingPinnedEvent(false);
+				graphics.pin_tooltips$setRenderingPinnedEvent(false);
 			}
 		}
 
@@ -133,14 +127,7 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 	public @Nullable DummyHoveredSlot hoveredSlot() {return hoveredSlot;}
 
 	public @Nullable Style getStyleAt(double mouseX, double mouseY, Font font) {
-		var relativeX = (int) (mouseX - position().x());
-		var relativeY = (int) (mouseY - position().y());
-		var line = linesPosition.keySet().stream().filter(rect -> rect.contains(relativeX, relativeY)).findFirst().orElse(null);
-		var component = linesPosition.get(line);
-		if (component instanceof ClientTextTooltipAccess textTooltip) {
-			return font.getSplitter().componentStyleAtWidth(textTooltip.getText(), relativeX);
-		}
-		return null;
+		return style.getStyleAt(this, mouseX, mouseY, font);
 	}
 
 	@Override
@@ -160,5 +147,17 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 
 	public boolean isHovered() {
 		return hovered;
+	}
+
+	public Map<Rect2i, ClientTooltipComponent> linesPosition() {
+		return linesPosition;
+	}
+
+	public TooltipStyle style() {
+		return style;
+	}
+
+	public void setSize(int width, int height) {
+		size.set(width, height);
 	}
 }
