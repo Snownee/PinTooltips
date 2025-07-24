@@ -15,7 +15,9 @@
 		"pin.AbstractContainerScreenMixin",
 		"pin.GuiGraphicsAccess",
 		"pin.GuiGraphicsMixin",
-		"pin.TooltipRenderUtilMixin",
-		"tconstruct.TooltipUtilMixin"
+		"pin.TooltipRenderUtilMixin"
+	],
+	"mixins": [
+		"compat.TooltipUtilMixin"
 	]
 }

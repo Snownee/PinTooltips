@@ -1,4 +1,4 @@
-package snownee.pintooltips.mixin.tconstruct;
+package snownee.pintooltips.mixin.compat;
 
 import java.util.List;
 
