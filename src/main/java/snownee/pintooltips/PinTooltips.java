@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2ic;
 import org.slf4j.Logger;
 
@@ -255,7 +256,8 @@ public class PinTooltips implements ClientModInitializer {
 			Font font,
 			List<ClientTooltipComponent> components,
 			Vector2ic position,
-			ItemStack itemStack) {
+			ItemStack itemStack,
+			@Nullable TooltipStyle style) {
 		var service = PinnedTooltipsService.INSTANCE;
 		if (service.focused != null) {
 			return;
@@ -268,7 +270,7 @@ public class PinTooltips implements ClientModInitializer {
 			if (delay >= 0) {
 				hasTooltipInThisFrame = true;
 				if (lastMouseMovedTime > 0 && time - lastMouseMovedTime >= delay) {
-					service.pin(position, components, font, itemStack, time);
+					service.pin(position, components, font, itemStack, time, style);
 				}
 			}
 			return;
@@ -285,7 +287,7 @@ public class PinTooltips implements ClientModInitializer {
 			return;
 		}
 
-		service.pin(position, components, font, itemStack, -1);
+		service.pin(position, components, font, itemStack, -1, style);
 	}
 
 	public static boolean isGrabbing() {
