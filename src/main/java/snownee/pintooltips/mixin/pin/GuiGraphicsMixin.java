@@ -22,6 +22,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.world.item.ItemStack;
 import snownee.pintooltips.PinTooltips;
+import snownee.pintooltips.PinTooltipsClient;
 import snownee.pintooltips.PinnedTooltipsService;
 import snownee.pintooltips.duck.PTGuiGraphics;
 
@@ -62,7 +63,8 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 				font,
 				components,
 				position,
-				pin_tooltips$getRenderingItemStack());
+				pin_tooltips$getRenderingItemStack(),
+				null);
 	}
 
 	@Inject(
@@ -100,6 +102,7 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 	@Override
 	public void pin_tooltips$setRenderingItemStack(ItemStack itemStack) {
 		pin_tooltips$renderingItemStack = itemStack;
+		PinTooltipsClient.setRenderingItemStack((GuiGraphics) (Object) this, itemStack);
 	}
 
 	@Override
