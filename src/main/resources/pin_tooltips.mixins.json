@@ -18,6 +18,6 @@
 		"pin.TooltipRenderUtilMixin"
 	],
 	"mixins": [
-		"compat.TooltipUtilMixin"
+		"compat.TConstructMixin"
 	]
 }

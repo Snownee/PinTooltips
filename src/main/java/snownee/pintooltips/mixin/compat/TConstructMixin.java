@@ -19,7 +19,7 @@ import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 import snownee.pintooltips.PinTooltipsHooks;
 
 @Mixin(value = TooltipUtil.class, remap = false)
-public class TooltipUtilMixin {
+public class TConstructMixin {
 	@WrapOperation(
 			method = "addModifierNames",
 			at = @At(
