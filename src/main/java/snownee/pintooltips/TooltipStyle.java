@@ -3,6 +3,8 @@ package snownee.pintooltips;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Style;
 
 public interface TooltipStyle {
@@ -15,7 +17,11 @@ public interface TooltipStyle {
 	default boolean isHovering(PinnedTooltip tooltip, double mouseX, double mouseY) {
 		var position = tooltip.position();
 		var size = tooltip.size();
-		return mouseX >= position.x() - TOOLTIP_PADDING && mouseX <= position.x() + size.x() + TOOLTIP_PADDING
-				&& mouseY >= position.y() - TOOLTIP_PADDING && mouseY <= position.y() + size.y() + TOOLTIP_PADDING;
+		return mouseX >= position.x() - TOOLTIP_PADDING && mouseX <= position.x() + size.x() + TOOLTIP_PADDING &&
+				mouseY >= position.y() - TOOLTIP_PADDING && mouseY <= position.y() + size.y() + TOOLTIP_PADDING;
 	}
+
+	default void preRender(PinnedTooltip tooltip, Screen screen, Font font, GuiGraphics context, int mouseX, int mouseY) {}
+
+	default void postRender(PinnedTooltip tooltip, Screen screen, Font font, GuiGraphics context, int mouseX, int mouseY) {}
 }

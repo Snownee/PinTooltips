@@ -90,12 +90,14 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 		if (hoveredSlot != null) {
 			graphics.pin_tooltips$setRenderingItemStack(hoveredSlot.getItem());
 		}
+		style.preRender(this, screen, font, context, mouseX, mouseY);
 		((GuiGraphicsAccess) context).callRenderTooltipInternal(
 				font,
 				components(),
 				(int) position().x(),
 				(int) position().y(),
 				this);
+		style.postRender(this, screen, font, context, mouseX, mouseY);
 		graphics.pin_tooltips$setRenderingPinned(false);
 
 		if (service.hovered == this && !service.dragging) {
