@@ -9,7 +9,7 @@ import org.joml.Vector2d;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
 
-import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -46,7 +46,7 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 		this.components = components;
 		this.autoPinnedTimestamp = autoPinnedTimestamp;
 		this.hoveredSlot = hoveredSlot;
-		this.linesPosition = new Reference2ObjectOpenHashMap<>();
+		this.linesPosition = new Reference2ObjectLinkedOpenHashMap<>();
 	}
 
 	public PinnedTooltip(
