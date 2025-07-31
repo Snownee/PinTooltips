@@ -32,10 +32,6 @@ public abstract class ItemStackMixin {
 	public abstract CompoundTag getTag();
 
 	@Shadow
-	@Nullable
-	private CompoundTag tag;
-
-	@Shadow
 	public abstract Item getItem();
 
 	@WrapMethod(method = "getTooltipLines")
