@@ -7,8 +7,8 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.enchantment.Enchantment;
 import snownee.jade.api.config.IWailaConfig;
 import snownee.jade.util.ModIdentification;
-import snownee.pintooltips.compat.JeedCompat;
-import snownee.pintooltips.compat.MEICompat;
+import snownee.pintooltips.mods.JeedCompat;
+import snownee.pintooltips.mods.MEICompat;
 
 public class PinTooltipsCompats {
 	public static boolean jeed = FabricLoader.getInstance().isModLoaded("jeed");

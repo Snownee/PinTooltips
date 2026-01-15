@@ -12,12 +12,11 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositione
 
 @Mixin(GuiGraphics.class)
 public interface GuiGraphicsAccess {
-    @Invoker
-    void callRenderTooltipInternal(
-        Font font,
-        List<ClientTooltipComponent> components,
-        int mouseX,
-        int mouseY,
-        ClientTooltipPositioner tooltipPositioner
-    );
+	@Invoker
+	void callRenderTooltipInternal(
+			Font font,
+			List<ClientTooltipComponent> components,
+			int mouseX,
+			int mouseY,
+			ClientTooltipPositioner tooltipPositioner);
 }

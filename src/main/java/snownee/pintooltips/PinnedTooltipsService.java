@@ -2,6 +2,7 @@ package snownee.pintooltips;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
@@ -38,7 +39,7 @@ public class PinnedTooltipsService {
 		}
 
 		for (var tooltip : Lists.reverse(tooltips)) {
-			if (tooltip.isHovering(mouseX, mouseY)) {
+			if (Objects.requireNonNull(tooltip).isHovering(mouseX, mouseY)) {
 				return tooltip;
 			}
 		}

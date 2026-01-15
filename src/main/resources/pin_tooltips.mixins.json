@@ -12,9 +12,11 @@
 		"interact.MouseHandlerMixin",
 		"interact.PotionContentsMixin",
 		"interact.ScreenMixin",
+		"mods.obscure.TooltipRendererMixin",
 		"pin.AbstractContainerScreenMixin",
 		"pin.GuiGraphicsAccess",
 		"pin.GuiGraphicsMixin",
+		"pin.TooltipRenderUtilAccess",
 		"pin.TooltipRenderUtilMixin"
 	]
 }
