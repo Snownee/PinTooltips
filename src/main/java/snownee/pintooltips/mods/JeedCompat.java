@@ -1,4 +1,4 @@
-package snownee.pintooltips.compat;
+package snownee.pintooltips.mods;
 
 import net.mehvahdjukaar.jeed.api.JeedAPI;
 import net.minecraft.client.Minecraft;

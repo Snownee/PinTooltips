@@ -31,10 +31,10 @@ When **Tinkers Construct** installed, you can view the description of the traits
 | Mod                | Status                 | Note                                      |
 |--------------------|------------------------|-------------------------------------------|
 | Equipment Compare  | ✔️ Supported           |                                           |
-| Obscure Tooltips   | ✔️ Partially supported | Components are not interactable           |
+| Obscure Tooltips   | ✔️ Supported           |                                           |
 | Legendary Tooltips | ✔️ Partially supported | Title's interacting position is incorrect |
 | Tooltips Reforged  | ❌ Not supported        |                                           |
 | Immersive:Tooltip  | ❌ Not supported        |                                           |
-| Tooltips Reforged  | ❌ Not supported        |                                           |
+| Tooltip Overhaul   | ❌ Not supported        |                                           |
 | EnhancedTooltips   | ❌ Not supported        |                                           |
 | ModernUI           | ❌ Not supported        |                                           |

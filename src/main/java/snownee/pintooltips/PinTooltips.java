@@ -22,6 +22,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.core.Holder;
@@ -31,9 +32,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
+import snownee.pintooltips.duck.PTGuiGraphics;
+import snownee.pintooltips.mixin.pin.TooltipRenderUtilAccess;
 import snownee.pintooltips.util.DefaultDescriptions;
 
 public class PinTooltips implements ClientModInitializer {
@@ -41,6 +45,7 @@ public class PinTooltips implements ClientModInitializer {
 	public static final Logger LOGGER = LogUtils.getLogger();
 	public static final Component CLICK_TO_COPY = Component.translatable("chat.copy.click").withStyle(ChatFormatting.GRAY);
 	public static final HoverEvent CLICK_TO_COPY_EVENT = new HoverEvent(HoverEvent.Action.SHOW_TEXT, CLICK_TO_COPY);
+	private static final ThreadLocal<Boolean> renderingFrameLock = ThreadLocal.withInitial(() -> false);
 	private static int keyPressedFrames = -1;
 	private static long lastRenderTooltipTime;
 	private static int lastMouseX;
@@ -274,16 +279,22 @@ public class PinTooltips implements ClientModInitializer {
 	}
 
 	public static void onRenderTooltip(
+			GuiGraphics graphics,
 			Font font,
 			List<ClientTooltipComponent> components,
 			Vector2ic position,
-			ItemStack itemStack,
 			@Nullable TooltipStyle style) {
 		var service = PinnedTooltipsService.INSTANCE;
 		if (service.focused != null) {
 			return;
 		}
 
+		PTGuiGraphics ptGraphics = PTGuiGraphics.of(graphics);
+		if (ptGraphics.pin_tooltips$getRenderingPinned()) {
+			return;
+		}
+
+		ItemStack itemStack = ptGraphics.pin_tooltips$getRenderingItemStack();
 		long time = System.currentTimeMillis();
 
 		if (keyPressedFrames < 0) {
@@ -309,6 +320,27 @@ public class PinTooltips implements ClientModInitializer {
 		}
 
 		service.pin(position, components, font, itemStack, -1, style);
+	}
+
+	public static void onRenderFrame(GuiGraphics graphics, int x, int y, int width, int height, int z) {
+		if (PinTooltips.isGrabbing() || PTGuiGraphics.of(graphics).pin_tooltips$getRenderingPinned()) {
+			return;
+		}
+		if (renderingFrameLock.get()) {
+			return;
+		}
+		int delay = PinTooltipsConfig.hoveringAutoPinDelay;
+		if (lastMouseMovedTime == 0 || delay <= 0) {
+			return;
+		}
+		float ratio = Mth.clamp((float) (System.currentTimeMillis() - lastMouseMovedTime) / delay, 0, 1);
+		if (ratio < 0.2F) {
+			return;
+		}
+		int color = 0xFFFFFF | (int) (ratio * 0xFF) << 24;
+		renderingFrameLock.set(true);
+		TooltipRenderUtilAccess.callRenderFrameGradient(graphics, x, y, width, height, z + 1, color, color);
+		renderingFrameLock.set(false);
 	}
 
 	public static boolean isGrabbing() {
