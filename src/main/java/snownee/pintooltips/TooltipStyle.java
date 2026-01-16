@@ -1,6 +1,6 @@
 package snownee.pintooltips;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Style;

@@ -10,9 +10,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import snownee.kiwi.util.NotNullByDefault;
 
-@NotNullByDefault
 public class DummyHoveredSlot extends Slot {
 	private static final Supplier<Container> CONTAINER = Suppliers.memoize(() -> new Container() {
 		@Override

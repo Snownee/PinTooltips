@@ -3,8 +3,7 @@ package snownee.pintooltips.mixin.interact;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,15 +19,18 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.TagParser;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.enchantment.Enchantment;
 import snownee.pintooltips.PinTooltips;
 import snownee.pintooltips.PinTooltipsCompats;
 import snownee.pintooltips.PinTooltipsHooks;
+import snownee.pintooltips.util.ComponentDecorator;
 
 @Mixin(Screen.class)
 public class ScreenMixin {
@@ -42,38 +44,33 @@ public class ScreenMixin {
 			cancellable = true)
 	private void pin_tooltips$handleComponentClicked(Style style, CallbackInfoReturnable<Boolean> cir) {
 		ClickEvent clickEvent = style.getClickEvent();
-		if (clickEvent == null || minecraft == null || clickEvent.getAction() != ClickEvent.Action.RUN_COMMAND) {
+		if (minecraft == null || !(clickEvent instanceof ClickEvent.Custom(Identifier id, Optional<Tag> tag)) || tag.isEmpty()) {
 			return;
 		}
-		String value = clickEvent.getValue();
-		if (!value.startsWith("@pin_tooltips ")) {
+		if (!id.getNamespace().equals(PinTooltips.ID)) {
 			return;
 		}
 		try {
-			value = value.substring(14);
-			if (value.startsWith("click_effect ")) {
-				value = value.substring(13);
-				MobEffectInstance effectInstance = MobEffectInstance.load(TagParser.parseTag(value));
+			if (ComponentDecorator.SHOW_EFFECT.equals(id)) {
+				MobEffectInstance effectInstance = MobEffectInstance.CODEC.parse(NbtOps.INSTANCE, tag.get()).result().orElse(null);
 				if (effectInstance == null) {
 					return;
 				}
 				Window window = minecraft.getWindow();
 				double mouseX = minecraft.mouseHandler.xpos() * (double) window.getGuiScaledWidth() / (double) window.getScreenWidth();
-				double mouseY =
-						minecraft.mouseHandler.ypos() * (double) window.getGuiScaledHeight() / (double) window.getScreenHeight();
+				double mouseY = minecraft.mouseHandler.ypos() * (double) window.getGuiScaledHeight() / (double) window.getScreenHeight();
 				PinTooltipsCompats.clickEffect(effectInstance, mouseX, mouseY, InputConstants.MOUSE_BUTTON_LEFT);
-			} else if (value.startsWith("click_enchantment ")) {
-				String[] parts = StringUtils.split(value.substring(18), " ");
-				Optional<Enchantment> enchantment = Objects.requireNonNull(Minecraft.getInstance().level)
+			} else if (ComponentDecorator.SHOW_ENCHANTMENT.equals(id)) {
+				CompoundTag compoundTag = (CompoundTag) tag.get();
+				Enchantment enchantment = Objects.requireNonNull(Minecraft.getInstance().level)
 						.registryAccess()
-						.registry(Registries.ENCHANTMENT)
-						.flatMap(it -> it.getOptional(ResourceLocation.parse(parts[0])));
-				if (enchantment.isEmpty()) {
+						.lookupOrThrow(Registries.ENCHANTMENT)
+						.getValue(Identifier.parse(compoundTag.getString("enchantment").orElseThrow()));
+				if (enchantment == null) {
 					return;
 				}
-				int level = Integer.parseInt(parts[1]);
-				PinTooltipsCompats.clickEnchantment(enchantment.get(), level, InputConstants.MOUSE_BUTTON_LEFT);
-
+				int level = compoundTag.getInt("level").orElseThrow();
+				PinTooltipsCompats.clickEnchantment(enchantment, level, InputConstants.MOUSE_BUTTON_LEFT);
 			}
 		} catch (Throwable e) {
 			PinTooltips.LOGGER.error("Failed to parse component action", e);

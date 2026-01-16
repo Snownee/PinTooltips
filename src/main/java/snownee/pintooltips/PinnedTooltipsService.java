@@ -4,9 +4,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
 import org.joml.Vector2ic;
+import org.jspecify.annotations.Nullable;
 
 import com.google.common.collect.Lists;
 
@@ -19,12 +19,11 @@ import net.minecraft.world.item.ItemStack;
 public class PinnedTooltipsService {
 	public static final PinnedTooltipsService INSTANCE = new PinnedTooltipsService();
 
-	@Nullable
-	private PinnedTooltip autoPinnedTooltip;
+	private @Nullable PinnedTooltip autoPinnedTooltip;
 	private final List<PinnedTooltip> tooltips = Collections.synchronizedList(new ReferenceArrayList<>());
 
-	public PinnedTooltip focused;
-	public PinnedTooltip hovered;
+	public @Nullable PinnedTooltip focused;
+	public @Nullable PinnedTooltip hovered;
 
 	public boolean dragging;
 	public double storedDragX;
@@ -33,7 +32,7 @@ public class PinnedTooltipsService {
 	private PinnedTooltipsService() {
 	}
 
-	public PinnedTooltip findHovered(double mouseX, double mouseY) {
+	public @Nullable PinnedTooltip findHovered(double mouseX, double mouseY) {
 		if (tooltips.isEmpty()) {
 			return null;
 		}
@@ -65,7 +64,7 @@ public class PinnedTooltipsService {
 		}
 
 		// Avoid modifying the tooltips when rendering the tooltip hover event that will cause crash.
-		Minecraft.getInstance().tell(() -> {
+		Minecraft.getInstance().execute(() -> {
 			PinnedTooltip tooltip = new PinnedTooltip(
 					style == null ? DefaultTooltipStyle.INSTANCE : style,
 					new Vector2d(position),
@@ -87,7 +86,7 @@ public class PinnedTooltipsService {
 
 	public void unpin(PinnedTooltip tooltip) {
 		// Avoid modifying the tooltips when rendering the tooltip hover event that will cause crash.
-		Minecraft.getInstance().tell(() -> {
+		Minecraft.getInstance().execute(() -> {
 			tooltips.remove(tooltip);
 			if (autoPinnedTooltip == tooltip) {
 				autoPinnedTooltip = null;

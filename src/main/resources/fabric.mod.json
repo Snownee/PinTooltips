@@ -3,7 +3,7 @@
 	"id": "pin_tooltips",
 	"version": "${version}",
 	"name": "Pin Tooltips",
-	"description": "${mod_description}",
+	"description": "Add the ability to pin tooltips to the screen and view more information from them such as enchantment and mob effect descriptions.",
 	"authors": [
 		"Snownee",
 		"SettingDust"
@@ -25,7 +25,7 @@
 		"pin_tooltips.mixins.json"
 	],
 	"depends": {
-		"fabric-api": ">=0.83"
+		"fabric-api": ">0.141"
 	},
 	"suggests": {
 		"more_enchantment_info": ">=0.2"

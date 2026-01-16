@@ -3,18 +3,19 @@ package snownee.pintooltips.util;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-import net.minecraft.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
+import net.minecraft.util.Util;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.enchantment.Enchantment;
 import snownee.pintooltips.PinTooltipsConfig;
 
+@SuppressWarnings("JavadocReference")
 public class DefaultDescriptions {
 	private static final Map<Holder<Enchantment>, Component> ENCHANTMENT_CACHE = new HashMap<>();
 	private static final Map<MobEffect, Component> EFFECT_CACHE = new HashMap<>();
@@ -27,7 +28,7 @@ public class DefaultDescriptions {
 	 * is provided by any language file and {@link IdwtialsimmoedmConfig#hideMissingDescriptions} is {@code true}
 	 */
 	public static @Nullable Component forEnchantmentRaw(Holder<Enchantment> enchantment) {
-		var translationKey = Util.makeDescriptionId("enchantment", enchantment.unwrapKey().orElseThrow().location()) + ".desc";
+		var translationKey = Util.makeDescriptionId("enchantment", enchantment.unwrapKey().orElseThrow().identifier()) + ".desc";
 		if (PinTooltipsConfig.hideMissingDescriptions && !Language.getInstance().has(translationKey)) {
 			return null;
 		}
@@ -77,7 +78,7 @@ public class DefaultDescriptions {
 	}
 
 	public static Component clickCopyTranslationKey(String key) {
-		return Component.translatable(key).withStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, key)));
+		return Component.translatable(key).withStyle(Style.EMPTY.withClickEvent(new ClickEvent.CopyToClipboard(key)));
 	}
 
 	public static void clearCache() {

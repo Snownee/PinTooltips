@@ -1,11 +1,11 @@
 package snownee.pintooltips;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Style;
-import snownee.pintooltips.mixin.interact.ClientTextTooltipAccess;
 
 public class DefaultTooltipStyle implements TooltipStyle {
 	public static final DefaultTooltipStyle INSTANCE = new DefaultTooltipStyle();
@@ -17,7 +17,7 @@ public class DefaultTooltipStyle implements TooltipStyle {
 		tooltip.linesPosition().clear();
 		for (var component : tooltip.components()) {
 			var componentWidth = component.getWidth(font);
-			var componentHeight = component.getHeight();
+			var componentHeight = component.getHeight(font);
 			tooltip.linesPosition().put(new Rect2i(0, height, componentWidth, componentHeight), component);
 			width = Math.max(width, componentWidth);
 			height += componentHeight;
@@ -33,9 +33,9 @@ public class DefaultTooltipStyle implements TooltipStyle {
 		var relativeY = (int) (mouseY - tooltip.position().y());
 		var line = tooltip.linesPosition().keySet().stream().filter(rect -> rect.contains(relativeX, relativeY)).findFirst().orElse(null);
 		var component = tooltip.linesPosition().get(line);
-		if (component instanceof ClientTextTooltipAccess textTooltip) {
-			return font.getSplitter().componentStyleAtWidth(textTooltip.getText(), relativeX);
-		}
+//		if (component instanceof ClientTextTooltip textTooltip) {
+//			return font.getSplitter().componentStyleAtWidth(textTooltip.text, relativeX);
+//		}
 		return null;
 	}
 }

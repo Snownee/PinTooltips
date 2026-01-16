@@ -7,7 +7,6 @@ import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.gui.screens.GenericMessageScreen;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.ProgressScreen;
-import net.minecraft.client.gui.screens.ReceivingLevelScreen;
 import snownee.kiwi.KiwiModule;
 import snownee.kiwi.config.ConfigUI;
 import snownee.kiwi.config.KiwiConfig;
@@ -33,7 +32,6 @@ public class PinTooltipsConfig {
 				PauseScreen.class.getName(),
 				ChatScreen.class.getName(),
 				GenericMessageScreen.class.getName(),
-				ReceivingLevelScreen.class.getName(),
 				ProgressScreen.class.getName()
 		);
 	}

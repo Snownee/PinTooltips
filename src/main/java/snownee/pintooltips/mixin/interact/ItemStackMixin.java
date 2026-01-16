@@ -58,7 +58,7 @@ public abstract class ItemStackMixin {
 				mutableComponent = component.copy();
 			}
 			return mutableComponent.withStyle($ -> $.withHoverEvent(PinTooltips.CLICK_TO_COPY_EVENT)
-					.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, component.getString())));
+					.withClickEvent(new ClickEvent.CopyToClipboard(component.getString())));
 		}
 		return component;
 	}
@@ -80,10 +80,9 @@ public abstract class ItemStackMixin {
 					RegistryOps.create(
 							NbtOps.INSTANCE,
 							registries), getComponents()).getOrThrow());
-			component.withStyle($ -> $.withHoverEvent(new HoverEvent(
-							HoverEvent.Action.SHOW_TEXT,
-							prettyComponent.copy().append("\n").append(PinTooltips.CLICK_TO_COPY)))
-					.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, prettyComponent.getString())));
+			component.withStyle($ -> $.withHoverEvent(new HoverEvent.ShowText(prettyComponent.copy()
+					.append("\n")
+					.append(PinTooltips.CLICK_TO_COPY))).withClickEvent(new ClickEvent.CopyToClipboard(prettyComponent.getString())));
 		}
 		return component;
 	}
@@ -97,7 +96,7 @@ public abstract class ItemStackMixin {
 		MutableComponent component = original.call(text);
 		if (PinTooltipsHooks.isGrabbing() && !text.startsWith("#") && text.equals(BuiltInRegistries.ITEM.getKey(getItem()).toString())) {
 			component.withStyle($ -> $.withHoverEvent(PinTooltips.CLICK_TO_COPY_EVENT)
-					.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, text)));
+					.withClickEvent(new ClickEvent.CopyToClipboard(text)));
 		}
 		return component;
 	}

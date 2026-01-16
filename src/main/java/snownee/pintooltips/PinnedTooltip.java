@@ -3,11 +3,10 @@ package snownee.pintooltips;
 import java.util.List;
 import java.util.Map;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
+import org.jspecify.annotations.Nullable;
 
 import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap;
 import net.minecraft.client.gui.Font;
@@ -78,7 +77,7 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 	}
 
 	public void render(PinnedTooltipsService service, Screen screen, Font font, GuiGraphics context, int mouseX, int mouseY) {
-		context.pose().pushPose();
+		context.pose().pushMatrix();
 		updateSize(screen.width, screen.height, font);
 		var inContainer = hoveredSlot() != null && screen instanceof PTContainerScreen;
 		if (inContainer) {
@@ -102,7 +101,7 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 			var style = getStyleAt(mouseX, mouseY, font);
 			if (style != null) {
 				graphics.pin_tooltips$setRenderingPinnedEvent(true);
-				context.pose().translate(0, 0, 1);
+//				context.pose().translate(0, 0, 1);
 				context.renderComponentHoverEffect(font, style, mouseX, mouseY);
 				graphics.pin_tooltips$setRenderingPinnedEvent(false);
 			}
@@ -111,7 +110,7 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 		if (inContainer) {
 			((PTContainerScreen) screen).pin_tooltips$dropDummyHoveredSlot();
 		}
-		context.pose().popPose();
+		context.pose().popMatrix();
 	}
 
 	public void setPosition(int screenWidth, int screenHeight, double x, double y) {
@@ -131,7 +130,7 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 	}
 
 	@Override
-	public @NotNull Vector2ic positionTooltip(
+	public Vector2ic positionTooltip(
 			int screenWidth,
 			int screenHeight,
 			int mouseX,

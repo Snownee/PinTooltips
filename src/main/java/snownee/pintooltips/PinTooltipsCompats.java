@@ -49,7 +49,7 @@ public class PinTooltipsCompats {
 		if (key == null) {
 			return desc;
 		}
-		return appendModName(desc, ModIdentification.getModName(key.location()));
+		return appendModName(desc, ModIdentification.getModName(key.identifier()));
 	}
 
 	public static Component appendModName(Component desc, Holder<Enchantment> enchantment) {
@@ -60,15 +60,15 @@ public class PinTooltipsCompats {
 		if (key == null) {
 			return desc;
 		}
-		return appendModName(desc, ModIdentification.getModName(key.location()));
+		return appendModName(desc, ModIdentification.getModName(key.identifier()));
 	}
 
 	private static Component appendModName(Component desc, String modName) {
 		return desc.copy().append("\n").append(Component.literal(modName)
-				.withStyle(IWailaConfig.get().getFormatting().getItemModNameStyle()));
+				.withStyle(IWailaConfig.get().formatting().getItemModNameStyle()));
 	}
 
 	public static boolean shouldAppendModName() {
-		return jade && IWailaConfig.get().getGeneral().showItemModNameTooltip();
+		return jade && IWailaConfig.get().general().showItemModNameTooltip();
 	}
 }

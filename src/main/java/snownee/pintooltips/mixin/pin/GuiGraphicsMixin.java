@@ -2,6 +2,7 @@ package snownee.pintooltips.mixin.pin;
 
 import java.util.List;
 
+import org.joml.Matrix3x2fStack;
 import org.joml.Vector2ic;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -14,7 +15,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -30,7 +30,7 @@ import snownee.pintooltips.duck.PTGuiGraphics;
 public class GuiGraphicsMixin implements PTGuiGraphics {
 	@Shadow
 	@Final
-	private PoseStack pose;
+	private Matrix3x2fStack pose;
 	@Unique
 	private ItemStack pin_tooltips$renderingItemStack = ItemStack.EMPTY;
 	@Unique
@@ -44,7 +44,7 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 	}
 
 	@Inject(
-			method = "renderTooltipInternal",
+			method = "renderTooltip",
 			at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;pushPose()V")
 	)
 	private void pin_tooltips$onRender(
@@ -60,7 +60,7 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 	}
 
 	@Inject(
-			method = "renderTooltipInternal", at = @At(
+			method = "renderTooltip", at = @At(
 			value = "INVOKE",
 			target = "Lnet/minecraft/client/gui/GuiGraphics;drawManaged(Ljava/lang/Runnable;)V"))
 	private void pin_tooltips$changeZOffset(
