@@ -2,8 +2,6 @@ package snownee.pintooltips.util;
 
 import java.util.function.Supplier;
 
-import org.jetbrains.annotations.NotNull;
-
 import com.google.common.base.Suppliers;
 
 import net.minecraft.world.Container;
@@ -24,17 +22,17 @@ public class DummyHoveredSlot extends Slot {
 		}
 
 		@Override
-		public @NotNull ItemStack getItem(int slot) {
+		public ItemStack getItem(int slot) {
 			return ItemStack.EMPTY;
 		}
 
 		@Override
-		public @NotNull ItemStack removeItem(int slot, int amount) {
+		public ItemStack removeItem(int slot, int amount) {
 			return ItemStack.EMPTY;
 		}
 
 		@Override
-		public @NotNull ItemStack removeItemNoUpdate(int slot) {
+		public ItemStack removeItemNoUpdate(int slot) {
 			return ItemStack.EMPTY;
 		}
 
@@ -60,7 +58,7 @@ public class DummyHoveredSlot extends Slot {
 	}
 
 	@Override
-	public @NotNull ItemStack getItem() {
+	public ItemStack getItem() {
 		return itemStack;
 	}
 

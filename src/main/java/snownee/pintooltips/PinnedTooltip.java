@@ -16,64 +16,68 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Style;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import snownee.pintooltips.duck.PTContainerScreen;
 import snownee.pintooltips.duck.PTGuiGraphics;
-import snownee.pintooltips.mixin.pin.GuiGraphicsAccess;
 import snownee.pintooltips.util.DummyHoveredSlot;
 
 public final class PinnedTooltip implements ClientTooltipPositioner {
-	private final TooltipStyle style;
+	private final TooltipLayout layout;
 	private final Vector2d position;
 	private final Vector2i size;
 	private final List<ClientTooltipComponent> components;
+	private final @Nullable Identifier style;
 	private final @Nullable DummyHoveredSlot hoveredSlot;
 	private final Map<Rect2i, ClientTooltipComponent> linesPosition;
 	long autoPinnedTimestamp;
 	private boolean hovered;
 
 	public PinnedTooltip(
-			TooltipStyle style,
+			TooltipLayout layout,
 			Vector2d position,
 			Vector2i size,
 			List<ClientTooltipComponent> components,
+			@Nullable Identifier style,
 			long autoPinnedTimestamp,
 			@Nullable DummyHoveredSlot hoveredSlot) {
-		this.style = style;
+		this.layout = layout;
 		this.position = position;
 		this.size = size;
 		this.components = components;
+		this.style = style;
 		this.autoPinnedTimestamp = autoPinnedTimestamp;
 		this.hoveredSlot = hoveredSlot;
 		this.linesPosition = new Reference2ObjectLinkedOpenHashMap<>();
 	}
 
 	public PinnedTooltip(
-			TooltipStyle style,
+			TooltipLayout layout,
 			Vector2d position,
 			List<ClientTooltipComponent> components,
+			@Nullable Identifier style,
 			int screenWidth,
 			int screenHeight,
 			Font font,
 			ItemStack itemStack,
-			long autoPinnedTimestamp
-	) {
+			long autoPinnedTimestamp) {
 		this(
-				style,
+				layout,
 				position,
 				new Vector2i(),
 				components,
+				style,
 				autoPinnedTimestamp,
 				itemStack.isEmpty() ? null : new DummyHoveredSlot(itemStack.copy()));
 		updateSize(screenWidth, screenHeight, font);
 	}
 
 	public boolean isHovering(double mouseX, double mouseY) {
-		return style.isHovering(this, mouseX, mouseY);
+		return layout.isHovering(this, mouseX, mouseY);
 	}
 
 	public void updateSize(int screenWidth, int screenHeight, Font font) {
-		style.updateSize(this, screenWidth, screenHeight, font);
+		layout.updateSize(this, screenWidth, screenHeight, font);
 	}
 
 	public void render(PinnedTooltipsService service, Screen screen, Font font, GuiGraphics context, int mouseX, int mouseY) {
@@ -89,26 +93,25 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 		if (hoveredSlot != null) {
 			graphics.pin_tooltips$setRenderingItemStack(hoveredSlot.getItem());
 		}
-		((GuiGraphicsAccess) context).callRenderTooltipInternal(
-				font,
-				components(),
-				(int) position().x(),
-				(int) position().y(),
-				this);
+		context.renderTooltip(font, components(), (int) position().x(), (int) position().y(), this, style);
 		graphics.pin_tooltips$setRenderingPinned(false);
-
-		if (service.hovered == this && !service.dragging) {
-			var style = getStyleAt(mouseX, mouseY, font);
-			if (style != null) {
-				graphics.pin_tooltips$setRenderingPinnedEvent(true);
-//				context.pose().translate(0, 0, 1);
-				context.renderComponentHoverEffect(font, style, mouseX, mouseY);
-				graphics.pin_tooltips$setRenderingPinnedEvent(false);
-			}
-		}
 
 		if (inContainer) {
 			((PTContainerScreen) screen).pin_tooltips$dropDummyHoveredSlot();
+		}
+
+		if (service.hovered == this && !service.dragging) {
+			layout.visitLines(this, context.textRenderer(GuiGraphics.HoveredTextEffects.TOOLTIP_AND_CURSOR));
+			var style = context.hoveredTextStyle;
+			if (style == null) {
+				style = getExtraStyleAt(mouseX, mouseY, font);
+			}
+			if (style != null) {
+				graphics.pin_tooltips$setRenderingPinnedEvent(true);
+				context.renderComponentHoverEffect(font, style, mouseX, mouseY);
+				context.renderDeferredElements();
+				graphics.pin_tooltips$setRenderingPinnedEvent(false);
+			}
 		}
 		context.pose().popMatrix();
 	}
@@ -117,26 +120,28 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 		position.set(x, y);
 	}
 
-	public Vector2d position() {return position;}
+	public Vector2d position() {
+		return position;
+	}
 
-	public Vector2ic size() {return size;}
+	public Vector2ic size() {
+		return size;
+	}
 
-	public List<ClientTooltipComponent> components() {return components;}
+	public List<ClientTooltipComponent> components() {
+		return components;
+	}
 
-	public @Nullable DummyHoveredSlot hoveredSlot() {return hoveredSlot;}
+	public @Nullable DummyHoveredSlot hoveredSlot() {
+		return hoveredSlot;
+	}
 
-	public @Nullable Style getStyleAt(double mouseX, double mouseY, Font font) {
-		return style.getStyleAt(this, mouseX, mouseY, font);
+	public @Nullable Style getExtraStyleAt(double mouseX, double mouseY, Font font) {
+		return layout.getExtraStyleAt(this, mouseX, mouseY, font);
 	}
 
 	@Override
-	public Vector2ic positionTooltip(
-			int screenWidth,
-			int screenHeight,
-			int mouseX,
-			int mouseY,
-			int tooltipWidth,
-			int tooltipHeight) {
+	public Vector2ic positionTooltip(int screenWidth, int screenHeight, int mouseX, int mouseY, int tooltipWidth, int tooltipHeight) {
 		return new Vector2i((int) position.x, (int) position.y);
 	}
 
@@ -152,8 +157,8 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 		return linesPosition;
 	}
 
-	public TooltipStyle style() {
-		return style;
+	public TooltipLayout layout() {
+		return layout;
 	}
 
 	public void setSize(int width, int height) {

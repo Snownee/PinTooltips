@@ -21,10 +21,13 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
@@ -37,7 +40,6 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import snownee.pintooltips.duck.PTGuiGraphics;
-import snownee.pintooltips.mixin.pin.TooltipRenderUtilAccess;
 import snownee.pintooltips.util.DefaultDescriptions;
 
 public class PinTooltips implements ClientModInitializer {
@@ -45,6 +47,7 @@ public class PinTooltips implements ClientModInitializer {
 	public static final Logger LOGGER = LogUtils.getLogger();
 	public static final Component CLICK_TO_COPY = Component.translatable("chat.copy.click").withStyle(ChatFormatting.GRAY);
 	public static final HoverEvent CLICK_TO_COPY_EVENT = new HoverEvent.ShowText(CLICK_TO_COPY);
+	public static final Identifier AUTOPIN_HIGHLIGHT = id("autopin_highlight");
 	private static final ThreadLocal<Boolean> renderingFrameLock = ThreadLocal.withInitial(() -> false);
 	private static int keyPressedFrames = -1;
 	private static long lastRenderTooltipTime;
@@ -64,10 +67,6 @@ public class PinTooltips implements ClientModInitializer {
 
 	public static Identifier id(String id) {
 		return Identifier.fromNamespaceAndPath(ID, id);
-	}
-
-	public static int getMaxZOffset() {
-		return 6000;
 	}
 
 	@Override
@@ -148,11 +147,15 @@ public class PinTooltips implements ClientModInitializer {
 					if (button == InputConstants.MOUSE_BUTTON_LEFT && !dragging) {
 						// Mouse position is offset to avoid rendering highlights. Re-calculate it.
 						Minecraft mc = Minecraft.getInstance();
-						int mouseX = (int) (
-								event.x() * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getScreenWidth());
-						int mouseY = (int) (
-								event.y() * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getScreenHeight());
-						Style style = focused.getStyleAt(mouseX, mouseY, mc.font);
+						ActiveTextCollector.ClickableStyleFinder collector = new ActiveTextCollector.ClickableStyleFinder(
+								mc.font,
+								(int) event.x(),
+								(int) event.y());
+						focused.layout().visitLines(focused, collector);
+						Style style = collector.result();
+						if (style == null) {
+							style = focused.getExtraStyleAt((int) event.x(), (int) event.y(), mc.font);
+						}
 						if (style != null && style.getClickEvent() != null) {
 							Screen.defaultHandleGameClickEvent(style.getClickEvent(), mc, screen1);
 						}
@@ -162,7 +165,30 @@ public class PinTooltips implements ClientModInitializer {
 				return true;
 			});
 
-			ScreenEvents.afterRender(screen).register((screen1, context, mouseX, mouseY, tickDelta) -> {
+			ScreenMouseEvents.afterMouseDrag(screen).register((screen1, event, deltaX, deltaY, consumed) -> {
+				var focused = service.focused;
+				if (event.button() == InputConstants.MOUSE_BUTTON_LEFT && focused != null) {
+					if (!service.dragging) {
+						service.storedDragX += deltaX;
+						service.storedDragY += deltaY;
+						if (Math.abs(service.storedDragX) + Math.abs(service.storedDragY) > 5) {
+							service.dragging = true;
+							deltaX = service.storedDragX;
+							deltaY = service.storedDragY;
+						}
+					}
+					if (service.dragging) {
+						var position = focused.position();
+						focused.setPosition(screen1.width, screen1.height, position.x() + deltaX, position.y() + deltaY);
+					}
+					return true;
+				} else if (event.button() == InputConstants.MOUSE_BUTTON_MIDDLE && service.hovered != null) {
+					service.unpin(service.hovered);
+				}
+				return false;
+			});
+
+			ScreenEvents.afterRender(screen).register((screen1, context, mouseX, mouseY, _) -> {
 				if (!shouldShowTooltips(screen1)) {
 					return;
 				}
@@ -193,13 +219,10 @@ public class PinTooltips implements ClientModInitializer {
 
 				service.hovered = service.findHovered(mouseX, mouseY);
 				var font = mc.font;
-				var zOffset = 1;
 				for (var tooltip : service.tooltips()) {
 					context.pose().pushMatrix();
-//					context.pose().translate(0, 0, zOffset);
 					tooltip.render(service, screen1, font, context, mouseX, mouseY);
 					context.pose().popMatrix();
-					zOffset = Math.min(getMaxZOffset() - 1, zOffset + 400);
 				}
 				PinnedTooltip autoPinnedTooltip = service.autoPinnedTooltip();
 				if (autoPinnedTooltip != null && autoPinnedTooltip.isHovered() && autoPinnedTooltip != service.hovered) {
@@ -213,11 +236,11 @@ public class PinTooltips implements ClientModInitializer {
 					} else {
 						hint = Component.translatable("gui.pin_tooltips.unpin_hint");
 					}
-					context.drawCenteredString(font, hint, screen1.width / 2, 4, 0xAAAAAA);
+					context.drawCenteredString(font, hint, screen1.width / 2, 4, 0xAAAAAAAA);
 				}
 			});
 
-			ScreenEvents.remove(screen).register(screen1 -> {
+			ScreenEvents.remove(screen).register(_ -> {
 				PinnedTooltip tooltip = service.autoPinnedTooltip();
 				if (tooltip != null) {
 					service.unpin(tooltip);
@@ -225,7 +248,7 @@ public class PinTooltips implements ClientModInitializer {
 			});
 		});
 
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> service.clearStates());
+		ClientPlayConnectionEvents.DISCONNECT.register((_, _) -> service.clearStates());
 	}
 
 	private static void validateTranslations() {
@@ -257,34 +280,13 @@ public class PinTooltips implements ClientModInitializer {
 		LOGGER.info("Translations validated.");
 	}
 
-	public static void onDrag(Screen screen, int button, double deltaX, double deltaY) {
-		var service = PinnedTooltipsService.INSTANCE;
-		var focused = service.focused;
-		if (button == InputConstants.MOUSE_BUTTON_LEFT && focused != null) {
-			if (!service.dragging) {
-				service.storedDragX += deltaX;
-				service.storedDragY += deltaY;
-				if (Math.abs(service.storedDragX) + Math.abs(service.storedDragY) > 5) {
-					service.dragging = true;
-					deltaX = service.storedDragX;
-					deltaY = service.storedDragY;
-				}
-			}
-			if (service.dragging) {
-				var position = focused.position();
-				focused.setPosition(screen.width, screen.height, position.x() + deltaX, position.y() + deltaY);
-			}
-		} else if (button == InputConstants.MOUSE_BUTTON_MIDDLE && service.hovered != null) {
-			service.unpin(service.hovered);
-		}
-	}
-
 	public static void onRenderTooltip(
 			GuiGraphics graphics,
 			Font font,
 			List<ClientTooltipComponent> components,
+			@Nullable Identifier style,
 			Vector2ic position,
-			@Nullable TooltipStyle style) {
+			@Nullable TooltipLayout layout) {
 		var service = PinnedTooltipsService.INSTANCE;
 		if (service.focused != null) {
 			return;
@@ -303,7 +305,7 @@ public class PinTooltips implements ClientModInitializer {
 			if (delay >= 0) {
 				hasTooltipInThisFrame = true;
 				if (lastMouseMovedTime > 0 && time - lastMouseMovedTime >= delay) {
-					service.pin(position, components, font, itemStack, time, style);
+					service.pin(layout, position, font, components, style, itemStack, time);
 				}
 			}
 			return;
@@ -320,10 +322,10 @@ public class PinTooltips implements ClientModInitializer {
 			return;
 		}
 
-		service.pin(position, components, font, itemStack, -1, style);
+		service.pin(layout, position, font, components, style, itemStack, -1);
 	}
 
-	public static void onRenderFrame(GuiGraphics graphics, int x, int y, int width, int height, int z) {
+	public static void onRenderFrame(GuiGraphics graphics, int x, int y, int width, int height, @Nullable Identifier style) {
 		if (PinTooltips.isGrabbing() || PTGuiGraphics.of(graphics).pin_tooltips$getRenderingPinned()) {
 			return;
 		}
@@ -334,13 +336,12 @@ public class PinTooltips implements ClientModInitializer {
 		if (lastMouseMovedTime == 0 || delay <= 0) {
 			return;
 		}
-		float ratio = Mth.clamp((float) (System.currentTimeMillis() - lastMouseMovedTime) / delay, 0, 1);
-		if (ratio < 0.2F) {
+		float alpha = Mth.clamp((float) (System.currentTimeMillis() - lastMouseMovedTime) / delay, 0, 1);
+		if (alpha < 0.2F) {
 			return;
 		}
-		int color = 0xFFFFFF | (int) (ratio * 0xFF) << 24;
 		renderingFrameLock.set(true);
-		TooltipRenderUtilAccess.callRenderFrameGradient(graphics, x, y, width, height, z + 1, color, color);
+		renderTooltipFrame(graphics, x, y, width, height, AUTOPIN_HIGHLIGHT, alpha);
 		renderingFrameLock.set(false);
 	}
 
@@ -352,5 +353,20 @@ public class PinTooltips implements ClientModInitializer {
 	public static boolean shouldShowTooltips(Screen screen) {
 		// Avoid rendering tooltips when there are multiple screens open
 		return Minecraft.getInstance().screen == screen;
+	}
+
+	public static void renderTooltipFrame(GuiGraphics graphics, int x, int y, int w, int h, @Nullable Identifier style, float alpha) {
+		int x0 = x - 3 - 9;
+		int y0 = y - 3 - 9;
+		int paddedWidth = w + 3 + 3 + 18;
+		int paddedHeight = h + 3 + 3 + 18;
+		graphics.blitSprite(
+				RenderPipelines.GUI_TEXTURED,
+				TooltipRenderUtil.getFrameSprite(style),
+				x0,
+				y0,
+				paddedWidth,
+				paddedHeight,
+				alpha);
 	}
 }

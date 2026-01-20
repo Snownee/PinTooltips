@@ -37,12 +37,12 @@ public abstract class ItemStackMixin {
 
 	@WrapMethod(method = "getTooltipLines")
 	private List<Component> pin_tooltips$handleGrabbing(
-			final Item.TooltipContext tooltipContext,
+			final Item.TooltipContext context,
 			final Player player,
 			final TooltipFlag tooltipFlag,
 			final Operation<List<Component>> original) {
 		boolean grabbing = PinTooltipsHooks.markGrabbing();
-		var result = original.call(tooltipContext, player, tooltipFlag);
+		var result = original.call(context, player, tooltipFlag);
 		PinTooltipsHooks.unmarkGrabbing(grabbing);
 		return result;
 	}
@@ -64,7 +64,7 @@ public abstract class ItemStackMixin {
 	}
 
 	@WrapOperation(
-			method = "getTooltipLines",
+			method = "addDetailsToTooltip",
 			at = @At(
 					value = "INVOKE",
 					target = "Lnet/minecraft/network/chat/Component;translatable(Ljava/lang/String;[Ljava/lang/Object;)Lnet/minecraft/network/chat/MutableComponent;"))
@@ -72,9 +72,9 @@ public abstract class ItemStackMixin {
 			String key,
 			Object[] args,
 			Operation<MutableComponent> original,
-			Item.TooltipContext tooltipContext) {
+			Item.TooltipContext context) {
 		MutableComponent component = original.call(key, args);
-		HolderLookup.Provider registries = tooltipContext.registries();
+		HolderLookup.Provider registries = context.registries();
 		if (PinTooltipsHooks.isGrabbing() && "item.components".equals(key) && registries != null) {
 			Component prettyComponent = NbtUtils.toPrettyComponent(DataComponentMap.CODEC.encodeStart(
 					RegistryOps.create(
@@ -88,7 +88,7 @@ public abstract class ItemStackMixin {
 	}
 
 	@WrapOperation(
-			method = "getTooltipLines",
+			method = "addDetailsToTooltip",
 			at = @At(
 					value = "INVOKE",
 					target = "Lnet/minecraft/network/chat/Component;literal(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;"))

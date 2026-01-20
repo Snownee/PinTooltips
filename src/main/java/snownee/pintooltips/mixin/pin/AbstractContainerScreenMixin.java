@@ -43,8 +43,8 @@ public class AbstractContainerScreenMixin implements PTContainerScreen {
 			at = @At(
 					value = "INVOKE",
 					target = "Lnet/minecraft/world/item/ItemStack;getTooltipImage()Ljava/util/Optional;"))
-	private ItemStack pin_tooltips$recordContext(final ItemStack itemStack, GuiGraphics guiGraphics) {
-		PTGuiGraphics.of(guiGraphics).pin_tooltips$setRenderingItemStack(itemStack);
+	private ItemStack pin_tooltips$grabContext(final ItemStack itemStack, GuiGraphics graphics) {
+		PTGuiGraphics.of(graphics).pin_tooltips$setRenderingItemStack(itemStack);
 		return itemStack;
 	}
 }

@@ -4,17 +4,12 @@
 	"package": "snownee.pintooltips.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"client": [
-		"fabric.GameRendererMixin",
-		"interact.ClientTextTooltipAccess",
 		"interact.EnchantmentMixin",
 		"interact.ItemStackMixin",
-		"interact.MouseHandlerMixin",
 		"interact.PotionContentsMixin",
 		"interact.ScreenMixin",
 		"pin.AbstractContainerScreenMixin",
-		"pin.GuiGraphicsAccess",
 		"pin.GuiGraphicsMixin",
-		"pin.TooltipRenderUtilAccess",
 		"pin.TooltipRenderUtilMixin"
 	]
 }

@@ -14,6 +14,7 @@ import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 public class PinnedTooltipsService {
@@ -53,12 +54,13 @@ public class PinnedTooltipsService {
 	}
 
 	public void pin(
+			@Nullable TooltipLayout layout,
 			Vector2ic position,
-			List<ClientTooltipComponent> components,
 			Font font,
+			List<ClientTooltipComponent> components,
+			@Nullable Identifier style,
 			ItemStack itemStack,
-			long autoPinnedTimestamp,
-			@Nullable TooltipStyle style) {
+			long autoPinnedTimestamp) {
 		if (autoPinnedTimestamp > 0 && autoPinnedTooltip != null && autoPinnedTooltip.autoPinnedTimestamp == autoPinnedTimestamp) {
 			return;
 		}
@@ -66,9 +68,10 @@ public class PinnedTooltipsService {
 		// Avoid modifying the tooltips when rendering the tooltip hover event that will cause crash.
 		Minecraft.getInstance().execute(() -> {
 			PinnedTooltip tooltip = new PinnedTooltip(
-					style == null ? DefaultTooltipStyle.INSTANCE : style,
+					layout == null ? DefaultTooltipLayout.INSTANCE : layout,
 					new Vector2d(position),
 					components,
+					style,
 					Minecraft.getInstance().getWindow().getGuiScaledWidth(),
 					Minecraft.getInstance().getWindow().getGuiScaledHeight(),
 					font,
