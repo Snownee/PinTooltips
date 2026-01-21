@@ -17,8 +17,8 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
-public class PinnedTooltipsService {
-	public static final PinnedTooltipsService INSTANCE = new PinnedTooltipsService();
+public class PinTooltipsService {
+	public static final PinTooltipsService INSTANCE = new PinTooltipsService();
 
 	private @Nullable PinnedTooltip autoPinnedTooltip;
 	private final List<PinnedTooltip> tooltips = Collections.synchronizedList(new ReferenceArrayList<>());
@@ -30,7 +30,7 @@ public class PinnedTooltipsService {
 	public double storedDragX;
 	public double storedDragY;
 
-	private PinnedTooltipsService() {
+	private PinTooltipsService() {
 	}
 
 	public @Nullable PinnedTooltip findHovered(double mouseX, double mouseY) {
@@ -60,6 +60,7 @@ public class PinnedTooltipsService {
 			List<ClientTooltipComponent> components,
 			@Nullable Identifier style,
 			ItemStack itemStack,
+			@Nullable ClientTooltipComponent image,
 			long autoPinnedTimestamp) {
 		if (autoPinnedTimestamp > 0 && autoPinnedTooltip != null && autoPinnedTooltip.autoPinnedTimestamp == autoPinnedTimestamp) {
 			return;
@@ -76,6 +77,7 @@ public class PinnedTooltipsService {
 					Minecraft.getInstance().getWindow().getGuiScaledHeight(),
 					font,
 					itemStack,
+					image,
 					autoPinnedTimestamp);
 			if (autoPinnedTimestamp > 0) {
 				if (autoPinnedTooltip != null) {

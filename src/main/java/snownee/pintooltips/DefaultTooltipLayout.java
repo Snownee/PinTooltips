@@ -18,6 +18,9 @@ public class DefaultTooltipLayout implements TooltipLayout {
 			width = Math.max(width, componentWidth);
 			height += componentHeight;
 		}
+		for (var position : tooltip.linesPosition().keySet()) {
+			position.setWidth(width);
+		}
 		if (width != tooltip.size().x() || height != tooltip.size().y()) {
 			tooltip.setSize(width, height);
 		}

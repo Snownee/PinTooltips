@@ -7,3 +7,14 @@ accessible method net/minecraft/client/gui/screens/inventory/tooltip/TooltipRend
 accessible method net/minecraft/client/gui/screens/inventory/tooltip/TooltipRenderUtil getFrameSprite (Lnet/minecraft/resources/Identifier;)Lnet/minecraft/resources/Identifier;
 
 accessible field net/minecraft/client/gui/GuiGraphics hoveredTextStyle Lnet/minecraft/network/chat/Style;
+
+accessible field net/minecraft/client/gui/screens/inventory/tooltip/ClientBundleTooltip contents Lnet/minecraft/world/item/component/BundleContents;
+accessible method net/minecraft/client/gui/screens/inventory/tooltip/ClientBundleTooltip getShownItems (I)Ljava/util/List;
+accessible method net/minecraft/client/gui/screens/inventory/tooltip/ClientBundleTooltip getContentXOffset (I)I
+accessible method net/minecraft/client/gui/screens/inventory/tooltip/ClientBundleTooltip gridSizeY ()I
+accessible method net/minecraft/client/gui/screens/inventory/tooltip/ClientBundleTooltip shouldRenderSurplusText (ZII)Z
+accessible method net/minecraft/client/gui/screens/inventory/tooltip/ClientBundleTooltip shouldRenderItemSlot (Ljava/util/List;I)Z
+
+accessible method net/minecraft/world/inventory/AbstractContainerMenu createCarriedSlotAccess ()Lnet/minecraft/world/entity/SlotAccess;
+
+accessible method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen slotClicked (Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ContainerInput;)V

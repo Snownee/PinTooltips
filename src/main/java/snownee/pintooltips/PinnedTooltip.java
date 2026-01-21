@@ -9,14 +9,18 @@ import org.joml.Vector2ic;
 import org.jspecify.annotations.Nullable;
 
 import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import snownee.pintooltips.duck.PTContainerScreen;
 import snownee.pintooltips.duck.PTGuiGraphics;
@@ -28,6 +32,8 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 	private final Vector2i size;
 	private final List<ClientTooltipComponent> components;
 	private final @Nullable Identifier style;
+	private final ItemStack itemStack;
+	private @Nullable ClientTooltipComponent image;
 	private final @Nullable DummyHoveredSlot hoveredSlot;
 	private final Map<Rect2i, ClientTooltipComponent> linesPosition;
 	long autoPinnedTimestamp;
@@ -40,6 +46,8 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 			List<ClientTooltipComponent> components,
 			@Nullable Identifier style,
 			long autoPinnedTimestamp,
+			ItemStack itemStack,
+			@Nullable ClientTooltipComponent image,
 			@Nullable DummyHoveredSlot hoveredSlot) {
 		this.layout = layout;
 		this.position = position;
@@ -47,6 +55,8 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 		this.components = components;
 		this.style = style;
 		this.autoPinnedTimestamp = autoPinnedTimestamp;
+		this.itemStack = itemStack;
+		this.image = image;
 		this.hoveredSlot = hoveredSlot;
 		this.linesPosition = new Reference2ObjectLinkedOpenHashMap<>();
 	}
@@ -60,6 +70,7 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 			int screenHeight,
 			Font font,
 			ItemStack itemStack,
+			@Nullable ClientTooltipComponent image,
 			long autoPinnedTimestamp) {
 		this(
 				layout,
@@ -68,6 +79,8 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 				components,
 				style,
 				autoPinnedTimestamp,
+				itemStack,
+				image,
 				itemStack.isEmpty() ? null : new DummyHoveredSlot(itemStack.copy()));
 		updateSize(screenWidth, screenHeight, font);
 	}
@@ -77,10 +90,18 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 	}
 
 	public void updateSize(int screenWidth, int screenHeight, Font font) {
+		if (image != null) {
+			int i = components.indexOf(image);
+			TooltipComponent newImage = itemStack.getTooltipImage().orElse(null);
+			if (i != -1 && newImage != null) {
+				image = ClientTooltipComponent.create(newImage);
+				components.set(i, image);
+			}
+		}
 		layout.updateSize(this, screenWidth, screenHeight, font);
 	}
 
-	public void render(PinnedTooltipsService service, Screen screen, Font font, GuiGraphics context, int mouseX, int mouseY) {
+	public void render(PinTooltipsService service, Screen screen, Font font, GuiGraphics context, int mouseX, int mouseY) {
 		context.pose().pushMatrix();
 		updateSize(screen.width, screen.height, font);
 		var inContainer = hoveredSlot() != null && screen instanceof PTContainerScreen;
@@ -137,7 +158,24 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 	}
 
 	public @Nullable Style getExtraStyleAt(double mouseX, double mouseY, Font font) {
+		var relativeX = (int) (mouseX - position.x());
+		var relativeY = (int) (mouseY - position.y());
+		var line = linesPosition.keySet().stream().filter(rect -> rect.contains(relativeX, relativeY)).findFirst();
+		var component = line.map(linesPosition::get).orElse(null);
+		if (component != null) {
+			Style style = getExtraStyleAt(component, font, relativeX - line.get().getX(), relativeY - line.get().getY());
+			if (style != null) {
+				return style;
+			}
+		}
 		return layout.getExtraStyleAt(this, mouseX, mouseY, font);
+	}
+
+	private @Nullable Style getExtraStyleAt(ClientTooltipComponent component, Font font, int relativeX, int relativeY) {
+		//noinspection unchecked
+		return StyleHandlers.get(component)
+				.map($ -> ((StyleHandler<ClientTooltipComponent>) $).handle(this, component, font, relativeX, relativeY, size.x))
+				.orElse(null);
 	}
 
 	@Override
@@ -163,5 +201,20 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 
 	public void setSize(int width, int height) {
 		size.set(width, height);
+	}
+
+	public ItemStack itemReference() {
+		return itemStack;
+	}
+
+	public @Nullable Slot itemSlot() {
+		if (!itemStack.isEmpty() && Minecraft.getInstance().screen instanceof AbstractContainerScreen<?> screen) {
+			for (Slot slot : screen.getMenu().slots) {
+				if (slot.getItem() == itemStack) {
+					return slot;
+				}
+			}
+		}
+		return null;
 	}
 }

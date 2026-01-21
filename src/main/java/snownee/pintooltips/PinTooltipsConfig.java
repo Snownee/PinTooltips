@@ -16,6 +16,7 @@ public class PinTooltipsConfig {
 	public static boolean hideMissingDescriptions = true;
 	public static boolean jadeModEnchantmentModName = true;
 	public static boolean jadeModMobEffectModName = true;
+	public static boolean bundleInteraction = true;
 	public static int hoveringAutoPinDelay = 1500;
 	@ConfigUI.Typed(String.class)
 	public static List<String> screenBlacklist = defaultBlacklist();

@@ -25,6 +25,7 @@ import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -71,7 +72,7 @@ public class PinTooltips implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
-		var service = PinnedTooltipsService.INSTANCE;
+		var service = PinTooltipsService.INSTANCE;
 		ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
 			if (PinTooltipsConfig.screenBlacklist.contains(screen.getClass().getName())) {
 				return;
@@ -237,6 +238,10 @@ public class PinTooltips implements ClientModInitializer {
 						hint = Component.translatable("gui.pin_tooltips.unpin_hint");
 					}
 					context.drawCenteredString(font, hint, screen1.width / 2, 4, 0xAAAAAAAA);
+
+					if (screen1 instanceof AbstractContainerScreen<?> containerScreen) {
+						containerScreen.renderCarriedItem(context, mouseX, mouseY);
+					}
 				}
 			});
 
@@ -287,17 +292,18 @@ public class PinTooltips implements ClientModInitializer {
 			@Nullable Identifier style,
 			Vector2ic position,
 			@Nullable TooltipLayout layout) {
-		var service = PinnedTooltipsService.INSTANCE;
+		var service = PinTooltipsService.INSTANCE;
 		if (service.focused != null) {
 			return;
 		}
 
-		PTGuiGraphics ptGraphics = PTGuiGraphics.of(graphics);
-		if (ptGraphics.pin_tooltips$getRenderingPinned()) {
+		PTGuiGraphics context = PTGuiGraphics.of(graphics);
+		if (context.pin_tooltips$getRenderingPinned()) {
 			return;
 		}
 
-		ItemStack itemStack = ptGraphics.pin_tooltips$getRenderingItemStack();
+		ItemStack itemStack = context.pin_tooltips$getRenderingItemStack();
+		ClientTooltipComponent image = context.pin_tooltips$getRenderingImage();
 		long time = System.currentTimeMillis();
 
 		if (keyPressedFrames < 0) {
@@ -305,7 +311,7 @@ public class PinTooltips implements ClientModInitializer {
 			if (delay >= 0) {
 				hasTooltipInThisFrame = true;
 				if (lastMouseMovedTime > 0 && time - lastMouseMovedTime >= delay) {
-					service.pin(layout, position, font, components, style, itemStack, time);
+					service.pin(layout, position, font, components, style, itemStack, image, time);
 				}
 			}
 			return;
@@ -322,7 +328,7 @@ public class PinTooltips implements ClientModInitializer {
 			return;
 		}
 
-		service.pin(layout, position, font, components, style, itemStack, -1);
+		service.pin(layout, position, font, components, style, itemStack, image, -1);
 	}
 
 	public static void onRenderFrame(GuiGraphics graphics, int x, int y, int width, int height, @Nullable Identifier style) {
