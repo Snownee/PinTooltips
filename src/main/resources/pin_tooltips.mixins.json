@@ -10,10 +10,12 @@
 		"interact.ItemStackMixin",
 		"interact.PotionContentsMixin",
 		"interact.ScreenMixin",
+		"mods.obscure.TooltipRendererMixin",
 		"neo.GameRendererMixin",
 		"pin.AbstractContainerScreenMixin",
 		"pin.GuiGraphicsAccess",
 		"pin.GuiGraphicsMixin",
+		"pin.TooltipRenderUtilAccess",
 		"pin.TooltipRenderUtilMixin"
 	]
 }

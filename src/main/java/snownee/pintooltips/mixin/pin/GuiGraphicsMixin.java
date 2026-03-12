@@ -56,15 +56,7 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 			final CallbackInfo ci,
 			@Local Vector2ic position
 	) {
-		if (pin_tooltips$renderingPinned) {
-			return;
-		}
-		PinTooltips.onRenderTooltip(
-				font,
-				components,
-				position,
-				pin_tooltips$getRenderingItemStack(),
-				null);
+		PinTooltips.onRenderTooltip((GuiGraphics) (Object) this, font, components, position, null);
 	}
 
 	@Inject(

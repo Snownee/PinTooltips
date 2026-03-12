@@ -1,4 +1,4 @@
-package snownee.pintooltips.compat;
+package snownee.pintooltips.mods;
 
 import java.lang.reflect.Method;
 
