@@ -16,7 +16,7 @@ targetCompatibility = JavaVersion.VERSION_21
 neoForge {
     // We currently only support NeoForge versions later than 21.0.x
     // See https://projects.neoforged.net/neoforged/neoforge for the latest updates
-    version = "21.1.120"
+    version = "21.1.219"
 
     // Validate AT files and raise errors when they have invalid targets
     // This option is false by default, but turning it on is recommended
@@ -129,7 +129,7 @@ jar {
 }
 
 publishMods {
-    file = remapJar.archiveFile
+    file = jar.archiveFile
     changelog = file('CHANGELOG.md').exists() ? file('CHANGELOG.md').text : ''
     type = ['release': STABLE, 'beta': BETA, 'alpha': ALPHA][release_type]
     modLoaders.add("neoforge")
