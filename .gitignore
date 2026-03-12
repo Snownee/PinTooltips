@@ -24,3 +24,4 @@ build
 /bin
 /CHANGELOG.md
 /.factorypath
+/libs/*.jar
