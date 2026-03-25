@@ -19,7 +19,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.network.chat.Component;
@@ -31,7 +31,7 @@ import snownee.pintooltips.PinTooltipsClient;
 import snownee.pintooltips.PinTooltipsService;
 import snownee.pintooltips.duck.PTGuiGraphics;
 
-@Mixin(value = GuiGraphics.class, priority = 499)
+@Mixin(value = GuiGraphicsExtractor.class, priority = 499)
 public class GuiGraphicsMixin implements PTGuiGraphics {
 	@Shadow
 	private @Nullable Runnable deferredTooltip;
@@ -83,7 +83,7 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 			CallbackInfo ci,
 			@Local(name = "positionedTooltip") Vector2ic positionedTooltip
 	) {
-		PinTooltips.onRenderTooltip((GuiGraphics) (Object) this, font, lines, style, positionedTooltip, null);
+		PinTooltips.onRenderTooltip((GuiGraphicsExtractor) (Object) this, font, lines, style, positionedTooltip, null);
 	}
 
 	@WrapMethod(method = "setTooltipForNextFrameInternal")
@@ -108,7 +108,7 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 					value = "FIELD",
 					opcode = Opcodes.PUTFIELD,
 					target = "Lnet/minecraft/client/gui/GuiGraphics;deferredTooltip:Ljava/lang/Runnable;"))
-	private void pin_tooltips$grabContextInternal(GuiGraphics graphics, Runnable value, Operation<Void> original) {
+	private void pin_tooltips$grabContextInternal(GuiGraphicsExtractor graphics, Runnable value, Operation<Void> original) {
 		original.call(graphics, value);
 		Runnable runnable = deferredTooltip;
 		ItemStack itemStack = pin_tooltips$getRenderingItemStack();
@@ -126,7 +126,7 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 	@Override
 	public void pin_tooltips$setRenderingItemStack(ItemStack itemStack) {
 		pin_tooltips$renderingItemStack = itemStack;
-		PinTooltipsClient.setRenderingItemStack((GuiGraphics) (Object) this, itemStack);
+		PinTooltipsClient.setRenderingItemStack((GuiGraphicsExtractor) (Object) this, itemStack);
 	}
 
 	@Override

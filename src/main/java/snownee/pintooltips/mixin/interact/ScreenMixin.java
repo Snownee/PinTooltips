@@ -10,7 +10,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.sugar.Local;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.resources.Identifier;
@@ -42,8 +42,8 @@ public class ScreenMixin {
 		ci.cancel();
 	}
 
-	@WrapMethod(method = "renderWithTooltipAndSubtitles")
-	private void pin_tooltips$renderWithTooltip(GuiGraphics graphics, int mouseX, int mouseY, float a, Operation<Void> original) {
+	@WrapMethod(method = "extractRenderStateWithTooltipAndSubtitles")
+	private void pin_tooltips$renderWithTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a, Operation<Void> original) {
 		boolean grabbing = PinTooltipsHooks.markGrabbing();
 		if (PinTooltipsService.INSTANCE.hovered != null) {
 			mouseX = -100;

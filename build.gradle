@@ -83,10 +83,9 @@ dependencies {
 //    modImplementation("maven.modrinth:jei:19.21.0.247-fabric")
 //    modImplementation("maven.modrinth:just-enough-effect-descriptions-jeed:1.21-2.2.15-fabric")
     implementation("maven.modrinth:jade:${jade_version}+fabric")
-//    modImplementation("maven.modrinth:kiwi:15.1.4+fabric")
-//    annotationProcessor("maven.modrinth:kiwi:15.1.4+fabric")
-    implementation fileTree(dir: "libs", include: ["*.jar"])
-    annotationProcessor fileTree(dir: "libs", include: ["*.jar"])
+    implementation annotationProcessor("maven.modrinth:kiwi:${kiwi_version}+fabric")
+//    implementation fileTree(dir: "libs", include: ["*.jar"])
+//    annotationProcessor fileTree(dir: "libs", include: ["*.jar"])
 }
 
 processResources {

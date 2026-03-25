@@ -6,7 +6,7 @@ accessible field net/minecraft/client/gui/screens/inventory/tooltip/ClientTextTo
 accessible method net/minecraft/client/gui/screens/inventory/tooltip/TooltipRenderUtil getBackgroundSprite (Lnet/minecraft/resources/Identifier;)Lnet/minecraft/resources/Identifier;
 accessible method net/minecraft/client/gui/screens/inventory/tooltip/TooltipRenderUtil getFrameSprite (Lnet/minecraft/resources/Identifier;)Lnet/minecraft/resources/Identifier;
 
-accessible field net/minecraft/client/gui/GuiGraphics hoveredTextStyle Lnet/minecraft/network/chat/Style;
+accessible field net/minecraft/client/gui/GuiGraphicsExtractor hoveredTextStyle Lnet/minecraft/network/chat/Style;
 
 accessible field net/minecraft/client/gui/screens/inventory/tooltip/ClientBundleTooltip contents Lnet/minecraft/world/item/component/BundleContents;
 accessible method net/minecraft/client/gui/screens/inventory/tooltip/ClientBundleTooltip getShownItems (I)Ljava/util/List;

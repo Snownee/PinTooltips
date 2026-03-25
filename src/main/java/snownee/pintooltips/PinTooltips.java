@@ -23,7 +23,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -189,7 +189,7 @@ public class PinTooltips implements ClientModInitializer {
 				return false;
 			});
 
-			ScreenEvents.afterRender(screen).register((screen1, context, mouseX, mouseY, _) -> {
+			ScreenEvents.afterExtract(screen).register((screen1, context, mouseX, mouseY, _) -> {
 				if (!shouldShowTooltips(screen1)) {
 					return;
 				}
@@ -237,10 +237,10 @@ public class PinTooltips implements ClientModInitializer {
 					} else {
 						hint = Component.translatable("gui.pin_tooltips.unpin_hint");
 					}
-					context.drawCenteredString(font, hint, screen1.width / 2, 4, 0xAAAAAAAA);
+					context.centeredText(font, hint, screen1.width / 2, 4, 0xAAAAAAAA);
 
 					if (screen1 instanceof AbstractContainerScreen<?> containerScreen) {
-						containerScreen.renderCarriedItem(context, mouseX, mouseY);
+						containerScreen.extractCarriedItem(context, mouseX, mouseY);
 					}
 				}
 			});
@@ -286,7 +286,7 @@ public class PinTooltips implements ClientModInitializer {
 	}
 
 	public static void onRenderTooltip(
-			GuiGraphics graphics,
+			GuiGraphicsExtractor graphics,
 			Font font,
 			List<ClientTooltipComponent> components,
 			@Nullable Identifier style,
@@ -331,7 +331,7 @@ public class PinTooltips implements ClientModInitializer {
 		service.pin(layout, position, font, components, style, itemStack, image, -1);
 	}
 
-	public static void onRenderFrame(GuiGraphics graphics, int x, int y, int width, int height, @Nullable Identifier style) {
+	public static void onRenderFrame(GuiGraphicsExtractor graphics, int x, int y, int width, int height, @Nullable Identifier style) {
 		if (PinTooltips.isGrabbing() || PTGuiGraphics.of(graphics).pin_tooltips$getRenderingPinned()) {
 			return;
 		}
@@ -361,7 +361,14 @@ public class PinTooltips implements ClientModInitializer {
 		return Minecraft.getInstance().screen == screen;
 	}
 
-	public static void renderTooltipFrame(GuiGraphics graphics, int x, int y, int w, int h, @Nullable Identifier style, float alpha) {
+	public static void renderTooltipFrame(
+			GuiGraphicsExtractor graphics,
+			int x,
+			int y,
+			int w,
+			int h,
+			@Nullable Identifier style,
+			float alpha) {
 		int x0 = x - 3 - 9;
 		int y0 = y - 3 - 9;
 		int paddedWidth = w + 3 + 3 + 18;

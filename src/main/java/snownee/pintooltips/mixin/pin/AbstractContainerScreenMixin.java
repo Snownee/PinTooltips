@@ -14,7 +14,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -51,12 +51,12 @@ public class AbstractContainerScreenMixin implements PTContainerScreen {
 
 	@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 	@WrapOperation(
-			method = "renderTooltip",
+			method = "extractTooltip",
 			at = @At(
 					value = "INVOKE",
 					target = "Lnet/minecraft/client/gui/GuiGraphics;setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/Identifier;)V"))
 	private void pin_tooltips$grabItem(
-			GuiGraphics graphics,
+			GuiGraphicsExtractor graphics,
 			Font font,
 			List<Component> texts,
 			Optional<TooltipComponent> optionalImage,

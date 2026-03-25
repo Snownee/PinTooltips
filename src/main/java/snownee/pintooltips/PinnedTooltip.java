@@ -11,7 +11,7 @@ import org.jspecify.annotations.Nullable;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -101,7 +101,7 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 		layout.updateSize(this, screenWidth, screenHeight, font);
 	}
 
-	public void render(PinTooltipsService service, Screen screen, Font font, GuiGraphics context, int mouseX, int mouseY) {
+	public void render(PinTooltipsService service, Screen screen, Font font, GuiGraphicsExtractor context, int mouseX, int mouseY) {
 		context.pose().pushMatrix();
 		updateSize(screen.width, screen.height, font);
 		var inContainer = hoveredSlot() != null && screen instanceof PTContainerScreen;
@@ -114,7 +114,7 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 		if (hoveredSlot != null) {
 			graphics.pin_tooltips$setRenderingItemStack(hoveredSlot.getItem());
 		}
-		context.renderTooltip(font, components(), (int) position().x(), (int) position().y(), this, style);
+		context.tooltip(font, components(), (int) position().x(), (int) position().y(), this, style);
 		graphics.pin_tooltips$setRenderingPinned(false);
 
 		if (inContainer) {
@@ -122,15 +122,14 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 		}
 
 		if (service.hovered == this && !service.dragging) {
-			layout.visitLines(this, context.textRenderer(GuiGraphics.HoveredTextEffects.TOOLTIP_AND_CURSOR));
+			layout.visitLines(this, context.textRenderer(GuiGraphicsExtractor.HoveredTextEffects.TOOLTIP_AND_CURSOR));
 			var style = context.hoveredTextStyle;
 			if (style == null) {
 				style = getExtraStyleAt(mouseX, mouseY, font);
 			}
 			if (style != null) {
 				graphics.pin_tooltips$setRenderingPinnedEvent(true);
-				context.renderComponentHoverEffect(font, style, mouseX, mouseY);
-				context.renderDeferredElements();
+				context.extractDeferredElements(mouseX, mouseY, 0);
 				graphics.pin_tooltips$setRenderingPinnedEvent(false);
 			}
 		}
