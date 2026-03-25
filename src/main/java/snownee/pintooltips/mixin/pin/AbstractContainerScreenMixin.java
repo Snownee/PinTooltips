@@ -54,7 +54,7 @@ public class AbstractContainerScreenMixin implements PTContainerScreen {
 			method = "extractTooltip",
 			at = @At(
 					value = "INVOKE",
-					target = "Lnet/minecraft/client/gui/GuiGraphics;setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/Identifier;)V"))
+					target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/Identifier;)V"))
 	private void pin_tooltips$grabItem(
 			GuiGraphicsExtractor graphics,
 			Font font,

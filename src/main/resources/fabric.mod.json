@@ -25,7 +25,7 @@
 		"pin_tooltips.mixins.json"
 	],
 	"depends": {
-		"fabric-api": ">0.141"
+		"fabric-api": ">=0.144"
 	},
 	"suggests": {
 		"more_enchantment_info": ">=0.2"

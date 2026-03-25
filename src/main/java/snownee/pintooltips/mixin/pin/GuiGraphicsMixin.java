@@ -54,7 +54,7 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 			method = "setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/Identifier;)V",
 			at = @At(
 					value = "INVOKE",
-					target = "Lnet/minecraft/client/gui/GuiGraphics;setTooltipForNextFrameInternal(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;Lnet/minecraft/resources/Identifier;Z)V"))
+					target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;setTooltipForNextFrameInternal(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;Lnet/minecraft/resources/Identifier;Z)V"))
 	private void pin_tooltips$renderTooltip$grabImage(
 			Font font,
 			List<Component> texts,
@@ -70,7 +70,7 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 	}
 
 	@Inject(
-			method = "renderTooltip",
+			method = "tooltip",
 			at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2fStack;pushMatrix()Lorg/joml/Matrix3x2fStack;")
 	)
 	private void pin_tooltips$onRender(
@@ -107,7 +107,7 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 			at = @At(
 					value = "FIELD",
 					opcode = Opcodes.PUTFIELD,
-					target = "Lnet/minecraft/client/gui/GuiGraphics;deferredTooltip:Ljava/lang/Runnable;"))
+					target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;deferredTooltip:Ljava/lang/Runnable;"))
 	private void pin_tooltips$grabContextInternal(GuiGraphicsExtractor graphics, Runnable value, Operation<Void> original) {
 		original.call(graphics, value);
 		Runnable runnable = deferredTooltip;
