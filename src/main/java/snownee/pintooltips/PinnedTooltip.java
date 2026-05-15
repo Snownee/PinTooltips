@@ -1,5 +1,6 @@
 package snownee.pintooltips;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +53,7 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 		this.layout = layout;
 		this.position = position;
 		this.size = size;
-		this.components = components;
+		this.components = new ArrayList<>(components);
 		this.style = style;
 		this.autoPinnedTimestamp = autoPinnedTimestamp;
 		this.itemStack = itemStack;

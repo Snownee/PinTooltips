@@ -30,13 +30,6 @@ versionRange="[1.21,)"
 side="CLIENT"
 
 [[dependencies.pin_tooltips]]
-modId="fabric_api"
-versionRange="[0.92,)"
-side="CLIENT"
-reason="Forgified Fabric API is required for this mod to work."
-referralUrl="https://www.curseforge.com/minecraft/mc-mods/forgified-fabric-api"
-
-[[dependencies.pin_tooltips]]
 modId="more_enchantment_info"
 type="optional"
 versionRange="[0.2,)"

@@ -54,15 +54,16 @@ public class AbstractContainerScreenMixin implements PTContainerScreen {
 			method = "extractTooltip",
 			at = @At(
 					value = "INVOKE",
-					target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/Identifier;)V"))
+					target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;Lnet/minecraft/world/item/ItemStack;IILnet/minecraft/resources/Identifier;)V"))
 	private void pin_tooltips$grabItem(
 			GuiGraphicsExtractor graphics,
 			Font font,
-			List<Component> texts,
-			Optional<TooltipComponent> optionalImage,
-			int xo,
-			int yo,
-			@Nullable Identifier style,
+			List<Component> textComponents,
+			Optional<TooltipComponent> tooltipComponent,
+			ItemStack stack,
+			int mouseX,
+			int mouseY,
+			@Nullable Identifier backgroundTexture,
 			Operation<Void> original,
 			@Local(name = "item") ItemStack item) {
 		PinnedTooltip tooltip = PinTooltipsService.INSTANCE.autoPinnedTooltip();
@@ -70,6 +71,6 @@ public class AbstractContainerScreenMixin implements PTContainerScreen {
 			return;
 		}
 		PTGuiGraphics.of(graphics).pin_tooltips$setRenderingItemStack(item);
-		original.call(graphics, font, texts, optionalImage, xo, yo, style);
+		original.call(graphics, font, textComponents, tooltipComponent, stack, mouseX, mouseY, backgroundTexture);
 	}
 }

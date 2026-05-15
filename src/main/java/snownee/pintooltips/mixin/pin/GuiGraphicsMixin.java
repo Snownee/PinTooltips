@@ -70,7 +70,7 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 	}
 
 	@Inject(
-			method = "tooltip",
+			method = "tooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;Lnet/minecraft/resources/Identifier;Lnet/minecraft/world/item/ItemStack;)V",
 			at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2fStack;pushMatrix()Lorg/joml/Matrix3x2fStack;")
 	)
 	private void pin_tooltips$onRender(
@@ -80,6 +80,7 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 			int yo,
 			ClientTooltipPositioner positioner,
 			@Nullable Identifier style,
+			ItemStack tooltipStack,
 			CallbackInfo ci,
 			@Local(name = "positionedTooltip") Vector2ic positionedTooltip
 	) {
@@ -98,8 +99,7 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 			Operation<Void> original) {
 		if (PinTooltipsService.INSTANCE.hovered == null || pin_tooltips$renderingPinned || pin_tooltips$renderingPinnedEvent) {
 			original.call(font, lines, xo, yo, positioner, style, replaceExisting);
-		}
-		pin_tooltips$clearRenderingItemStack();
+		} else pin_tooltips$clearRenderingItemStack();
 	}
 
 	@WrapOperation(

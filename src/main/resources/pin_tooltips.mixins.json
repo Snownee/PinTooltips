@@ -5,17 +5,13 @@
 	"compatibilityLevel": "JAVA_21",
 	"refmap": "pin_tooltips.refmap.json",
 	"client": [
-		"interact.ClientTextTooltipAccess",
 		"interact.EnchantmentMixin",
 		"interact.ItemStackMixin",
 		"interact.PotionContentsMixin",
 		"interact.ScreenMixin",
-		"mods.obscure.TooltipRendererMixin",
 		"neo.GameRendererMixin",
 		"pin.AbstractContainerScreenMixin",
-		"pin.GuiGraphicsAccess",
 		"pin.GuiGraphicsMixin",
-		"pin.TooltipRenderUtilAccess",
 		"pin.TooltipRenderUtilMixin"
 	]
 }
