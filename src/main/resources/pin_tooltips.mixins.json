@@ -2,8 +2,7 @@
 	"required": true,
 	"minVersion": "0.8",
 	"package": "snownee.pintooltips.mixin",
-	"compatibilityLevel": "JAVA_21",
-	"refmap": "pin_tooltips.refmap.json",
+	"compatibilityLevel": "JAVA_25",
 	"client": [
 		"interact.EnchantmentMixin",
 		"interact.ItemStackMixin",
