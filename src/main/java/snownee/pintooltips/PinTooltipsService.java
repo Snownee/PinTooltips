@@ -4,9 +4,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
 import org.joml.Vector2ic;
+import org.jspecify.annotations.Nullable;
 
 import com.google.common.collect.Lists;
 
@@ -14,26 +14,26 @@ import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
-public class PinnedTooltipsService {
-	public static final PinnedTooltipsService INSTANCE = new PinnedTooltipsService();
+public class PinTooltipsService {
+	public static final PinTooltipsService INSTANCE = new PinTooltipsService();
 
-	@Nullable
-	private PinnedTooltip autoPinnedTooltip;
+	private @Nullable PinnedTooltip autoPinnedTooltip;
 	private final List<PinnedTooltip> tooltips = Collections.synchronizedList(new ReferenceArrayList<>());
 
-	public PinnedTooltip focused;
-	public PinnedTooltip hovered;
+	public @Nullable PinnedTooltip focused;
+	public @Nullable PinnedTooltip hovered;
 
 	public boolean dragging;
 	public double storedDragX;
 	public double storedDragY;
 
-	private PinnedTooltipsService() {
+	private PinTooltipsService() {
 	}
 
-	public PinnedTooltip findHovered(double mouseX, double mouseY) {
+	public @Nullable PinnedTooltip findHovered(double mouseX, double mouseY) {
 		if (tooltips.isEmpty()) {
 			return null;
 		}
@@ -54,26 +54,30 @@ public class PinnedTooltipsService {
 	}
 
 	public void pin(
+			@Nullable TooltipLayout layout,
 			Vector2ic position,
-			List<ClientTooltipComponent> components,
 			Font font,
+			List<ClientTooltipComponent> components,
+			@Nullable Identifier style,
 			ItemStack itemStack,
-			long autoPinnedTimestamp,
-			@Nullable TooltipStyle style) {
+			@Nullable ClientTooltipComponent image,
+			long autoPinnedTimestamp) {
 		if (autoPinnedTimestamp > 0 && autoPinnedTooltip != null && autoPinnedTooltip.autoPinnedTimestamp == autoPinnedTimestamp) {
 			return;
 		}
 
 		// Avoid modifying the tooltips when rendering the tooltip hover event that will cause crash.
-		Minecraft.getInstance().tell(() -> {
+		Minecraft.getInstance().execute(() -> {
 			PinnedTooltip tooltip = new PinnedTooltip(
-					style == null ? DefaultTooltipStyle.INSTANCE : style,
+					layout == null ? DefaultTooltipLayout.INSTANCE : layout,
 					new Vector2d(position),
 					components,
+					style,
 					Minecraft.getInstance().getWindow().getGuiScaledWidth(),
 					Minecraft.getInstance().getWindow().getGuiScaledHeight(),
 					font,
 					itemStack,
+					image,
 					autoPinnedTimestamp);
 			if (autoPinnedTimestamp > 0) {
 				if (autoPinnedTooltip != null) {
@@ -87,7 +91,7 @@ public class PinnedTooltipsService {
 
 	public void unpin(PinnedTooltip tooltip) {
 		// Avoid modifying the tooltips when rendering the tooltip hover event that will cause crash.
-		Minecraft.getInstance().tell(() -> {
+		Minecraft.getInstance().execute(() -> {
 			tooltips.remove(tooltip);
 			if (autoPinnedTooltip == tooltip) {
 				autoPinnedTooltip = null;

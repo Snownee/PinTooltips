@@ -7,7 +7,6 @@ import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.gui.screens.GenericMessageScreen;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.ProgressScreen;
-import net.minecraft.client.gui.screens.ReceivingLevelScreen;
 import snownee.kiwi.KiwiModule;
 import snownee.kiwi.config.ConfigUI;
 import snownee.kiwi.config.KiwiConfig;
@@ -17,6 +16,7 @@ public class PinTooltipsConfig {
 	public static boolean hideMissingDescriptions = true;
 	public static boolean jadeModEnchantmentModName = true;
 	public static boolean jadeModMobEffectModName = true;
+	public static boolean bundleInteraction = true;
 	public static int hoveringAutoPinDelay = 1500;
 	@ConfigUI.Typed(String.class)
 	public static List<String> screenBlacklist = defaultBlacklist();
@@ -33,7 +33,6 @@ public class PinTooltipsConfig {
 				PauseScreen.class.getName(),
 				ChatScreen.class.getName(),
 				GenericMessageScreen.class.getName(),
-				ReceivingLevelScreen.class.getName(),
 				ProgressScreen.class.getName()
 		);
 	}
