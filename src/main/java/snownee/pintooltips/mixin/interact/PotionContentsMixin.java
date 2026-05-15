@@ -24,9 +24,9 @@ public class PotionContentsMixin {
 	private static MutableComponent pin_tooltips$addPotionTooltip(
 			final MutableComponent component,
 			final ChatFormatting format,
-			@Local MobEffectInstance effectInstance) {
+			@Local(name = "effect") MobEffectInstance effect) {
 		if (PinTooltipsHooks.isGrabbing()) {
-			ComponentDecorator.mobEffect(component, effectInstance);
+			ComponentDecorator.mobEffect(component, effect);
 		}
 		return component;
 	}

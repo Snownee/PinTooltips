@@ -1,3 +1,4 @@
+/*
 package snownee.pintooltips.mixin.mods.obscure;
 
 import java.util.List;
@@ -104,3 +105,4 @@ public class TooltipRendererMixin {
 		PinTooltips.onRenderFrame(graphics, pos.x() - 2, pos.y() - 2, width + 4, height + 5, 0);
 	}
 }
+*/
