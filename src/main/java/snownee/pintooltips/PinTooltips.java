@@ -20,6 +20,8 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
@@ -359,5 +361,17 @@ public class PinTooltips {
 			int h,
 			@Nullable Identifier style,
 			float alpha) {
+		int x0 = x - 3 - 9;
+		int y0 = y - 3 - 9;
+		int paddedWidth = w + 3 + 3 + 18;
+		int paddedHeight = h + 3 + 3 + 18;
+		graphics.blitSprite(
+				RenderPipelines.GUI_TEXTURED,
+				TooltipRenderUtil.getFrameSprite(style),
+				x0,
+				y0,
+				paddedWidth,
+				paddedHeight,
+				alpha);
 	}
 }
