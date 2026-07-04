@@ -58,12 +58,12 @@ public class AbstractContainerScreenMixin implements PTContainerScreen {
 	private void pin_tooltips$grabItem(
 			GuiGraphicsExtractor graphics,
 			Font font,
-			List<Component> textComponents,
-			Optional<TooltipComponent> tooltipComponent,
+			List<Component> texts,
+			Optional<TooltipComponent> optionalImage,
 			ItemStack stack,
-			int mouseX,
-			int mouseY,
-			@Nullable Identifier backgroundTexture,
+			int xo,
+			int yo,
+			@Nullable Identifier style,
 			Operation<Void> original,
 			@Local(name = "item") ItemStack item) {
 		PinnedTooltip tooltip = PinTooltipsService.INSTANCE.autoPinnedTooltip();
@@ -71,6 +71,6 @@ public class AbstractContainerScreenMixin implements PTContainerScreen {
 			return;
 		}
 		PTGuiGraphics.of(graphics).pin_tooltips$setRenderingItemStack(item);
-		original.call(graphics, font, textComponents, tooltipComponent, stack, mouseX, mouseY, backgroundTexture);
+		original.call(graphics, font, texts, optionalImage, stack, xo, yo, style);
 	}
 }

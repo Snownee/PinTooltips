@@ -89,6 +89,7 @@ dependencies {
 //    implementation("io.github.llamalad7:mixinextras-forge:0.4.1")
 
     runtimeOnly "me.shedaniel.cloth:cloth-config-neoforge:26.1.154"
+    implementation "org.sinytra.forgified-fabric-api:forgified-fabric-api:${forgified_fabric_api_version}"
 
 //    runtimeOnly fg.deobf("maven.modrinth:prism-lib:1.0.5-forge")
 //    runtimeOnly fg.deobf("maven.modrinth:iceberg:1.1.25-forge")

@@ -30,6 +30,11 @@ versionRange="[1.21,)"
 side="CLIENT"
 
 [[dependencies.pin_tooltips]]
+modId="fabric_api"
+versionRange="[0.154.0,)"
+side="CLIENT"
+
+[[dependencies.pin_tooltips]]
 modId="more_enchantment_info"
 type="optional"
 versionRange="[0.2,)"
