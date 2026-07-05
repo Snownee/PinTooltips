@@ -163,7 +163,7 @@ public class PinTooltips {
 				return true;
 			});
 
-			ScreenMouseEvents.afterMouseDrag(screen).register((screen1, event, deltaX, deltaY, consumed) -> {
+			ScreenMouseEvents.allowMouseDrag(screen).register((screen1, event, deltaX, deltaY) -> {
 				if (!shouldShowTooltips(screen1)) {
 					return false;
 				}
@@ -189,7 +189,7 @@ public class PinTooltips {
 				return false;
 			});
 
-			ScreenEvents.afterExtract(screen).register((screen1, context, mouseX, mouseY, deltaTracker) -> {
+			ScreenEvents.afterExtract(screen).register((screen1, context, mouseX, mouseY, _) -> {
 				if (!shouldShowTooltips(screen1)) {
 					return;
 				}
@@ -245,7 +245,7 @@ public class PinTooltips {
 				}
 			});
 
-			ScreenEvents.remove(screen).register(screen1 -> {
+			ScreenEvents.remove(screen).register(_ -> {
 				PinnedTooltip tooltip = service.autoPinnedTooltip();
 				if (tooltip != null) {
 					service.unpin(tooltip);
@@ -253,7 +253,7 @@ public class PinTooltips {
 			});
 		});
 
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> service.clearStates());
+		ClientPlayConnectionEvents.DISCONNECT.register((_, _) -> service.clearStates());
 	}
 
 	private static boolean isBlacklistedScreen(Screen screen) {

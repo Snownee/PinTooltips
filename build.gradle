@@ -16,7 +16,7 @@ base {
 neoForge {
     // We currently only support NeoForge versions later than 21.0.x
     // See https://projects.neoforged.net/neoforged/neoforge for the latest updates
-    version = "26.1.2.50-beta"
+    version = "26.1.2.77"
 
     // Validate AT files and raise errors when they have invalid targets
     // This option is false by default, but turning it on is recommended

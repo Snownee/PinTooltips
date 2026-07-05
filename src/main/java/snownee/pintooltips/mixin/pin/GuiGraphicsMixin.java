@@ -99,7 +99,8 @@ public class GuiGraphicsMixin implements PTGuiGraphics {
 			Operation<Void> original) {
 		if (PinTooltipsService.INSTANCE.hovered == null || pin_tooltips$renderingPinned || pin_tooltips$renderingPinnedEvent) {
 			original.call(font, lines, xo, yo, positioner, style, replaceExisting);
-		} else pin_tooltips$clearRenderingItemStack();
+		}
+		pin_tooltips$clearRenderingItemStack();
 	}
 
 	@WrapOperation(
