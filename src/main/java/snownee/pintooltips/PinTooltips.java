@@ -166,7 +166,7 @@ public class PinTooltips implements ClientModInitializer {
 				return true;
 			});
 
-			ScreenMouseEvents.afterMouseDrag(screen).register((screen1, event, deltaX, deltaY, consumed) -> {
+			ScreenMouseEvents.allowMouseDrag(screen).register((screen1, event, deltaX, deltaY) -> {
 				var focused = service.focused;
 				if (event.button() == InputConstants.MOUSE_BUTTON_LEFT && focused != null) {
 					if (!service.dragging) {
