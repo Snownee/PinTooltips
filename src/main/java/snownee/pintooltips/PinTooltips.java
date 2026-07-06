@@ -74,7 +74,7 @@ public class PinTooltips implements ClientModInitializer {
 	public void onInitializeClient() {
 		var service = PinTooltipsService.INSTANCE;
 		ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
-			if (PinTooltipsConfig.screenBlacklist.contains(screen.getClass().getName())) {
+			if (isBlacklistedScreen(screen)) {
 				return;
 			}
 
@@ -255,6 +255,10 @@ public class PinTooltips implements ClientModInitializer {
 				containerScreen.extractCarriedItem(context, mouseX, mouseY);
 			}
 		}
+	}
+
+	private static boolean isBlacklistedScreen(Screen screen) {
+		return PinTooltipsConfig.screenBlacklist.contains(screen.getClass().getName());
 	}
 
 	private static void validateTranslations() {
