@@ -10,6 +10,7 @@
 		"interact.ScreenMixin",
 		"pin.AbstractContainerScreenMixin",
 		"pin.GuiGraphicsMixin",
+		"pin.ScreenMixin",
 		"pin.TooltipRenderUtilMixin"
 	]
 }

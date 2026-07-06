@@ -189,62 +189,6 @@ public class PinTooltips implements ClientModInitializer {
 				return false;
 			});
 
-			ScreenEvents.afterExtract(screen).register((screen1, context, mouseX, mouseY, _) -> {
-				if (!shouldShowTooltips(screen1)) {
-					return;
-				}
-				// Mouse position is offset to avoid rendering highlights. Re-calculate it.
-				Minecraft mc = Minecraft.getInstance();
-				mouseX = (int) (
-						mc.mouseHandler.xpos()
-								* (double) mc.getWindow().getGuiScaledWidth()
-								/ (double) mc.getWindow().getScreenWidth()
-				);
-				mouseY = (int) (
-						mc.mouseHandler.ypos()
-								* (double) mc.getWindow().getGuiScaledHeight()
-								/ (double) mc.getWindow().getScreenHeight()
-				);
-				if (hasTooltipInThisFrame) {
-					hasTooltipInThisFrame = false;
-					if (lastMouseX != mouseX || lastMouseY != mouseY) {
-						lastMouseX = mouseX;
-						lastMouseY = mouseY;
-						lastMouseMovedTime = System.currentTimeMillis();
-					}
-				} else {
-					lastMouseX = 0;
-					lastMouseY = 0;
-					lastMouseMovedTime = 0;
-				}
-
-				service.hovered = service.findHovered(mouseX, mouseY);
-				var font = mc.font;
-				for (var tooltip : service.tooltips()) {
-					context.pose().pushMatrix();
-					tooltip.render(service, screen1, font, context, mouseX, mouseY);
-					context.pose().popMatrix();
-				}
-				PinnedTooltip autoPinnedTooltip = service.autoPinnedTooltip();
-				if (autoPinnedTooltip != null && autoPinnedTooltip.isHovered() && autoPinnedTooltip != service.hovered) {
-					service.unpin(autoPinnedTooltip);
-				}
-				if (service.hovered != null) {
-					service.hovered.hovered();
-					Component hint;
-					if (!GRAB_KEY.isUnbound() && System.currentTimeMillis() / 2000 % 2 == 0) {
-						hint = Component.translatable("gui.pin_tooltips.clear_hint", GRAB_KEY.getTranslatedKeyMessage());
-					} else {
-						hint = Component.translatable("gui.pin_tooltips.unpin_hint");
-					}
-					context.centeredText(font, hint, screen1.width / 2, 4, 0xAAAAAAAA);
-
-					if (screen1 instanceof AbstractContainerScreen<?> containerScreen) {
-						containerScreen.extractCarriedItem(context, mouseX, mouseY);
-					}
-				}
-			});
-
 			ScreenEvents.remove(screen).register(_ -> {
 				PinnedTooltip tooltip = service.autoPinnedTooltip();
 				if (tooltip != null) {
@@ -254,6 +198,63 @@ public class PinTooltips implements ClientModInitializer {
 		});
 
 		ClientPlayConnectionEvents.DISCONNECT.register((_, _) -> service.clearStates());
+	}
+
+	public static void renderPinnedTooltips(Screen screen, GuiGraphicsExtractor context, int mouseX, int mouseY) {
+		if (!shouldShowTooltips(screen)) {
+			return;
+		}
+		// Mouse position is offset to avoid rendering highlights. Re-calculate it.
+		Minecraft mc = Minecraft.getInstance();
+		mouseX = (int) (
+				mc.mouseHandler.xpos()
+						* (double) mc.getWindow().getGuiScaledWidth()
+						/ (double) mc.getWindow().getScreenWidth()
+		);
+		mouseY = (int) (
+				mc.mouseHandler.ypos()
+						* (double) mc.getWindow().getGuiScaledHeight()
+						/ (double) mc.getWindow().getScreenHeight()
+		);
+		if (hasTooltipInThisFrame) {
+			hasTooltipInThisFrame = false;
+			if (lastMouseX != mouseX || lastMouseY != mouseY) {
+				lastMouseX = mouseX;
+				lastMouseY = mouseY;
+				lastMouseMovedTime = System.currentTimeMillis();
+			}
+		} else {
+			lastMouseX = 0;
+			lastMouseY = 0;
+			lastMouseMovedTime = 0;
+		}
+
+		var service = PinTooltipsService.INSTANCE;
+		service.hovered = service.findHovered(mouseX, mouseY);
+		var font = mc.font;
+		for (var tooltip : service.tooltips()) {
+			context.pose().pushMatrix();
+			tooltip.render(service, screen, font, context, mouseX, mouseY);
+			context.pose().popMatrix();
+		}
+		PinnedTooltip autoPinnedTooltip = service.autoPinnedTooltip();
+		if (autoPinnedTooltip != null && autoPinnedTooltip.isHovered() && autoPinnedTooltip != service.hovered) {
+			service.unpin(autoPinnedTooltip);
+		}
+		if (service.hovered != null) {
+			service.hovered.hovered();
+			Component hint;
+			if (!GRAB_KEY.isUnbound() && System.currentTimeMillis() / 2000 % 2 == 0) {
+				hint = Component.translatable("gui.pin_tooltips.clear_hint", GRAB_KEY.getTranslatedKeyMessage());
+			} else {
+				hint = Component.translatable("gui.pin_tooltips.unpin_hint");
+			}
+			context.centeredText(font, hint, screen.width / 2, 4, 0xAAAAAAAA);
+
+			if (screen instanceof AbstractContainerScreen<?> containerScreen) {
+				containerScreen.extractCarriedItem(context, mouseX, mouseY);
+			}
+		}
 	}
 
 	private static void validateTranslations() {
