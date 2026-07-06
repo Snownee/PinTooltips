@@ -11,6 +11,7 @@
 		"neo.GameRendererMixin",
 		"pin.AbstractContainerScreenMixin",
 		"pin.GuiGraphicsMixin",
+		"pin.ScreenMixin",
 		"pin.TooltipRenderUtilMixin"
 	]
 }
