@@ -27,7 +27,6 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
@@ -41,6 +40,7 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import snownee.pintooltips.duck.PTGuiGraphics;
+import snownee.pintooltips.mixin.accessor.TooltipRenderUtilInvoker;
 import snownee.pintooltips.util.DefaultDescriptions;
 
 public class PinTooltips implements ClientModInitializer {
@@ -380,7 +380,7 @@ public class PinTooltips implements ClientModInitializer {
 		int paddedHeight = h + 3 + 3 + 18;
 		graphics.blitSprite(
 				RenderPipelines.GUI_TEXTURED,
-				TooltipRenderUtil.getFrameSprite(style),
+				TooltipRenderUtilInvoker.callGetFrameSprite(style),
 				x0,
 				y0,
 				paddedWidth,

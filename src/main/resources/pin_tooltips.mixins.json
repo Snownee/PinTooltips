@@ -4,6 +4,9 @@
 	"package": "snownee.pintooltips.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"client": [
+		"accessor.ClientTextTooltipAccessor",
+		"accessor.GuiGraphicsExtractorAccessor",
+		"accessor.TooltipRenderUtilInvoker",
 		"interact.EnchantmentMixin",
 		"interact.ItemStackMixin",
 		"interact.PotionContentsMixin",

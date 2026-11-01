@@ -24,6 +24,7 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import snownee.pintooltips.duck.PTContainerScreen;
 import snownee.pintooltips.duck.PTGuiGraphics;
+import snownee.pintooltips.mixin.accessor.GuiGraphicsExtractorAccessor;
 import snownee.pintooltips.util.DummyHoveredSlot;
 
 public final class PinnedTooltip implements ClientTooltipPositioner {
@@ -123,7 +124,7 @@ public final class PinnedTooltip implements ClientTooltipPositioner {
 
 		if (service.hovered == this && !service.dragging) {
 			layout.visitLines(this, context.textRenderer(GuiGraphicsExtractor.HoveredTextEffects.TOOLTIP_AND_CURSOR));
-			var style = context.hoveredTextStyle;
+			Style style = ((GuiGraphicsExtractorAccessor) context).getHoveredTextStyle();
 			if (style == null) {
 				style = getExtraStyleAt(mouseX, mouseY, font);
 			}

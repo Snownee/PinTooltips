@@ -11,6 +11,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Style;
+import snownee.pintooltips.mixin.accessor.ClientTextTooltipAccessor;
 
 public interface TooltipLayout {
 	int TOOLTIP_PADDING = 3;
@@ -37,7 +38,8 @@ public interface TooltipLayout {
 						(int) tooltip.position().x() + entry.getKey().getX(),
 						(int) tooltip.position().y() + entry.getKey().getY(),
 						parameters,
-						text.text);
+						((ClientTextTooltipAccessor) text).getText()
+				);
 			}
 		}
 	}
