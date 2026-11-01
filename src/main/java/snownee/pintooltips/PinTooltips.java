@@ -36,10 +36,12 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
+import snownee.kiwi.Mod;
 import snownee.pintooltips.duck.PTGuiGraphics;
 import snownee.pintooltips.mixin.pin.TooltipRenderUtilAccess;
 import snownee.pintooltips.util.DefaultDescriptions;
 
+@Mod(PinTooltips.ID)
 public class PinTooltips implements ClientModInitializer {
 	public static final String ID = "pin_tooltips";
 	public static final Logger LOGGER = LogUtils.getLogger();
